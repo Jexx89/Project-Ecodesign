@@ -691,17 +691,17 @@ def update_lay_fig(
 # filter data day 1 - Use Scattergl
 # no filter data day 1 - Use Scatter
 
-test_req_num = "24078" # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+test_req_num = "24086" # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
 test_appl = "HM" # The appliance used for the test: HM or Monotank
-pow_appl = "70" # The power of the appliance in kW: 25, 35, 45, 70, 85, 120
+pow_appl = "45" # The power of the appliance in kW: 25, 35, 45, 70, 85, 120
 fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
-test_num = "N" # The test number. It can be A, B, C, D, etc.
-alg_typ = "6" # The algorithm type/number we use for the tests
+test_num = "A" # The test number. It can be A, B, C, D, etc.
+alg_typ = "1" # The algorithm type/number we use for the tests
 
-Plt_MiPLAN = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_SEEB = "No" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
 Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_DHW = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
 Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
 Plt_PLC = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
@@ -1183,6 +1183,24 @@ elif test_req_num == "24123":
         T_DHW = 55 # DHW Setpoint temperature [°C]
         T_ADD = 5.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "24086":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM45TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 55 # DHW Setpoint temperature [°C]
+        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 11 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "B":
+
+        T_DHW = 54 # DHW Setpoint temperature [°C]
+        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 11 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 
 
 
