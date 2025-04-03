@@ -18,6 +18,9 @@ import plotly.graph_objects as go # importing plotly for plotting figures
 from plotly.offline import plot
 from plotly.subplots import make_subplots # importing subplots to plot several curves in the same graph
 
+import tkinter as tk # importing the GUI toolkit interface
+from tkinter import messagebox
+
 #%% THIS SECTION HAS ALL THE FUNCTIONS THAT ARE USED LATER IN THE SCRIPT
 
 def read_csv_file(path_fol,file_name,dlm):
@@ -234,8 +237,8 @@ def read_df_SEEB_Enr5(dt):
 
     """
 
-    t_str_rec = pd.to_datetime(dt["Date Time"][0],dayfirst="True") # Actual time when we start recording
-    #t_str_rec = pd.to_datetime(dt["Timestamp"][0],dayfirst="True") # Actual time when we start recording
+    # t_str_rec = pd.to_datetime(dt["Date Time"][0],dayfirst="True") # Actual time when we start recording
+    t_str_rec = pd.to_datetime(dt["Timestamp"][0],dayfirst="True") # Actual time when we start recording
     T_in_DHW = dt["T°in DHW [°C]"] # Inlet temperature coming from the grid [°C]
     T_out_avg = dt["T°out TC  [°C]"] # Average outlet temperature for the domestic hot water [°C]
     T_fume = dt["T°Fume [°C]"] # Outlet temperature of the smoke exiting the Heat Master [°C]
@@ -247,7 +250,7 @@ def read_df_SEEB_Enr5(dt):
     
     return t_str_rec,T_in_DHW,T_out_avg,T_fume,flow_DHW_kg,Gas_vol,P_val_in,Pow_cons,Cum_energy
 
-def read_df_microcom(dt):
+def read_df_microcom(dt,pump):
 
     """
     Function to read some columns of the dataframe and store them in a series
@@ -276,6 +279,8 @@ def read_df_microcom(dt):
          An array countaining all the values of the outlet temperature of the smoke exiting the Heat Master or Water Master [°C]
     Burn_mod: series
          An array countaining all the values of the the burning modulation [%]
+    pump: string
+         An array with "yes" or "no" deciding if loading the pump power/speed of MicroCOM
     """
 
     T_sup = dt["Supply [°C]"] # Temperature on the main tank [°C]
@@ -285,7 +290,17 @@ def read_df_microcom(dt):
     T_fume_mc = dt["Flue temp [0,01°C]"] # Temperature on the fume [°C]
     Burn_mod = dt["Actual measured load"] # Burner modulation [%]
 
-    return T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc, Burn_mod
+    if pump == "no":
+
+        return T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc, Burn_mod
+    
+    elif pump == "yes":
+
+        pump_spd_MicroCOM = dt["Pump PWM %(111F)"] # Pump modulation power [%] (Range:0 - 100 %)
+        pump_pwr_MicroCOM = dt["Pump Power W(65F2)"] # Pump power consumed [W] (Range: 0 - 70 W)
+        burner_status = dt["Burner State"] # Status of the burner
+
+        return T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc, Burn_mod, pump_spd_MicroCOM, pump_pwr_MicroCOM, burner_status
 
 def read_df_DHW_sens(dt,appliance):
 
@@ -482,11 +497,15 @@ def read_df_PLC(dt,complete):
         pump_onoff = dt["PUMP"] # Array of 0 and 1 to see if pump is ON or OFF [-]
         pump_stp = dt["PUMP SP"] # Setpoint of the pump. Delta T between T supply and T return [°C]
         pump_speed = dt["PUMP SPEED %"] # Pump speed [%]
+        # volt_burn = dt["VoltageInput"] # Voltage of the XXX [V]
 
         return pump_onoff,pump_stp,pump_speed
 
     if complete == "Yes":
 
+        pump_onoff = dt["PUMP"] # Array of 0 and 1 to see if pump is ON or OFF [-]
+        pump_stp = dt["PUMP SP"] # Setpoint of the pump. Delta T between T supply and T return [°C]
+        pump_speed = dt["PUMP SPEED %"] # Pump speed [%]
         T_sup = dt["SUPPLY DEG"] # Temperature on the main tank [°C]
         T_ret = dt["RETURN DEG"] # Temperature on the pump pipe to cool down the burner [°C]
         T_DHW_stor = dt["DHW DEG"] # Temperature inside the big ballon [°C]
@@ -691,19 +710,33 @@ def update_lay_fig(
 # filter data day 1 - Use Scattergl
 # no filter data day 1 - Use Scatter
 
-test_req_num = "24086" # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-test_appl = "HM" # The appliance used for the test: HM or Monotank
-pow_appl = "45" # The power of the appliance in kW: 25, 35, 45, 70, 85, 120
-fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
-test_num = "A" # The test number. It can be A, B, C, D, etc.
-alg_typ = "1" # The algorithm type/number we use for the tests
+# test_req_num = "24108" # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+# test_appl = "HM" # The appliance used for the test: HM or Monotank
+# pow_appl = "120" # The power of the appliance in kW: 25, 35, 45, 70, 85, 120, 45X, 25X
+# fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
+# test_num = "L" # The test number. It can be A, B, C, D, etc.
+# alg_typ = "11" # The algorithm type/number we use for the tests
 
-Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = "No" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
-Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
-Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-Plt_PLC = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+# Plt_MiPLAN = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+# Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+# Plt_MiCOM = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+# Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+# Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+# Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+
+test_req_num = input("Enter the test request number and: ") # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+test_appl = input("Enter the test appliance type (HM or Monotank): ") # The appliance used for the test: HM or Monotank
+pow_appl = input("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): ") # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
+fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
+test_num = input("Enter the test letter: ") # The test number. It can be A, B, C, D, etc.
+alg_typ = input("Enter the alorithm number: ") # The algorithm type/number we use for the tests
+
+Plt_MiPLAN = input("Plot MicroPLAN data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_SEEB = input("Plot SEEB data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiCOM = input("Plot MicroCOM data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+Plt_DHW = input("Plot FieldLogger data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_Side_T = input("Side temperature data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+Plt_PLC = input("Plot PLC data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 if test_req_num == "23146":
  
@@ -978,7 +1011,7 @@ elif test_req_num == "24074":
     fol_test = test_req_num + test_num
     name_test_descp = fol_test + "_XXL_HM35TC_Algo" + alg_typ
 
-    if test_num == "B" or test_num == "C" or test_num == "D" or test_num == "E" or test_num == "F" or test_num == "G":
+    if test_num == "B" or test_num == "C" or test_num == "D" or test_num == "E" or test_num == "F" or test_num == "G" or test_num == "H":
 
         T_DHW = 55 # DHW Setpoint temperature [°C]
         T_ADD = 8.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
@@ -1165,7 +1198,36 @@ elif test_req_num == "24122":
         T_DHW = 52 # DHW Setpoint temperature [°C]
         T_ADD = 8 # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    
+    elif test_num == "G" or test_num == "H":
 
+        T_DHW = 52 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "I":
+
+        T_DHW = 52 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "J":
+
+        T_DHW = 52 # DHW Setpoint temperature [°C]
+        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "K" or test_num == "O" or test_num == "P" or test_num == "Q":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "M" or test_num == "N":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "24123":
 
@@ -1184,6 +1246,29 @@ elif test_req_num == "24123":
         T_ADD = 5.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+elif test_req_num == "24091":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM25TC_Algo" + alg_typ
+
+    if test_num == "A" or test_num == "B":
+
+        T_DHW = 55 # DHW Setpoint temperature [°C]
+        T_ADD = 5.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "C":
+
+        T_DHW = 54 # DHW Setpoint temperature [°C]
+        T_ADD = 4.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "D":
+
+        T_DHW = 54 # DHW Setpoint temperature [°C]
+        T_ADD = 4.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 elif test_req_num == "24086":
 
     fol_test = test_req_num + test_num
@@ -1192,17 +1277,306 @@ elif test_req_num == "24086":
     if test_num == "A":
 
         T_DHW = 55 # DHW Setpoint temperature [°C]
-        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_ADD = 6.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 11 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
     elif test_num == "B":
 
         T_DHW = 54 # DHW Setpoint temperature [°C]
-        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_ADD = 6.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 11 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    elif test_num == "C":
 
+        T_DHW = 54 # DHW Setpoint temperature [°C]
+        T_ADD = 5.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 10 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    elif test_num == "D":
+
+        T_DHW = 54 # DHW Setpoint temperature [°C]
+        T_ADD = 5.5 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 12 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "24108":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM120TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "B":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 10 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "C":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 11 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "D":
+
+        T_DHW = 52 # DHW Setpoint temperature [°C]
+        T_ADD = 11 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "E":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 19 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and24108 the starting of the burner [°C]
+
+    elif test_num == "F":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 19 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "G":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 18 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    # elif test_num == "H": # Day 1
+
+    #     T_DHW = 49 # DHW Setpoint temperature [°C]
+    #     T_ADD = 18 # This is the delta T between the T_CH and T_DHW_SP [°C]
+    #     T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "H":  # Day 2 and 3
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 17 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "I":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "J" or test_num == "K":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 21 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "L" or test_num == "M":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 21 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "N":
+
+        T_DHW = 48 # DHW Setpoint temperature [°C]
+        T_ADD = 20 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "O":
+
+        T_DHW = 48 # DHW Setpoint temperature [°C]
+        T_ADD = 18 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "P":
+
+        T_DHW = 48 # DHW Setpoint temperature [°C]
+        T_ADD = 16 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "24082":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM45XTC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "B" or test_num == "C" or test_num == "D":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "24092":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM25XTC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "B" or test_num == "C":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "D" or test_num == "E":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25017":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM120TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 21 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25021":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM85TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    
+    elif test_num == "B" or test_num == "D":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 15 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "C":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 13 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "E":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 15 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "F":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 16 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "G" or test_num == "H" or test_num == "M" or test_num == "N":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 14 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "I":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 8 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "J":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "K":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 10 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 10 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "L":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 9 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 14 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "O" or test_num == "P" or test_num == "Q":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 15 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 10 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "R" or test_num == "S":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 15 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "T" or test_num == "U":
+
+        T_DHW = 49 # DHW Setpoint temperature [°C]
+        T_ADD = 15 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25027":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM70TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25013":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM60TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 13 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25028":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM60TC_Algo" + alg_typ
+
+    if test_num == "A" or test_num == "B" or test_num == "C":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 12 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "D" or test_num == "E" or test_num == "F":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 13 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    elif test_num == "G":
+
+        T_DHW = 51 # DHW Setpoint temperature [°C]
+        T_ADD = 13 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    
+    elif test_num == "H" or test_num == "I":
+
+        T_DHW = 50 # DHW Setpoint temperature [°C]
+        T_ADD = 13 # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8 # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 test_descp_miplan = "Microplan_Log" # Microplan test description
 test_descp_micom = "Microcom" # Microcom test description
@@ -1292,14 +1666,15 @@ if Plt_SEEB == "Yes":
 
 if Plt_MiCOM == "Yes":
 
-    T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod = read_df_microcom(dt_microcom) # Storing the MICROCOM
+    # T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod = read_df_microcom(dt_microcom,"no") # Storing the MICROCOM
+    T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod,pump_speed_mCOM,pump_pwr_MicroCOM,burner_status = read_df_microcom(dt_microcom,"yes") # Storing the MICROCOM
 
 if Plt_DHW == "Yes":
 
     # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"Normal") # Storing the DHW data
     # T1, T2, T3, T4, T5, T6, T7, T8 = read_df_DHW_sens(dt_DHW,"Monotank") # Storing the DHW data
-    T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"45TC") # Storing the DHW data
-    # T1, T2, T3, T4, T5, T6, T7 = read_df_DHW_sens(dt_DHW,"70TC") # Storing the DHW data
+    # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"45TC") # Storing the DHW data
+    T1, T2, T3, T4, T5, T6, T7 = read_df_DHW_sens(dt_DHW,"70TC") # Storing the DHW data
 
 if Plt_Side_T == "Yes":
 
@@ -1310,8 +1685,8 @@ if Plt_Side_T == "Yes":
 
 if Plt_PLC == "Yes":
 
-    pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"No") # Storing the PLC data
-    # T_sup_PLC,T_ret_PLC,T_DHW_stor_PLC,Flame_current_PLC,T_fume_mc_PLC,Burn_mod_PLC,pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"Yes") # Storing the PLC data
+    # pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"No") # Storing the PLC data
+    T_sup_PLC,T_ret_PLC,T_DHW_stor_PLC,Flame_current_PLC,T_fume_mc_PLC,Burn_mod_PLC,pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"Yes") # Storing the PLC data
 
 #%% THIS SECTION TIME SCALE THE DHW AND MICROCOM DATASET IN ORDER TO
 # PLOT THEM WITH THE CORRECT TIME DELAY AND MATCH THE MICROPLAN DATASET
@@ -1341,8 +1716,8 @@ if Plt_MiPLAN == "Yes":
 if Plt_SEEB == "Yes":
 
     # # add_cor_time_SEEB = res_timing(dt_SEEB,"Unnamed: 0",t_st_rec_SEEB)
-    add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Date Time",t_st_rec_SEEB)
-    #add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Timestamp",t_st_rec_SEEB)
+    # add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Date Time",t_st_rec_SEEB)
+    add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Timestamp",t_st_rec_SEEB)
 
     if Plt_MiCOM == "Yes":
 
@@ -1448,8 +1823,8 @@ if Plt_MiPLAN == "Yes":
 if Plt_SEEB == "Yes":
 
     # # rec_time_dt = pd.to_datetime(dt_SEEB["Unnamed: 0"],dayfirst="True") # Recording time array
-     rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Date Time"],dayfirst="True") # Recording time array
-    #rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Timestamp"],dayfirst="True") # Recording time array
+    # rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Date Time"],dayfirst="True") # Recording time array
+    rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Timestamp"],dayfirst="True") # Recording time array
 
 
 st_y = str(rec_time_dt.dt.year[0]) # Year when we start recording
@@ -1467,12 +1842,18 @@ T_CH = T_DHW_SP + T_ADD # This is the temperature setpoint for CH or primary wat
 
 Burn_ON = np.ones(len(T_out_avg))*(T_DHW_SP - T_HYS)
 
-T_45 = np.ones(len(T_out_avg))*45 # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
 T_30 = np.ones(len(T_out_avg))*30 # This is a straight line at 30 [°C] to see when we are below the delta T requested from the norm
+T_45 = np.ones(len(T_out_avg))*45 # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
+T_55 = np.ones(len(T_out_avg))*55 # This is a straight line at 55 [°C] to see if T OUT is above or below this treshold
 
-delta_T_req = T_out_avg - T_in_DHW # Delta T required by the norm between T DHW out and T DHW [°C]
-delta_T_boil = T_sup - T_ret # Delta T between T supply and T of the pump [°C]
-# delta_T_boil_PLC = T_sup_PLC - T_ret_PLC # Delta T between T supply and T of the pump [°C]
+if Plt_MiPLAN == "Yes" or Plt_SEEB == "Yes":
+    delta_T_req = T_out_avg - T_in_DHW # Delta T required by the norm between T DHW out and T DHW [°C]
+
+if Plt_MiCOM == "Yes":
+    delta_T_boil = T_sup - T_ret # Delta T between T supply and T of the pump [°C]
+
+if Plt_PLC == "Yes":
+    delta_T_boil_PLC = T_sup_PLC - T_ret_PLC # Delta T between T supply and T of the pump [°C]
 
 #%% THIS SECTION SETS SOME PARAMETERS FOR THE PLOTTING CURVE
 
@@ -1525,7 +1906,7 @@ if Plt_MiPLAN == "Yes":
     trace_fig(add_cor_time_miPLAN,T_out_avg,"miPLAN","microPLAN","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_out_PT100,"miPLAN","microPLAN","T out PT100 [°C]","maroon",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_out_TC1,"miPLAN","microPLAN","T out TC1 [°C]","olivedrab",False,op_main_lin,lin_typ_1)
-    trace_fig(add_cor_time_miPLAN,T_out_TC2,"miPLAN","microPLAN","T out TC2 [°C]","bisque",False,op_main_lin,lin_typ_1)
+    # trace_fig(add_cor_time_miPLAN,T_out_TC2,"miPLAN","microPLAN","T out TC2 [°C]","bisque",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_out_TC3,"miPLAN","microPLAN","T out TC3 [°C]","fuchsia",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_fume,"miPLAN","microPLAN","T fume MP[°C]","gray",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,flow_DHW_L,"miPLAN","microPLAN","FLDHW [L/min]","lightgreen",False,op_main_lin,lin_typ_1)
@@ -1562,25 +1943,32 @@ if Plt_MiCOM == "Yes":
     trace_fig(add_cor_time_miCOM,T_fume_mc,"miCOM","microCOM","T fume MC[°C]","darkblue",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,Burn_mod,"miCOM","microCOM","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,delta_T_boil,"miCOM","microCOM","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_miCOM,pump_speed_mCOM,"miCOM","microCOM","Pump modulation [%]","mediumslateblue",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_miCOM,pump_pwr_MicroCOM,"miCOM","microCOM","Pump power consumed [W]","mediumspringgreen",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_miCOM,burner_status,"miCOM","microCOM","Burner status","tomato",False,op_main_lin,lin_typ_1)
+    
+    burner_status
 
 trace_fig(add_time_set,T_CH,"Set","Settings","T CH STP [°C]","orange",False,op_sec_lin,lin_type_2) 
 trace_fig(add_time_set,Burn_ON,"Set","Settings","T BURN ON [°C]","purple",False,op_sec_lin,lin_type_2)
 trace_fig(add_time_set,T_DHW_SP,"Set","Settings","T DHW Setpoint [°C]","red",False,op_sec_lin,lin_type_2)
 trace_fig(add_time_set,T_30,"Set","Settings","T = 30 [°C]","black",False,op_sec_lin,lin_type_2)
 trace_fig(add_time_set,T_45,"Set","Settings","T = 45 [°C]","black",False,op_sec_lin,lin_type_2)
+trace_fig(add_time_set,T_55,"Set","Settings","T = 55 [°C]","black",False,op_sec_lin,lin_type_2)
 
 if Plt_PLC == "Yes":
 
     trace_fig(add_cor_time_PLC,pump_onoff,"PLC","PLC","ON/OFF Pump","mediumpurple",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_PLC,pump_stp,"PLC","PLC","Pump setpoint [°C]","mediumslateblue",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_PLC,pump_speed,"PLC","PLC","Pump speed [%]","mediumvioletred",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,T_sup_PLC,"PLC","PLC","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,T_ret_PLC,"PLC","PLC","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,T_DHW_stor_PLC,"PLC","PLC","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,Flame_current_PLC,"PLC","PLC","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,T_fume_mc_PLC,"PLC","PLC","T fume MC[°C]","darkblue",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,Burn_mod_PLC,"PLC","PLC","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_PLC,delta_T_boil_PLC,"PLC","PLC","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
+    # trace_fig(add_cor_time_PLC,volt_flame_burn,"PLC","PLC","Voltage PLC [V]","rosybrown",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,T_sup_PLC,"PLC","PLC","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,T_ret_PLC,"PLC","PLC","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,T_DHW_stor_PLC,"PLC","PLC","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,Flame_current_PLC,"PLC","PLC","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,T_fume_mc_PLC,"PLC","PLC","T fume MC[°C]","darkblue",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,Burn_mod_PLC,"PLC","PLC","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_PLC,delta_T_boil_PLC,"PLC","PLC","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
 
 if Plt_DHW == "Yes":
 
@@ -1589,9 +1977,9 @@ if Plt_DHW == "Yes":
     trace_fig(add_cor_time_DHW,T3,"DHW","DHW","T3 [°C]","coral",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_DHW,T4,"DHW","DHW","T4 [°C]","pink",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_DHW,T5,"DHW","DHW","T5 [°C]","purple",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_DHW,T6,"DHW","DHW","T6 [°C]","moccasin",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_DHW,T7,"DHW","DHW","T7 [°C]","navy",False,op_main_lin,lin_typ_1)
-    # # trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_DHW,T6,"DHW","DHW","T6 [°C]","moccasin",False,op_main_lin,lin_typ_1)
+    trace_fig(add_cor_time_DHW,T7,"DHW","DHW","T7 [°C]","navy",False,op_main_lin,lin_typ_1)
+    # trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
 
 if Plt_Side_T == "Yes":
 
