@@ -30,14 +30,73 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 
 # %% THIS SECTION LOADS THE DIFFERENT ARRAYS
 
+# test_num = [["HM", "70kW", "HM70TC", "24078", "C", 2, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "24078", "D", 2, "SEEB", 0]]
+
 # test_num = [["HM", "70kW", "HM70TC", "24078", "O", 6, "SEEB", 267],
 #             ["HM", "70kW", "HM70TC", "24078", "P", 6, "SEEB", 0]]
 
-# test_num = [["HM", "70kW", "HM70TC", "24078", "N", 6, "SEEB", 1283],
-#             ["HM", "70kW", "HM70TC", "24122", "B", 2, "SEEB", 0]]
+# test_num = [["HM", "70kW", "HM70TC", "24078", "N", 6, "SEEB", 716],
+#             ["HM", "70kW", "HM70TC", "24122", "E", 1, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "24122", "F", 4, "SEEB", -330],
+#             ["HM", "70kW", "HM70TC", "24122", "G", 5, "SEEB", -388]]
 
-test_num = [["HM", "35kW", "HM35TC", "24123", "A", 1, "microPLAN", 0],
-            ["HM", "35kW", "HM35TC", "24123", "B", 2, "microPLAN", 0]]
+# test_num = [["HM", "70kW", "HM70TC", "24122", "A", 1, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "24122", "B", 2, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "24122", "C", 1, "SEEB", 0]]
+
+# test_num = [["HM", "70kW", "HM70TC", "24078", "N", 6, "SEEB", 515],
+#             ["HM", "70kW", "HM70TC", "24122", "J", 7, "SEEB", 0]]
+
+# test_num = [["HM", "70kW", "HM70TC", "24122", "G", 5, "SEEB", 334],
+#             ["HM", "70kW", "HM70TC", "24122", "Q", 9, "SEEB", 0]]
+
+# test_num = [["HM", "120kW", "HM120TC", "24108", "A", 1, "microPLAN", 0],
+#             ["HM", "120kW", "HM120TC", "24108", "B", 2, "microPLAN", 0]]
+
+# test_num = [["HM", "45XkW", "HM45XTC", "24082", "A", 1, "SEEB", 0],
+#             ["HM", "45XkW", "HM45XTC", "24082", "B", 2, "SEEB", 552]]   #591 to have tapping sincronised
+
+# test_num = [["HM", "45XkW", "HM45XTC", "24077", "K", 6, "microPLAN", 100],
+#             ["HM", "45XkW", "HM45XTC", "24077", "L", 7, "microPLAN", 0],
+#             ["HM", "45XkW", "HM45XTC", "24082", "B", 2, "SEEB", 3256]]
+
+# test_num = [["HM", "25XkW", "HM25XTC", "24092", "C", 1, "SEEB", 474],
+#             ["HM", "25XkW", "HM25XTC", "24092", "D", 3, "SEEB", 0]]
+
+# test_num = [["HM", "120kW", "HM120TC", "24108", "C", 3, "microPLAN", 0], 
+#             ["HM", "120kW", "HM120TC", "24108", "D", 4, "microPLAN", 0]]
+
+# test_num = [["HM", "120kW", "HM120TC", "24108", "J", 9, "microPLAN", 0], 
+#             ["HM", "120kW", "HM120TC", "24108", "K", 10, "microPLAN", 54]] 
+
+# test_num = [["HM", "120kW", "HM120TC", "24108", "L", 11, "microPLAN", 0], 
+#             ["HM", "120kW", "HM120TC", "25017", "A", 1, "microPLAN", 70]] 
+
+# test_num = [["HM", "120kW", "HM120TC", "24108", "L", 11, "microPLAN", 0], 
+#             ["HM", "120kW", "HM120TC", "24108", "M", 11, "SEEB", 657],
+#             ["HM", "120kW", "HM120TC", "25017", "A", 1, "microPLAN", 70]] 
+
+# test_num = [["HM", "85kW", "HM85TC", "25021", "B", 2, "microPLAN", 0],
+#             ["HM", "85kW", "HM85TC", "25021", "C", 3, "microPLAN", 0]]
+
+# test_num = [["HM", "85kW", "HM85TC", "25021", "B", 2, "microPLAN", 10],
+#             ["HM", "85kW", "HM85TC", "25021", "D", 2, "microPLAN", 0],
+#             ["HM", "85kW", "HM85TC", "25021", "E", 4, "microPLAN", -38]]
+
+#TO SINC THE BURNER OF THE FIRST CYCLE USE THE FOLLOWING SECONDS: 80 - 70 - 32
+
+# test_num = [["HM", "85kW", "HM85TC", "25021", "H", 7, "microPLAN", 0],
+#             ["HM", "85kW", "HM85TC", "25021", "M", 7, "microPLAN", 0]]
+
+# test_num = [["HM", "85kW", "HM85TC", "25021", "O", 11, "microPLAN", 0],
+#             ["HM", "85kW", "HM85TC", "25021", "P", 12, "microPLAN", 36]]
+
+# test_num = [["HM", "85kW", "HM85TC", "25021", "P", 12, "microPLAN", 20],
+#             ["HM", "85kW", "HM85TC", "25021", "Q", 13, "microPLAN", 0]]
+
+# test_num = [["HM", "25XkW", "HM25XTC", "24079", "C", 3, "microPLAN", 0],
+#             ["HM", "25XkW", "HM25XTC", "24092", "E", 4, "SEEB", 2052]]
 
 ####KIWA tests
 # test_num = [["HM", "35kW", "HM35TC", "24074", "B", 3, "microPLAN", 704],
@@ -48,6 +107,28 @@ test_num = [["HM", "35kW", "HM35TC", "24123", "A", 1, "microPLAN", 0],
 
 # test_num = [["HM", "45XkW", "HM45XTC", "24077", "C", 3, "microPLAN", 0],
 #             ["HM", "45XkW", "HM45XTC", "24077", "D", 3, "microPLAN", 0]]
+
+# test_num = [["HM", "60kW", "HM60TC", "25028", "D", 4, "SEEB", 207],
+#             ["HM", "60kW", "HM60TC", "25028", "E", 5, "SEEB", 0]]
+
+# test_num = [["HM", "60kW", "HM60TC", "25028", "E", 5, "SEEB", 0],
+#             ["HM", "60kW", "HM60TC", "25028", "F", 6, "SEEB", 264]]
+
+# test_num = [["HM", "60kW", "HM60TC", "25028", "F", 6, "SEEB", 155],
+#             ["HM", "60kW", "HM60TC", "25028", "G", 7, "SEEB", 0]]
+
+# test_num = [["HM", "60kW", "HM60TC", "25028", "I", 8, "SEEB", 924],
+#             ["HM", "60kW", "HM60TC", "25013", "A", 1, "microPLAN", 0]]
+
+test_num = [["HM", "85kW", "HM85TC", "25021", "T", 15, "microPLAN", 0],
+            ["HM", "85kW", "HM85TC", "25021", "U", 16, "SEEB", 606]]
+
+Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+Plt_DHW = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+Plt_PLC = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 microPLAN_data_prm_ax = [
     ["_Test_T_in_DHW","T°in DHW [°C]"], # Inlet temperature coming from the grid [°C]
@@ -63,11 +144,12 @@ microCOM_data_prm_ax = [
     ["_Test_T_DHW_stor_t","DHW stor (°C)"], # Temperature inside the big ballon [°C]
     ["_Test_Flame_current","Flame Curent [uA]"], # Flame current [A] * 10^-6
     ["_Test_T_fume_mCOM","Flue temp [0,01°C]"], # Temperature on the fume [°C]
-    ["_Test_Burn_mod","Actual measured load"], # Burner modulation
+    ["_Test_Burn_mod","Actual measured load"] # Burner modulation
 ] # Vector names of microCOM to be loaded and plotted on the primary axes
 
 microPLAN_data_scd_ax = [
     ["_Test_Gas_vol_consp","Cumul. Gaz Vol. Corr.[L]"], # Volume of gas consumption [L]
+    # ["_Test_Power_consp","Power Absorbed [W]"], # Energy consumption of the whole electronic: fan, pump and boards [W]
     ["_Test_P_valv_in","pin DHW [bar]"] # Pressure of the inlet valve [bar]
 ] # Vector names to be loaded on the secondary axes
 
@@ -147,14 +229,14 @@ side_T_data = [
 
 
 PLC_data = [
-    ["_Test_T_sup","SUPPLY DEG"],
-    ["_Test_T_ret","RETURN DEG"],
-    ["_Test_T_DHW_stor_t","DHW DEG"],
-    ["_Test_Flame_current","FLAME µA"],
-    ["_Test_T_fume_PLC","FLUE DEG"],
-    ["_Test_Burn_mod","MICROCOM Mod."],
-    # ["_Test_ON/OFF Pump","PUMP"],
-    # ["_Test_Pump setpoint [°C]","PUMP SP"],
+    # ["_Test_T_sup","SUPPLY DEG"],
+    # ["_Test_T_ret","RETURN DEG"],
+    # ["_Test_T_DHW_stor_t","DHW DEG"],
+    # ["_Test_Flame_current","FLAME µA"],
+    # ["_Test_T_fume_PLC","FLUE DEG"],
+    # ["_Test_Burn_mod","MICROCOM Mod."],
+    ["_Test_ON/OFF Pump","PUMP"],
+    ["_Test_Pump setpoint [°C]","PUMP SP"],
     ["_Test_Pump speed [%]","PUMP SPEED %"]
 ]
 
@@ -266,17 +348,17 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
         
     elif i[6] == "SEEB":
 
-        # dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Timestamp"]
-        dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Date Time"]
+        dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Timestamp"]
+        # dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Date Time"]
         # dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Unnamed: 0"]
 
-        # day_0 = pd.to_datetime(dt_SEEB["Timestamp"][0],dayfirst="True")
-        day_0 = pd.to_datetime(dt_SEEB["Date Time"][0],dayfirst="True")
+        day_0 = pd.to_datetime(dt_SEEB["Timestamp"][0],dayfirst="True")
+        # day_0 = pd.to_datetime(dt_SEEB["Date Time"][0],dayfirst="True")
         # day_0 = pd.to_datetime(dt_SEEB["Unnamed: 0"][0],dayfirst="True")
 
         # dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Unnamed: 0",day_0,i[7])
-        dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Date Time",day_0,i[7])
-        # dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Timestamp",day_0,i[7])
+        # dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Date Time",day_0,i[7])
+        dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Timestamp",day_0,i[7])
     
     dict_stor_time_ax["Time_microCOM"] = dt_microCOM["Time DMY"]
     # dict_stor_time_ax["Time_DHW_sens"] = dt_DHW["Date-Time"]

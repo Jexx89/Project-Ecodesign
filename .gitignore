@@ -1,1 +1,3 @@
 HM/
+__pycache__/
+*.html

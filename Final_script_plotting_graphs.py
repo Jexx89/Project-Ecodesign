@@ -833,6 +833,14 @@ def update_lay_fig(
     fig.update_layout(legend=dict(groupclick="toggleitem"))
 
 
+def align_input_user(s: str) -> str:
+    spacementForAnswer = 65
+    x = 0
+    if len(s) < spacementForAnswer:
+        x = spacementForAnswer - len(s)
+    return s + (" " * x)
+
+
 # %% THIS SECTION SET THE INPUT PARAMETERS FOR READING CSV FILES
 
 # filter data day 1 - Use Scattergl
@@ -852,11 +860,6 @@ def update_lay_fig(
 # Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
 # Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
 # Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
-def align_input_user(s: str):
-    x = 0
-    if len(s) < 65:
-        x = 65 - len(s)
-    return s + (" " * x)
 
 
 negativeAnswer = ("NO", "NON", "N", "", "0")
