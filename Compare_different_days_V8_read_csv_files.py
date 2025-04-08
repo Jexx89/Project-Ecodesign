@@ -739,6 +739,13 @@ update_lay_fig(
     "Comparison Tests",
     18
 )
+folderName = "Comparaison" + os.sep
 
-plot(fig, filename = "Comparison_Tests.html")
+def file_name_generation()->str:
+    concatenate=""
+    for x in test_num:
+        concatenate += x[3] +"_" + x[4] + "_"
+    return concatenate
+
+plot(fig, filename = folderName + file_name_generation() + "Comparison_Tests.html")
 # # plot(fig, filename = path + os.sep + name_test_descp + date_test_dur + ".html")
