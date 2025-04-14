@@ -724,19 +724,19 @@ def update_lay_fig(
 # Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
 # Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
-test_req_num = input("Enter the test request number and: ") # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+test_req_num = input("Enter the test request number: ") # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
 test_appl = input("Enter the test appliance type (HM or Monotank): ") # The appliance used for the test: HM or Monotank
 pow_appl = input("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): ") # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
 fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
 test_num = input("Enter the test letter: ") # The test number. It can be A, B, C, D, etc.
 alg_typ = input("Enter the alorithm number: ") # The algorithm type/number we use for the tests
 
-Plt_MiPLAN = input("Plot MicroPLAN data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = input("Plot SEEB data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
-Plt_MiCOM = input("Plot MicroCOM data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = input("Plot FieldLogger data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
-Plt_Side_T = input("Side temperature data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-Plt_PLC = input("Plot PLC data? Yes or No: ") # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+Plt_MiPLAN = input("Plot MicroPLAN data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_SEEB = input("Plot SEEB data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiCOM = input("Plot MicroCOM data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+Plt_DHW = input("Plot FieldLogger data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_Side_T = input("Side temperature data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+Plt_PLC = input("Plot PLC data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 if test_req_num == "23146":
  
@@ -1599,50 +1599,30 @@ compl_path = fol_appl + fol_test # complete path where we saved the csv file of 
 # get the start time
 st = time.time()
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
     
     dt_microplan = read_csv_file(compl_path,name_test_miplan,",")
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
     
     # dt_SEEB = read_csv_file(compl_path,name_test_SEEB,"\t")
     dt_SEEB_Enr5 = read_csv_file(compl_path,name_test_SEEB_Enr5,",")
 
-if Plt_MiCOM == "Yes":
+if Plt_MiCOM == "y":
 
     dt_microcom = read_csv_file(compl_path,name_test_micom,",")
 
-if Plt_DHW == "Yes":
+if Plt_DHW == "y":
 
     dt_DHW = read_csv_file(compl_path,name_test_DHW,",")
 
-if Plt_Side_T == "Yes":
+if Plt_Side_T == "y":
 
     dt_side_T = read_csv_file(compl_path,name_test_side_T,",")
 
-if Plt_PLC == "Yes":
+if Plt_PLC == "y":
 
     dt_PLC = read_csv_file(compl_path,name_test_PLC,",")
-
-# if test_req_num == "23146" and test_num == "C":
-    
-#     # dt_microplan = read_csv_file(compl_path,name_test_miplan,",").dropna() # since the test is broken, there are sone NaN value. When we do the resampling time, pyhton explode
-#     dt_SEEB_Enr5 = read_csv_file(compl_path,name_test_SEEB_Enr5,",").dropna()
-#     # dt_SEEB = read_csv_file(compl_path,name_test_SEEB,"\t").dropna()
-#     dt_microcom = read_csv_file(compl_path,name_test_micom,",").dropna()
-#     dt_DHW = read_csv_file(compl_path,name_test_DHW,",").dropna()
-#     # dt_side_T = read_csv_file(compl_path,name_test_side_T,",").dropna()
-#     dt_PLC = read_csv_file(compl_path,name_test_PLC,",").dropna()
-
-# else:
-
-#     # dt_microplan = read_csv_file(compl_path,name_test_miplan,",")
-#     dt_SEEB_Enr5 = read_csv_file(compl_path,name_test_SEEB_Enr5,",")
-#     # dt_SEEB = read_csv_file(compl_path,name_test_SEEB,"\t")
-#     dt_microcom = read_csv_file(compl_path,name_test_micom,",")
-#     dt_DHW = read_csv_file(compl_path,name_test_DHW,",")
-#     # dt_side_T = read_csv_file(compl_path,name_test_side_T,",")
-#     dt_PLC = read_csv_file(compl_path,name_test_PLC,",")
 
 # get the end time
 et_rd_df = time.time()
@@ -1654,36 +1634,36 @@ print("Finish reading data in " + str(rd_time) + " seconds")
 
 #%% THIS SECTION READ THE CSV DATA AND STORE THEIR VALUES IN DIFFERENT ARRAYS
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     t_st_rec_miplan,T_in_DHW,T_out_avg,T_out_PT100,T_out_TC1,T_out_TC2,T_out_TC3,T_fume,flow_DHW_kg,flow_DHW_L,Gas_vol,P_valv_in,Pow_cons,Cum_energy = read_df_microplan(
                                                                     dt_microplan)
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
 
     # t_st_rec_SEEB,T_in_DHW,T_out_avg,T_fume,flow_valve_1_L,flow_valve_2_L,P_val_in,By_pass_val_ON,Tap_val_ON,Gas_vol,Gas_counter_L = read_df_SEEB(dt_SEEB)
     t_st_rec_SEEB,T_in_DHW,T_out_avg,T_fume,flow_kg,Gas_vol,P_val_in,Pow_cons,Cum_energy = read_df_SEEB_Enr5(dt_SEEB_Enr5)
 
-if Plt_MiCOM == "Yes":
+if Plt_MiCOM == "y":
 
     # T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod = read_df_microcom(dt_microcom,"no") # Storing the MICROCOM
     T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod,pump_speed_mCOM,pump_pwr_MicroCOM,burner_status = read_df_microcom(dt_microcom,"yes") # Storing the MICROCOM
 
-if Plt_DHW == "Yes":
+if Plt_DHW == "y":
 
     # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"Normal") # Storing the DHW data
     # T1, T2, T3, T4, T5, T6, T7, T8 = read_df_DHW_sens(dt_DHW,"Monotank") # Storing the DHW data
     # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"45TC") # Storing the DHW data
     T1, T2, T3, T4, T5, T6, T7 = read_df_DHW_sens(dt_DHW,"70TC") # Storing the DHW data
 
-if Plt_Side_T == "Yes":
+if Plt_Side_T == "y":
 
     # CH1, CH2, CH3, CH4 = read_df_side_T(dt_side_T) # Storing the side temperature data
     CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9 = read_df_side_T(dt_side_T) # Storing the side temperature data
     # CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9, CH10, CH11, CH12, CH13, CH14, = read_df_side_T(dt_side_T) # Storing the side temperature data
     # CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9, CH10, CH11, CH12, CH13, CH14, CH15, CH16, = read_df_side_T(dt_side_T) # Storing the side temperature data
 
-if Plt_PLC == "Yes":
+if Plt_PLC == "y":
 
     # pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"No") # Storing the PLC data
     T_sup_PLC,T_ret_PLC,T_DHW_stor_PLC,Flame_current_PLC,T_fume_mc_PLC,Burn_mod_PLC,pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"Yes") # Storing the PLC data
@@ -1692,135 +1672,56 @@ if Plt_PLC == "Yes":
 # PLOT THEM WITH THE CORRECT TIME DELAY AND MATCH THE MICROPLAN DATASET
 
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     add_cor_time_miPLAN = res_timing(dt_microplan,"Timestamp",t_st_rec_miplan)
 
-    if Plt_MiCOM == "Yes":
+    if Plt_MiCOM == "y":
         
         add_cor_time_miCOM = res_timing(dt_microcom,"Time DMY",t_st_rec_miplan)
 
-    if Plt_DHW == "Yes":
+    if Plt_DHW == "y":
         
         add_cor_time_DHW = res_timing(dt_DHW,"Date-Time",t_st_rec_miplan)
 
-    if Plt_Side_T == "Yes":
+    if Plt_Side_T == "y":
         
         add_cor_time_side_T = res_timing(dt_side_T,"Date&Time",t_st_rec_miplan)
 
-    if Plt_PLC == "Yes":
+    if Plt_PLC == "y":
 
         add_cor_time_PLC = res_timing(dt_PLC,"DATE-TIME",t_st_rec_miplan)
 
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
 
     # # add_cor_time_SEEB = res_timing(dt_SEEB,"Unnamed: 0",t_st_rec_SEEB)
     # add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Date Time",t_st_rec_SEEB)
     add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Timestamp",t_st_rec_SEEB)
 
-    if Plt_MiCOM == "Yes":
+    if Plt_MiCOM == "y":
 
         add_cor_time_miCOM = res_timing(dt_microcom,"Time DMY",t_st_rec_SEEB)
 
-    if Plt_DHW == "Yes":
+    if Plt_DHW == "y":
 
         add_cor_time_DHW = res_timing(dt_DHW,"Date-Time",t_st_rec_SEEB)
 
-    if Plt_Side_T == "Yes":
+    if Plt_Side_T == "y":
 
         add_cor_time_side_T = res_timing(dt_side_T,"Date&Time",t_st_rec_SEEB)
 
-    if Plt_PLC == "Yes":
+    if Plt_PLC == "y":
 
         add_cor_time_PLC = res_timing(dt_PLC,"DATE-TIME",t_st_rec_SEEB)
 
-
-#%% THIS SECTION DIVIDE THE TIME VECTOR IN THE DIFFERENT DAYS
-
-"""
-
-# a = rec_time_dt
-# a.dt.day
-# a2 = a.apply(lambda dt: dt.replace(day=25))    # this is to change day if we have a dt
-
-a = pd.to_datetime(add_cor_time_miPLAN,dayfirst="True") # convert list to DatetimeIndex
-
-""""Programma generale""""
-a1 = (a.hour*60+a.minute)*60 + a.second
-a2 = np.where(a1 == 0) # controllo a che positione si trova mezzanotte
-a3 = np.asanyarray(a2) # make a2 a vector
-a4 = a3.ravel # make the vector 1D
-days = max(a.day - a.day[0]) # numero di giorni totali
-len(a2[0]) == days # check per controllare che non abbaimo perso valori. Magari 00:00:00 non è stato registrato
-# len(a4) == days # check per controllare che non abbaimo perso valori. Magari 00:00:00 non è stato registrato
-ind_list = np.append(a4, len(a)-1)
-# zero_el = np.zeros(1,dtype="int64")
-# fin_ind_list = np.append(zero_el, ind_list)
-a_new = a.map(lambda t: t.replace(month=2, day=23))
-
-ii = 0
-dict_arr = {}
-for t in ind_list:
-    dict_arr["day"] = a[ii:t]
-    ii=t
-
-
-""
-Programma che funziona solo per i test che hanno giorni in 1 mese. Non funziona
-fra mesi differenti
-""
-
-st_day = a.day[0]
-fn_day = max(a.day)
-indx_spli_day = np.arange(st_day,fn_day+1)
-# days = a.day - a.day[0]
-# days_num = max(days)
-# np.arange(0,max(days)+1) # creating a vector countaing the number of days passed as integer. Adding +1 because np.arange does not take into account the last value
-
-a_new_date = a.map(lambda t: t.replace(year=2013, month=2, day=1)) # change values to a DatetimeIndex
-a_new = a.map(lambda t: t.replace(day=25))
-final_arr = a_new.tolist() # convert the DatetimeIndex to list
-
-"""
-
-"""
-Working general program
-
-a = pd.to_datetime(add_cor_time_miPLAN,dayfirst="True") # convert list to DatetimeIndex
-a1 = (a.hour*60+a.minute)*60 + a.second # convert the time array in seconds
-a2 = np.where(a1 == 0) # controllo a che positione si trova mezzanotte
-a3 = np.asanyarray(a2) # make a2 a vector
-a4 = np.ravel(a3) # make the vector 1D
-days = max(a.day - a.day[0]) # numero di giorni totali
-len(a2[0]) == days # check per controllare che non abbaimo perso valori. Magari 00:00:00 non è stato registrato
-# len(a4) == days # check per controllare che non abbaimo perso valori. Magari 00:00:00 non è stato registrato
-ind_list = np.append(a4, len(a)-1)
-# zero_el = np.zeros(1,dtype="int64")
-# fin_ind_list = np.append(zero_el, ind_list)
-a_new = a.map(lambda t: t.replace(month=2, day=23))
-
-
-num_days = np.arange(0,days+1)
-
-day_and_ind = np.column_stack((num_days,ind_list)) # from 1 D array to a 2D countaining all of them
-
-
-ii = 0
-dict_arr = {}
-
-for t in day_and_ind:
-    dict_arr["day_" + str(t[0])] = a_new[ii:t[1]]
-    ii=t[1]
-"""
-
 #%% EXTRACTING THE STARTING AND ENDING DATE OF THE TESTS
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     rec_time_dt = pd.to_datetime(dt_microplan["Timestamp"],dayfirst="True") # Recording time array
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
 
     # # rec_time_dt = pd.to_datetime(dt_SEEB["Unnamed: 0"],dayfirst="True") # Recording time array
     # rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Date Time"],dayfirst="True") # Recording time array
@@ -1846,13 +1747,13 @@ T_30 = np.ones(len(T_out_avg))*30 # This is a straight line at 30 [°C] to see w
 T_45 = np.ones(len(T_out_avg))*45 # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
 T_55 = np.ones(len(T_out_avg))*55 # This is a straight line at 55 [°C] to see if T OUT is above or below this treshold
 
-if Plt_MiPLAN == "Yes" or Plt_SEEB == "Yes":
+if Plt_MiPLAN == "y" or Plt_SEEB == "y":
     delta_T_req = T_out_avg - T_in_DHW # Delta T required by the norm between T DHW out and T DHW [°C]
 
-if Plt_MiCOM == "Yes":
+if Plt_MiCOM == "y":
     delta_T_boil = T_sup - T_ret # Delta T between T supply and T of the pump [°C]
 
-if Plt_PLC == "Yes":
+if Plt_PLC == "y":
     delta_T_boil_PLC = T_sup_PLC - T_ret_PLC # Delta T between T supply and T of the pump [°C]
 
 #%% THIS SECTION SETS SOME PARAMETERS FOR THE PLOTTING CURVE
@@ -1870,37 +1771,37 @@ fig = make_subplots(specs=[[{"secondary_y": True}]])
 
 # Add traces
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     add_time_set = add_cor_time_miPLAN 
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
 
     add_time_set = add_cor_time_SEEB
 
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     trace_fig(add_cor_time_miPLAN,T_in_DHW,"Rep_plot","Report_plot","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_out_avg,"Rep_plot","Report_plot","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,flow_DHW_kg,"Rep_plot","Report_plot","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,delta_T_req,"Rep_plot","Report_plot","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
     
     trace_fig(add_cor_time_SEEB,T_in_DHW,"Rep_plot","Report_plot","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_SEEB,T_out_avg,"Rep_plot","Report_plot","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_SEEB,flow_kg,"Rep_plot","Report_plot","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_SEEB,delta_T_req,"Rep_plot","Report_plot","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
 
-if Plt_MiCOM == "Yes":
+if Plt_MiCOM == "y":
 
     trace_fig(add_cor_time_miCOM,T_sup,"Rep_plot","Report_plot","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,T_DHW_stor,"Rep_plot","Report_plot","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,Flame_current,"Rep_plot","Report_plot","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,Burn_mod,"Rep_plot","Report_plot","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
 
-if Plt_MiPLAN == "Yes":
+if Plt_MiPLAN == "y":
 
     trace_fig(add_cor_time_miPLAN,T_in_DHW,"miPLAN","microPLAN","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miPLAN,T_out_avg,"miPLAN","microPLAN","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
@@ -1918,7 +1819,7 @@ if Plt_MiPLAN == "Yes":
     # trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 
 
-if Plt_SEEB == "Yes":
+if Plt_SEEB == "y":
 
     trace_fig(add_cor_time_SEEB,T_in_DHW,"SEEB","SEEB","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_SEEB,T_out_avg,"SEEB","SEEB","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
@@ -1934,7 +1835,7 @@ if Plt_SEEB == "Yes":
     trace_fig(add_cor_time_SEEB,delta_T_req,"SEEB","SEEB","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
     # # trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 
-if Plt_MiCOM == "Yes":
+if Plt_MiCOM == "y":
 
     trace_fig(add_cor_time_miCOM,T_sup,"miCOM","microCOM","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,T_ret,"miCOM","microCOM","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)
@@ -1946,8 +1847,7 @@ if Plt_MiCOM == "Yes":
     trace_fig(add_cor_time_miCOM,pump_speed_mCOM,"miCOM","microCOM","Pump modulation [%]","mediumslateblue",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,pump_pwr_MicroCOM,"miCOM","microCOM","Pump power consumed [W]","mediumspringgreen",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_miCOM,burner_status,"miCOM","microCOM","Burner status","tomato",False,op_main_lin,lin_typ_1)
-    
-    burner_status
+
 
 trace_fig(add_time_set,T_CH,"Set","Settings","T CH STP [°C]","orange",False,op_sec_lin,lin_type_2) 
 trace_fig(add_time_set,Burn_ON,"Set","Settings","T BURN ON [°C]","purple",False,op_sec_lin,lin_type_2)
@@ -1956,7 +1856,7 @@ trace_fig(add_time_set,T_30,"Set","Settings","T = 30 [°C]","black",False,op_sec
 trace_fig(add_time_set,T_45,"Set","Settings","T = 45 [°C]","black",False,op_sec_lin,lin_type_2)
 trace_fig(add_time_set,T_55,"Set","Settings","T = 55 [°C]","black",False,op_sec_lin,lin_type_2)
 
-if Plt_PLC == "Yes":
+if Plt_PLC == "y":
 
     trace_fig(add_cor_time_PLC,pump_onoff,"PLC","PLC","ON/OFF Pump","mediumpurple",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_PLC,pump_stp,"PLC","PLC","Pump setpoint [°C]","mediumslateblue",False,op_main_lin,lin_typ_1)
@@ -1970,7 +1870,7 @@ if Plt_PLC == "Yes":
     trace_fig(add_cor_time_PLC,Burn_mod_PLC,"PLC","PLC","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_PLC,delta_T_boil_PLC,"PLC","PLC","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
 
-if Plt_DHW == "Yes":
+if Plt_DHW == "y":
 
     trace_fig(add_cor_time_DHW,T1,"DHW","DHW","T1 [°C]","black",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_DHW,T2,"DHW","DHW","T2 [°C]","blue",False,op_main_lin,lin_typ_1)
@@ -1981,7 +1881,7 @@ if Plt_DHW == "Yes":
     trace_fig(add_cor_time_DHW,T7,"DHW","DHW","T7 [°C]","navy",False,op_main_lin,lin_typ_1)
     # trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
 
-if Plt_Side_T == "Yes":
+if Plt_Side_T == "y":
 
     trace_fig(add_cor_time_side_T,CH1,"Side","Side Temperature","CH1 [°C]","red",False,op_main_lin,lin_typ_1)
     trace_fig(add_cor_time_side_T,CH2,"Side","Side Temperature","CH2 [°C]","rebeccapurple",False,op_main_lin,lin_typ_1)
@@ -2015,42 +1915,3 @@ update_lay_fig(
 )
 
 plot(fig, filename = fol_appl + fol_test + os.sep + name_test_descp + date_test_dur + ".html")
-    
-# plot(fig, filename = path_fig + "HTML" + os.sep + add_path + date + "_" + vel + rpm + tape + test_name + "Evenlope_spectrum_signal_" + name + ".html")
-# fig.write_image("Test_1.png", scale=1, width=1920, height=1080)
-
-# %% THIS SECTION SAVES THE DIFFERENT ARRAYS
-
-# save_array = "no"
-
-# if save_array == "yes":
-    
-#     path_arr = "Saved_array" + os.sep + "23146" + test_num + os.sep
-#     add_cor_time_arr = np.array(add_cor_time_miCOM) # convertin the list into an array
-
-#     np.save(path_arr + "T_in_DHW_test_" + test_num, T_in_DHW)
-#     np.save(path_arr + "T_out_avg_test_" + test_num, T_out_avg)
-#     np.save(path_arr + "T_fume_mPLAN_test_" + test_num, T_fume)
-#     np.save(path_arr + "flow_DHW_L_test_" + test_num, flow_DHW_L)
-#     np.save(path_arr + "Gas_vol_test_" + test_num, Gas_vol)
-#     np.save(path_arr + "P_valv_in_test_" + test_num, P_valv_in)
-#     np.save(path_arr + "Pow_cons_test_" + test_num, Pow_cons)
-#     np.save(path_arr + "delta_T_test_" + test_num, delta_T_req)
-#     np.save(path_arr + "T_sup_test_" + test_num, T_sup)
-#     np.save(path_arr + "T_ret_test_" + test_num, T_ret)
-#     np.save(path_arr + "T_DHW_stor_test_" + test_num, T_DHW_stor)
-#     np.save(path_arr + "Flame_current_test_" + test_num, Flame_current)
-#     np.save(path_arr + "T_fume_mCOM_test_" + test_num, T_fume_mc)
-#     np.save(path_arr + "Burn_mod_test_" + test_num, Burn_mod)
-#     np.save(path_arr + "rec_time_mPLAN_test_" + test_num, add_cor_time_miPLAN)
-#     np.save(path_arr + "rec_time_mCOM_test_" + test_num, add_cor_time_arr)
-#     np.save(path_arr + "rec_time_PLC_test_" + test_num, add_cor_time_PLC)
-
-"""
-import pathlib
-pathlib.Path().resolve() ---- have the path of the current working folder (where the python program is located)
-
-path = pathlib.Path().resolve() --- assign the path to this variable
-
-files = os.listdir(path) --- read all the files and put them in a list. NOTE: the file are read with the extension as well
-"""

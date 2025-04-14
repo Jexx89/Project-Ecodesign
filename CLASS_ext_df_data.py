@@ -65,9 +65,7 @@ class ext_data_dt:
         Pow_cons: series
             An array countaining all the values of the energy consumption of the whole electronic: fan, pumo and elec board [W]
         Cum_energy: series
-            An array countaining the cumulative consumption of energy [kWh]
-        Rec_time: series
-            An array countaining the time step every second for the whole duration of the test [s]         
+            An array countaining the cumulative consumption of energy [kWh]     
 
         """
 
@@ -84,56 +82,11 @@ class ext_data_dt:
         P_val_in = dt["pin DHW [bar]"] # Pressure of the inlet valve [bar]
         Pow_cons = dt["Power Absorbed [W]"] # Energy consumption of the whole electronic: fan, pump and boards [W]
         Cum_energy = dt["Cumul. QDHW  [kWh]"] # Cumulative consunmption of energy [kWh]
-        # rec_time = np.arange(0,len(T_in_DHW))
 
         t_str_rec = pd.to_datetime(dt["Timestamp"][0],dayfirst="True") # Actual time when we start recording
         time_arr = pd.to_datetime(dt["Timestamp"],dayfirst="True") # Recording time array
-        st_y = str(time_arr.dt.year[0]) # Year when we start recording
-        st_m = str(time_arr.dt.month[0]) # Month when we start recording
-        st_day = str(time_arr.dt.day[0]) # Day when we start recording
-        end_y = str(time_arr.dt.year[len(time_arr)-1]) # Year when we end recording
-        end_m = str(time_arr.dt.month[len(time_arr)-1]) # Month when we end recording
-        end_day = str(time_arr.dt.day[len(time_arr)-1]) # Day when we end recording
-        
-        """
-        This if cicle is to add a 0 to the days and months with only one digit in order to have them
-        in 2 digits due to the format yyyy-mm-dd
-        """
 
-        if len(st_m) == 1:
-            st_m = "0" + st_m
-
-        if len(st_day) == 1:
-            st_day = "0" + st_day
-        
-        if len(end_m) == 1:
-            end_m = "0" + end_m
-
-        if len(end_day) == 1:
-            end_day = "0" + end_day
-
-        time_len = len(T_in_DHW) # total number of seconds recorded for the tests
-        tot_test_dur = str(datetime.timedelta(seconds=time_len)) # total time duration tests in days, hours, minutes and seconds
-        min = tot_test_dur[-5:-3]
-        sec = tot_test_dur[-3:len(tot_test_dur)]
-        # tot_time_days = time_len/86400 # Total amount of time in days
-        # days_int = int(time_len/86400) # Getting just the number of days
-        # ext_sec = (tot_time_days - days_int)*86400 # Getting the extra times in seconds after the full days
-        # all_hour = ext_sec/3600 # getting extra time in hour
-        # hour = int(all_hour)
-        # all_min = (all_hour - hour)*60
-        # min = int(all_min)
-        # sec = round((all_min - min)*60)
-        # tot_test_dur
-        add_min = 10 + int(min) # adding the mintues extra on the measurements in order to match the array length
-        # add_min = 30 + int(min) # adding the mintues extra on the measurements in order to match the array length
-        time_trial = np.arange(
-            st_y + "-" + st_m + "-" + st_day + "T21:30:00",
-            end_y + "-" + end_m + "-" + end_day + "T21:" + str(add_min) + sec,
-            dtype="datetime64[s]")
-        rec_time = time_trial
-
-        return rec_time,t_str_rec,T_in_DHW,T_out_avg,T_out_PT100,T_out_TC1,T_out_TC2,T_out_TC3,T_fume,flow_DHW_kg,flow_DHW_L,Gas_vol,P_val_in,Pow_cons,Cum_energy
+        return t_str_rec,T_in_DHW,T_out_avg,T_out_PT100,T_out_TC1,T_out_TC2,T_out_TC3,T_fume,flow_DHW_kg,flow_DHW_L,Gas_vol,P_val_in,Pow_cons,Cum_energy
         
     
     def read_df_SEEB(self,dt):

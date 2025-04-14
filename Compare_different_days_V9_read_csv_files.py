@@ -120,15 +120,18 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 # test_num = [["HM", "60kW", "HM60TC", "25028", "I", 8, "SEEB", 924],
 #             ["HM", "60kW", "HM60TC", "25013", "A", 1, "microPLAN", 0]]
 
-test_num = [["HM", "85kW", "HM85TC", "25021", "T", 15, "microPLAN", 0],
-            ["HM", "85kW", "HM85TC", "25021", "U", 16, "SEEB", 0]]
+# test_num = [["HM", "70kW", "HM70TC", "24122", "J", 7, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "24122", "K", 5, "SEEB", 161]]
 
-Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
-Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
-Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-Plt_PLC = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+test_num = [["HM", "120kW", "HM120TC", "24108", "P", 7, "SEEB", 0],
+            ["HM", "120kW", "HM120TC", "25017", "A", 1, "microPLAN", 0]]
+
+Plt_MiPLAN = input("Plot MicroPLAN data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_SEEB = input("Plot SEEB data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiCOM = input("Plot MicroCOM data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+Plt_DHW = input("Plot FieldLogger data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_Side_T = input("Side temperature data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+Plt_PLC = input("Plot PLC data? y or n: ") # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 microPLAN_data_prm_ax = [
     ["_Test_T_in_DHW","T°in DHW [°C]"], # Inlet temperature coming from the grid [°C]
@@ -262,19 +265,30 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
     file_name_side_T = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Side_Temperature"
     file_name_PLC = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_PLC"
 
-    if i[6] == "microPLAN":
+    if i[6] == "microPLAN" and Plt_MiPLAN == "y":
         
         dt_microPLAN = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_microPLAN,",")
     
-    elif i[6] == "SEEB":
+    elif i[6] == "SEEB" and Plt_SEEB  == "y":
         
         # dt_SEEB = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_SEEB,"\t")
         dt_SEEB = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_SEEB,",")
     
-    dt_microCOM = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_microCOM,",")
-    # dt_DHW = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_DHW,",")
-    # # dt_side_T = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_side_T,",")
-    # dt_PLC = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_PLC,",")
+    if Plt_MiCOM == "y":
+        
+        dt_microCOM = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_microCOM,",")
+    
+    if Plt_DHW == "y":
+        
+        dt_DHW = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_DHW,",")
+    
+    if Plt_Side_T == "y":
+        
+        dt_side_T = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_side_T,",")
+
+    if Plt_PLC == "y":
+        
+        dt_PLC = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_PLC,",")
     
     dict_stor_prm_ax_mPLAN = {} # Create an empty dictionary where storing the loading variables
     dict_stor_scd_ax_mPLAN = {} # Create an empty dictionary where storing the loading variables
@@ -290,7 +304,7 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
     dict_stor_corr_time_ax["Time_microPLAN"] = [] # inizialising the dict with an empty list in order to have a comparison if the vector does not exist
     dict_stor_corr_time_ax["Time_SEEB"] = [] # inizialising the dict with an empty list in order to have a comparison if the vector does not exist
 
-    if i[6] == "microPLAN":
+    if i[6] == "microPLAN" and Plt_MiPLAN == "y":
 
         for j in tqdm(microPLAN_data_prm_ax, desc="ESTIMATOR LOOP 2"):
 
@@ -301,7 +315,7 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
 
             dict_stor_scd_ax_mPLAN[i[0] + "_" + i[4] + l[0]] = dt_microPLAN[l[1]]
     
-    elif i[6] == "SEEB":
+    elif i[6] == "SEEB" and Plt_SEEB  == "y":
 
         for p in tqdm(SEEB_data_prm_ax, desc="ESTIMATOR LOOP 4"):
 
@@ -320,25 +334,33 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
         # dict_stor_prm_ax_SEEB [i[0] + "_" + i[4] + "_Test_By_pass_val_ON"] = dict_stor_prm_ax_SEEB[i[4] + "_Test_By_pass_val_ON"]*50
         # dict_stor_prm_ax_SEEB [i[0] + "_" + i[4] + "_Test_Tap_val_ON"] = dict_stor_prm_ax_SEEB[i[4] + "_Test_Tap_val_ON"]*50
 
-    for k in tqdm(microCOM_data_prm_ax, desc="ESTIMATOR LOOP 6"):
+    if Plt_MiCOM == "y":
 
-        dict_stor_prm_ax_mCOM[i[0] + "_" + i[4] + k[0]] = dt_microCOM[k[1]]
+        for k in tqdm(microCOM_data_prm_ax, desc="ESTIMATOR LOOP 6"):
 
-    # for m in tqdm(DHW_sens_data, desc="ESTIMATOR LOOP 7"):
+            dict_stor_prm_ax_mCOM[i[0] + "_" + i[4] + k[0]] = dt_microCOM[k[1]]
 
-    #     dict_stor_DHW_sens[i[0] + "_" + i[4] + m[0]] = dt_DHW[m[1]]
+    if Plt_DHW == "y":
 
-    # # for n in tqdm(side_T_data, desc="ESTIMATOR LOOP 8"):
+        for m in tqdm(DHW_sens_data, desc="ESTIMATOR LOOP 7"):
 
-    # #     dict_stor_side_T[i[0] + "_" + i[4] + n[0]] = dt_side_T[n[1]]
+            dict_stor_DHW_sens[i[0] + "_" + i[4] + m[0]] = dt_DHW[m[1]]
 
-    # for o in tqdm(PLC_data, desc="ESTIMATOR LOOP 9"):
+    if Plt_Side_T == "y":
 
-    #     dict_stor_PLC[i[0] + "_" + i[4] + o[0]] = dt_PLC[o[1]]
+        for n in tqdm(side_T_data, desc="ESTIMATOR LOOP 8"):
+
+            dict_stor_side_T[i[0] + "_" + i[4] + n[0]] = dt_side_T[n[1]]
+
+    if Plt_PLC == "y":
+
+        for o in tqdm(PLC_data, desc="ESTIMATOR LOOP 9"):
+
+            dict_stor_PLC[i[0] + "_" + i[4] + o[0]] = dt_PLC[o[1]]
 
 # most probably we can put this if cycle with the one above. It will make code easier
 
-    if i[6] == "microPLAN":
+    if i[6] == "microPLAN" and Plt_MiPLAN == "y":
         
         dict_stor_time_ax["Time_microPLAN"] = dt_microPLAN["Timestamp"]
 
@@ -346,7 +368,7 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
 
         dict_stor_corr_time_ax["Time_microPLAN"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_microPLAN,"Timestamp",day_0,i[7])
         
-    elif i[6] == "SEEB":
+    elif i[6] == "SEEB" and Plt_SEEB == "y":
 
         dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Timestamp"]
         # dict_stor_time_ax["Time_SEEB"] = dt_SEEB["Date Time"]
@@ -360,29 +382,39 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
         # dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Date Time",day_0,i[7])
         dict_stor_corr_time_ax["Time_SEEB"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_SEEB,"Timestamp",day_0,i[7])
     
-    dict_stor_time_ax["Time_microCOM"] = dt_microCOM["Time DMY"]
-    # dict_stor_time_ax["Time_DHW_sens"] = dt_DHW["Date-Time"]
-    # # dict_stor_time_ax["Time_side_T"] = dt_side_T["Date&Time"]
-    # dict_stor_time_ax["Time_PLC"] = dt_PLC["DATE-TIME"]
+    if Plt_MiCOM == "y":
 
-    dict_stor_corr_time_ax["Time_microCOM"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_microCOM,"Time DMY",day_0,i[7])
-    # dict_stor_corr_time_ax["Time_DHW_sens"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_DHW,"Date-Time",day_0,i[7])
-    # # dict_stor_corr_time_ax["Time_side_T"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_side_T,"Date&Time",day_0,i[7])
-    # dict_stor_corr_time_ax["Time_PLC"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_PLC,"DATE-TIME",day_0,i[7])
+        dict_stor_time_ax["Time_microCOM"] = dt_microCOM["Time DMY"]
+        dict_stor_corr_time_ax["Time_microCOM"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_microCOM,"Time DMY",day_0,i[7])
     
-    if i[6] == "microPLAN":
+    if Plt_DHW == "y":
+
+        dict_stor_time_ax["Time_DHW_sens"] = dt_DHW["Date-Time"]
+        dict_stor_corr_time_ax["Time_DHW_sens"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_DHW,"Date-Time",day_0,i[7])
+    
+    if Plt_Side_T == "y":
+        
+        dict_stor_time_ax["Time_side_T"] = dt_side_T["Date&Time"]
+        dict_stor_corr_time_ax["Time_side_T"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_side_T,"Date&Time",day_0,i[7])
+    
+    if Plt_PLC == "y":
+
+        dict_stor_time_ax["Time_PLC"] = dt_PLC["DATE-TIME"]
+        dict_stor_corr_time_ax["Time_PLC"] = impt_adj_t_ogj.res_timing_comparison_bypass(dt_PLC,"DATE-TIME",day_0,i[7])
+    
+    if i[6] == "microPLAN" and Plt_MiPLAN == "y":
 
         all_dict_prm_ax_mPLAN["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_prm_ax_mPLAN
         all_dict_scd_ax_mPLAN["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_scd_ax_mPLAN
 
-    elif i[6] == "SEEB":
+    elif i[6] == "SEEB" and Plt_SEEB == "y":
 
         all_dict_prm_ax_SEEB["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_prm_ax_SEEB
         all_dict_scd_ax_SEEB["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_scd_ax_SEEB
     
     all_dict_prm_ax_mCOM["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_prm_ax_mCOM
     all_dict_DHW_sens["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_DHW_sens
-    # all_dict_side_T["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_side_T
+    all_dict_side_T["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_side_T
     all_dict_PLC["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_PLC
     all_dict_time["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_time_ax
     all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]] = dict_stor_corr_time_ax
@@ -398,52 +430,7 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
     x_val_str_line = max(len(dict_stor_corr_time_ax["Time_microPLAN"]),len(dict_stor_corr_time_ax["Time_SEEB"]))
 
 
-#%% THIS SECTION PLOTS THE VALUES
-
-# def trace_fig(x_axis,y_axis,name,secd_y_ax,opac,typ_line):
-
-#     """
-#     Function to add the trace on the graphs
-
-#     Parameters
-#     -----------------
-
-#     x: array
-#         Array with values to be plotted on the x axis
-#     y: array
-#         Array with values to be plotted on the y axis
-#     name: string
-#         Name of the curve to plot
-#     col: string
-#         Colour of the curve on the graph
-#     secd_y_ax: Boolean
-#         True or False. True: plotting on the secondary y axins. False: plot on the primary
-#     opac: integer
-#         Value from 0 to 1 to set the opacity of the line
-#     typ_line: string
-#         Set the line layout
-
-#     Returns
-#     -----------
-
-#     The trace that can be added to the main figure plot
-
-#     """
-
-#     # Adding the trace
-#     fig.add_trace(go.Scatter
-#                   (x = x_axis,
-#                    y = y_axis,
-#                    name = name,
-#                    opacity = opac,
-#                 #    mode = typ_line,
-#                 #    marker = {"color" : col}),
-#                 #    line = dict(color=col, width=1.5, dash=typ_line)),
-#                    line = dict(width=1.5, dash=typ_line)),
-#                    secondary_y=secd_y_ax,
-#                 )
-
-
+#%% THIS SECTION HAS THE PLOTTING FUNCTION
 
 def trace_fig(x_axis,y_axis,group,gourp_ttl,name,secd_y_ax,opac,typ_line):
 
@@ -489,8 +476,6 @@ def trace_fig(x_axis,y_axis,group,gourp_ttl,name,secd_y_ax,opac,typ_line):
                    line = dict(width=1.5, dash=typ_line)),
                    secondary_y=secd_y_ax,
                 )
-
-
 
 def update_lay_fig(
         lab_x_ax,
@@ -587,7 +572,6 @@ def update_lay_fig(
     
     fig.update_layout(legend=dict(groupclick="toggleitem"))
 
-
 #%% THIS SECTION SETS SOME PARAMETERS FOR THE PLOTTING CURVE
 
 op_main_lin = 1 # Set the opacity of the main lines
@@ -601,32 +585,30 @@ T_30 = np.ones(x_val_str_line)*30 # This is a straight line at 30 [°C] to see w
 
 #%% THIS SECTION PLOT THE FIGURES
 
-# tm_ax_microPLAN = all_dict_corr_time["dict_HM45TC_test_G"]["Time_microPLAN"]
-
-# fig = make_subplots(specs=[[{"secondary_y": True}]])
-
-# trace_fig(tm_ax_microPLAN,
-#                     2,
-#                     "MicroPLAN",
-#                     "MicroPLAN",
-#                     "Test_G",
-#                     #   "darkblue",
-#                     False,
-#                     op_main_lin,lin_typ_1
-#                     )
-
 # Create figure with secondary y-axis
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 
 for i in test_num:
 
-    if i[6] == "microPLAN":
+    if i[6] == "microPLAN" and Plt_MiPLAN == "y":
 
         tm_ax_microPLAN = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_microPLAN"]
-        tm_ax_microCOM = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_microCOM"]
-        # tm_ax_DHW = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_DHW_sens"]
-        # # tm_ax_side_T = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_side_T"]
-        # tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
+    
+        if Plt_MiCOM == "y":
+
+            tm_ax_microCOM = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_microCOM"]
+
+        if Plt_DHW == "y":
+
+            tm_ax_DHW = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_DHW_sens"]
+
+        if Plt_Side_T == "y":
+
+            tm_ax_side_T = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_side_T"]
+
+        if Plt_PLC == "y":
+
+            tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
 
         for key,value in all_dict_prm_ax_mPLAN["dict_" + i[2] + "_test_%s" %i[4]].items():
             trace_fig(tm_ax_microPLAN,
@@ -650,13 +632,25 @@ for i in test_num:
                     op_main_lin,lin_typ_1
                     )
         
-    elif i[6] == "SEEB":
+    elif i[6] == "SEEB" and Plt_SEEB == "y":
 
         tm_ax_SEEB = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_SEEB"]
-        tm_ax_microCOM = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_microCOM"]
-        # tm_ax_DHW = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_DHW_sens"]
-        # # tm_ax_side_T = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_side_T"]
-        # tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
+
+        if Plt_MiCOM == "y":
+
+            tm_ax_microCOM = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_microCOM"]
+
+        if Plt_DHW == "y":
+
+            tm_ax_DHW = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_DHW_sens"]
+
+        if Plt_Side_T == "y":
+
+            tm_ax_side_T = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_side_T"]
+
+        if Plt_PLC == "y":
+
+            tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
 
         for key,value in all_dict_prm_ax_SEEB["dict_" + i[2] + "_test_%s" %i[4]].items():
             trace_fig(tm_ax_SEEB,
@@ -680,49 +674,58 @@ for i in test_num:
                     op_main_lin,lin_typ_1
                     )
     
-    for key,value in all_dict_prm_ax_mCOM["dict_" + i[2] + "_test_%s" %i[4]].items():
-            trace_fig(tm_ax_microCOM,
+
+    if Plt_MiCOM == "y":
+
+        for key,value in all_dict_prm_ax_mCOM["dict_" + i[2] + "_test_%s" %i[4]].items():
+                trace_fig(tm_ax_microCOM,
+                        value,
+                        i[2] + "_microCOM_" + i[4] + "_Algo_" + str(i[5]),
+                        "microCOM_test_" + i[4] + "_Algo_" + str(i[5]),
+                        key,
+                        #   "cyan",
+                        False,
+                        op_main_lin,lin_typ_1
+                        )
+
+    if Plt_DHW == "y":
+
+        for key,value in  all_dict_DHW_sens["dict_" + i[2] + "_test_%s" %i[4]].items():
+            trace_fig(tm_ax_DHW,
                     value,
-                    i[2] + "_microCOM_" + i[4] + "_Algo_" + str(i[5]),
-                    "microCOM_test_" + i[4] + "_Algo_" + str(i[5]),
+                    i[2] + "_DHW_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
+                    "DHW_test_" + i[4] + "_Algo_" + str(i[5]),
                     key,
                     #   "cyan",
                     False,
                     op_main_lin,lin_typ_1
                     )
 
-    # for key,value in  all_dict_DHW_sens["dict_" + i[2] + "_test_%s" %i[4]].items():
-    #     trace_fig(tm_ax_DHW,
-    #             value,
-    #             i[2] + "_DHW_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
-    #             "DHW_test_" + i[4] + "_Algo_" + str(i[5]),
-    #             key,
-    #             #   "cyan",
-    #             False,
-    #             op_main_lin,lin_typ_1
-    #             )
-            
-    # for key,value in all_dict_side_T["dict_" + i[2] + "_test_%s" %i[4]].items():
-    #     trace_fig(tm_ax_side_T,
-    #             value,
-    #             i[2] + "_Side_T_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
-    #             "side_T_test_" + i[4] + "_Algo_" + str(i[5]),
-    #             key,
-    #             #   "cyan",
-    #             False,
-    #             op_main_lin,lin_typ_1
-    #             )
+    if Plt_Side_T == "y":
 
-    # for key,value in all_dict_PLC["dict_" + i[2] + "_test_%s" %i[4]].items():
-    #     trace_fig(tm_ax_PLC,
-    #             value,
-    #             i[2] + "_PLC_T_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
-    #             "PLC_test_" + i[4] + "_Algo_" + str(i[5]),
-    #             key,
-    #             #   "cyan",
-    #             False,
-    #             op_main_lin,lin_typ_1
-    #             )
+        for key,value in all_dict_side_T["dict_" + i[2] + "_test_%s" %i[4]].items():
+            trace_fig(tm_ax_side_T,
+                    value,
+                    i[2] + "_Side_T_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
+                    "side_T_test_" + i[4] + "_Algo_" + str(i[5]),
+                    key,
+                    #   "cyan",
+                    False,
+                    op_main_lin,lin_typ_1
+                    )
+
+    if Plt_PLC == "y":
+
+        for key,value in all_dict_PLC["dict_" + i[2] + "_test_%s" %i[4]].items():
+            trace_fig(tm_ax_PLC,
+                    value,
+                    i[2] + "_PLC_T_" + i[4] + "_Algo_" + str(i[5]) + "_" + i[6],
+                    "PLC_test_" + i[4] + "_Algo_" + str(i[5]),
+                    key,
+                    #   "cyan",
+                    False,
+                    op_main_lin,lin_typ_1
+                    )
     
 trace_fig(tm_ax_T_45,T_30,"Set","Settings","T = 30 [°C]",False,op_sec_lin,lin_type_2)
 trace_fig(tm_ax_T_45,T_45,"Set","Settings","T = 45 [°C]",False,op_sec_lin,lin_type_2)
