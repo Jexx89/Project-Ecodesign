@@ -111,40 +111,26 @@ def read_df_microplan(dt):
          An array countaining the cumulative consumption of energy [kWh]
     t_str_rec: series
          A value indicating the date when the test actually started
+    T_amb: series
+        An array countaining all the values of the ambiente temperature - T°Amb [°C]
 
     """
 
     T_in_DHW = dt["T°in DHW [°C]"]  # Inlet temperature coming from the grid [°C]
-    T_out_avg = dt[
-        "T°out AV.  [°C]"
-    ]  # Average outlet temperature for the domestic hot water [°C]
-    T_out_PT100 = dt[
-        "T°out PT100  [°C]"
-    ]  # Outlet temperature for the domestic hot water - sensor PT100 [°C]
-    T_out_TC1 = dt[
-        "T°out TC1  [°C]"
-    ]  # Outlet temperature for the domestic hot water - sensor TC1 [°C]
-    T_out_TC2 = dt[
-        "T°out TC2  [°C]"
-    ]  # Outlet temperature for the domestic hot water - sensor TC2 [°C]
-    T_out_TC3 = dt[
-        "T°out TC3  [°C]"
-    ]  # Outlet temperature for the domestic hot water - sensor TC3 [°C]
-    T_fume = dt[
-        "T°Fume [°C]"
-    ]  # Outlet temperature of the smoke exiting the Heat Master [°C]
+    T_out_avg = dt["T°out AV.  [°C]"]  # Average outlet temperature for the domestic hot water [°C]
+    T_out_PT100 = dt["T°out PT100  [°C]"]  # Outlet temperature for the domestic hot water - sensor PT100 [°C]
+    T_out_TC1 = dt["T°out TC1  [°C]"]  # Outlet temperature for the domestic hot water - sensor TC1 [°C]
+    T_out_TC2 = dt["T°out TC2  [°C]"]  # Outlet temperature for the domestic hot water - sensor TC2 [°C]
+    T_out_TC3 = dt["T°out TC3  [°C]"]  # Outlet temperature for the domestic hot water - sensor TC3 [°C]
+    T_fume = dt["T°Fume [°C]"]  # Outlet temperature of the smoke exiting the Heat Master [°C]
     flow_DHW_kg = dt["FLDHW [kg/min]"]  # Water flow [kg/min]
     flow_DHW_L = dt["FLDHW [L/min]"]  # Water flow [L/min]
     Gas_vol = dt["Cumul. Gaz Vol. Corr.[L]"]  # Volume of gas consumption [L]
     P_val_in = dt["pin DHW [bar]"]  # Pressure of the inlet valve [bar]
-    Pow_cons = dt[
-        "Power Absorbed [W]"
-    ]  # Energy consumption of the whole electronic: fan, pump and boards [W]
+    Pow_cons = dt["Power Absorbed [W]"]  # Energy consumption of the whole electronic: fan, pump and boards [W]
     Cum_energy = dt["Cumul. QDHW  [kWh]"]  # Cumulative consunmption of energy [kWh]
-
-    t_str_rec = pd.to_datetime(
-        dt["Timestamp"][0], dayfirst="True"
-    )  # Actual time when we start recording
+    T_amb = dt["T°Amb [°C]"]  # Cumulative consunmption of energy [kWh]
+    t_str_rec = pd.to_datetime(dt["Timestamp"][0], dayfirst="True")  # Actual time when we start recording
 
     return (
         t_str_rec,
@@ -161,6 +147,7 @@ def read_df_microplan(dt):
         P_val_in,
         Pow_cons,
         Cum_energy,
+        T_amb
     )
 
 
@@ -362,9 +349,7 @@ def read_df_microcom(dt, pump):
     """
 
     T_sup = dt["Supply [°C]"]  # Temperature on the main tank [°C]
-    T_ret = dt[
-        "Return [°C]"
-    ]  # Temperature on the pump pipe to cool down the burner [°C]
+    T_ret = dt["Return [°C]"]  # Temperature on the pump pipe to cool down the burner [°C]
     T_DHW_stor = dt["DHW stor (°C)"]  # Temperature inside the big ballon [°C]
     Flame_current = dt["Flame Curent [uA]"]  # Flame current [A] * 10^-6
     T_fume_mc = dt["Flue temp [0,01°C]"]  # Temperature on the fume [°C]
@@ -376,12 +361,8 @@ def read_df_microcom(dt, pump):
 
     elif pump == "yes":
 
-        pump_spd_MicroCOM = dt[
-            "Pump PWM %(111F)"
-        ]  # Pump modulation power [%] (Range:0 - 100 %)
-        pump_pwr_MicroCOM = dt[
-            "Pump Power W(65F2)"
-        ]  # Pump power consumed [W] (Range: 0 - 70 W)
+        pump_spd_MicroCOM = dt["Pump PWM %(111F)"]  # Pump modulation power [%] (Range:0 - 100 %)
+        pump_pwr_MicroCOM = dt["Pump Power W(65F2)"]  # Pump power consumed [W] (Range: 0 - 70 W)
         burner_status = dt["Burner State"]  # Status of the burner
 
         return (
@@ -1692,10 +1673,15 @@ elif test_req_num == "25021":
         T_ADD = 15  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
-    elif test_num == "T" or test_num == "U":
+    elif test_num == "T" or test_num == "U" or test_num == "V":
 
         T_DHW = 49  # DHW Setpoint temperature [°C]
         T_ADD = 15  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    elif test_num == "W":
+
+        T_DHW = 49  # DHW Setpoint temperature [°C]
+        T_ADD = 16  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25027":
@@ -1708,6 +1694,17 @@ elif test_req_num == "25027":
         T_DHW = 51  # DHW Setpoint temperature [°C]
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 7  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+elif test_req_num == "25063":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM35TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 55  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25013":
 
@@ -1775,7 +1772,7 @@ st = time.time()
 
 if not (Plt_MiPLAN.upper() in negativeAnswer):
 
-    dt_microplan = read_csv_file(compl_path, name_test_miplan, ";")
+    dt_microplan = read_csv_file(compl_path, name_test_miplan, ",")
 
 if not (Plt_SEEB.upper() in negativeAnswer):
 
@@ -1784,7 +1781,7 @@ if not (Plt_SEEB.upper() in negativeAnswer):
 
 if not (Plt_MiCOM.upper() in negativeAnswer):
 
-    dt_microcom = read_csv_file(compl_path, name_test_micom, ";")
+    dt_microcom = read_csv_file(compl_path, name_test_micom, ",")
 
 if not (Plt_DHW.upper() in negativeAnswer):
 
@@ -1845,6 +1842,7 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
         P_valv_in,
         Pow_cons,
         Cum_energy,
+        T_amb
     ) = read_df_microplan(dt_microplan)
 
 if not (Plt_SEEB.upper() in negativeAnswer):
@@ -2301,6 +2299,18 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
         op_main_lin,
         lin_typ_1,
     )
+    trace_fig(
+        add_cor_time_miPLAN,
+        T_amb,
+        "miPLAN",
+        "microPLAN",
+        "T°Amb [°C]",
+        "pink",
+        False,
+        op_main_lin,
+        lin_typ_1,
+    )
+    
     trace_fig(
         add_cor_time_miPLAN,
         T_out_TC1,

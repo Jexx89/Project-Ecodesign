@@ -117,11 +117,11 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 # test_num = [["HM", "60kW", "HM60TC", "25028", "F", 6, "SEEB", 155],
 #             ["HM", "60kW", "HM60TC", "25028", "G", 7, "SEEB", 0]]
 
-# test_num = [["HM", "60kW", "HM60TC", "25028", "I", 8, "SEEB", 924],
+# test_num = [["HM", "60kW", "HM60TC", "25028", "I", 8, "SEEB", 909],
 #             ["HM", "60kW", "HM60TC", "25013", "A", 1, "microPLAN", 0]]
 
-test_num = [["HM", "85kW", "HM85TC", "25021", "T", 15, "microPLAN", 0],
-            ["HM", "85kW", "HM85TC", "25021", "U", 16, "SEEB", 606]]
+test_num = [["HM", "85kW", "HM85TC", "25021", "V", 16, "SEEB", 58],
+            ["HM", "85kW", "HM85TC", "25021", "U", 16, "SEEB", 0]]
 
 Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
 Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
@@ -135,7 +135,8 @@ microPLAN_data_prm_ax = [
     ["_Test_T_out_avg","T°out AV.  [°C]"], # Average outlet temperature for the domestic hot water [°C]
     ["_Test_T_fume_mPLAN","T°Fume [°C]"], # Outlet temperature of the smoke exiting the Heat Master [°C]
     ["_Test_flow_DHW_L/min","FLDHW [L/min]"], # Water flow [L/min]
-    ["_Test_flow_DHW_kg/min","FLDHW [kg/min]"] # Water flow [kg/min]. This is the flow corrected with the density and Cp. It is not computed if the value is less than 0.5. It will be considered as 0.
+    ["_Test_flow_DHW_kg/min","FLDHW [kg/min]"], # Water flow [kg/min]. This is the flow corrected with the density and Cp. It is not computed if the value is less than 0.5. It will be considered as 0.
+    ["_Test_T_Amb","T°Amb [°C]"]
 ] # Vector names of microPLAN to be loaded and plotted on the primary axes
 
 microCOM_data_prm_ax = [
@@ -150,7 +151,8 @@ microCOM_data_prm_ax = [
 microPLAN_data_scd_ax = [
     ["_Test_Gas_vol_consp","Cumul. Gaz Vol. Corr.[L]"], # Volume of gas consumption [L]
     # ["_Test_Power_consp","Power Absorbed [W]"], # Energy consumption of the whole electronic: fan, pump and boards [W]
-    ["_Test_P_valv_in","pin DHW [bar]"] # Pressure of the inlet valve [bar]
+    ["_Test_P_valv_in","pin DHW [bar]"], # Pressure of the inlet valve [bar]
+    ["_Test_P_ATM","patm [mbar]"]
 ] # Vector names to be loaded on the secondary axes
 
 SEEB_data_prm_ax = [
@@ -158,12 +160,14 @@ SEEB_data_prm_ax = [
     ["_Test_T_out_avg","T°out TC  [°C]"], # Average outlet temperature for the domestic hot water [°C]
     ["_Test_T_fume_SEEB","T°Fume [°C]"], # Outlet temperature of the smoke exiting the Heat Master [°C]
     ["_Test_flow_DHW_kg/min","FLDHW [kg/min]"], # Water flow [m^3/h] of the first valve
-    ["_Test_flow_DHW_L/min","FLDHW [l/min]"] # Water flow [L/min] of the second valve
+    ["_Test_flow_DHW_L/min","FLDHW [l/min]"], # Water flow [L/min] of the second valve
+    ["_Test_T_Amb","T°Amb [°C]"]
 ] # Vector names to be loaded on the secondary axes
 
 SEEB_data_sdc_ax = [
     ["_Test_Gas_vol_L","Cumul. Gaz Vol. Corr.[L]"], # Counter of amount of gas consumed when burner is on [L]
-    ["_Test_P_val_in","pin DHW [bar]"] # Pressure of the inlet valve [bar]
+    ["_Test_P_val_in","pin DHW [bar]"], # Pressure of the inlet valve [bar]
+    ["_Test_P_ATM","patm [mbar]"]
 ] # Vector names to be loaded on the secondary axes
 
 # SEEB_data_prm_ax = [
