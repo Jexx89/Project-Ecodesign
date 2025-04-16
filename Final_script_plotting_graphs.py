@@ -20,9 +20,7 @@ import datetime
 
 import plotly.graph_objects as go  # importing plotly for plotting figures
 from plotly.offline import plot
-from plotly.subplots import (
-    make_subplots,
-)  # importing subplots to plot several curves in the same graph
+from plotly.subplots import (make_subplots)  # importing subplots to plot several curves in the same graph
 
 import tkinter as tk  # importing the GUI toolkit interface
 from tkinter import messagebox
@@ -1762,9 +1760,7 @@ name_test_PLC = name_test_descp + "_" + test_descp_PLC
 name_test_SEEB = name_test_descp + "_" + test_descp_SEEB
 name_test_SEEB_Enr5 = name_test_descp + "_" + test_descp_SEEB_Enr5
 
-compl_path = (
-    fol_appl + fol_test
-)  # complete path where we saved the csv file of the tests
+compl_path = (fol_appl + fol_test)  # complete path where we saved the csv file of the tests
 
 # get the start time
 st = time.time()
@@ -2041,43 +2037,27 @@ st_day = str(rec_time_dt.dt.day[0])  # Day when we start recording
 end_y = str(rec_time_dt.dt.year[len(rec_time_dt) - 1])  # Year when we end recording
 end_m = str(rec_time_dt.dt.month[len(rec_time_dt) - 1])  # Month when we end recording
 end_day = str(rec_time_dt.dt.day[len(rec_time_dt) - 1])  # Day when we end recording
-date_test_dur = (
-    "_" + st_y + "_" + st_m + "_" + st_day + "_" + end_y + "_" + end_m + "_" + end_day
-)
+date_test_dur = ("_" + st_y + "_" + st_m + "_" + st_day + "_" + end_y + "_" + end_m + "_" + end_day)
 
 # %% THIS SECTION HAS THE SETTED CONDITIONS FOR THE TESTS
 
 T_DHW_SP = np.ones(len(T_out_avg)) * T_DHW  # This is temperature setpoint for DHW [°C]
-T_CH = (
-    T_DHW_SP + T_ADD
-)  # This is the temperature setpoint for CH or primary water or supply temperature [°C]
+T_CH = (T_DHW_SP + T_ADD)  # This is the temperature setpoint for CH or primary water or supply temperature [°C]
 
 Burn_ON = np.ones(len(T_out_avg)) * (T_DHW_SP - T_HYS)
 
-T_30 = (
-    np.ones(len(T_out_avg)) * 30
-)  # This is a straight line at 30 [°C] to see when we are below the delta T requested from the norm
-T_45 = (
-    np.ones(len(T_out_avg)) * 45
-)  # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
-T_55 = (
-    np.ones(len(T_out_avg)) * 55
-)  # This is a straight line at 55 [°C] to see if T OUT is above or below this treshold
+T_30 = (np.ones(len(T_out_avg)) * 30)  # This is a straight line at 30 [°C] to see when we are below the delta T requested from the norm
+T_45 = (np.ones(len(T_out_avg)) * 45)  # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
+T_55 = (np.ones(len(T_out_avg)) * 55)  # This is a straight line at 55 [°C] to see if T OUT is above or below this treshold
 
-if not (Plt_MiPLAN.upper() in negativeAnswer) or not (
-    Plt_SEEB.upper() in negativeAnswer
-):
-    delta_T_req = (
-        T_out_avg - T_in_DHW
-    )  # Delta T required by the norm between T DHW out and T DHW [°C]
+if not (Plt_MiPLAN.upper() in negativeAnswer) or not (Plt_SEEB.upper() in negativeAnswer):
+    delta_T_req = (T_out_avg - T_in_DHW)  # Delta T required by the norm between T DHW out and T DHW [°C]
 
 if not (Plt_MiCOM.upper() in negativeAnswer):
     delta_T_boil = T_sup - T_ret  # Delta T between T supply and T of the pump [°C]
 
 if not (Plt_PLC.upper() in negativeAnswer):
-    delta_T_boil_PLC = (
-        T_sup_PLC - T_ret_PLC
-    )  # Delta T between T supply and T of the pump [°C]
+    delta_T_boil_PLC = (T_sup_PLC - T_ret_PLC)  # Delta T between T supply and T of the pump [°C]
 
 # %% THIS SECTION SETS SOME PARAMETERS FOR THE PLOTTING CURVE
 
@@ -2095,11 +2075,9 @@ fig = make_subplots(specs=[[{"secondary_y": True}]])
 # Add traces
 
 if not (Plt_MiPLAN.upper() in negativeAnswer):
-
     add_time_set = add_cor_time_miPLAN
 
 if not (Plt_SEEB.upper() in negativeAnswer):
-
     add_time_set = add_cor_time_SEEB
 
 
@@ -2392,7 +2370,6 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
         lin_typ_1,
     )
     # trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
-
 
 if not (Plt_SEEB.upper() in negativeAnswer):
 
