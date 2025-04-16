@@ -277,28 +277,20 @@ def read_df_SEEB_Enr5(dt):
          An array countaining the cumulative consumption of energy [kWh]
     t_str_rec: series
          A value indicating the date and time when the test actually started
-
+    T_amb: series
+        An array countaining all the values of the ambiente temperature - T°Amb [°C]
     """
 
     # t_str_rec = pd.to_datetime(dt["Date Time"][0],dayfirst="True") # Actual time when we start recording
-    t_str_rec = pd.to_datetime(
-        dt["Timestamp"][0], dayfirst="True"
-    )  # Actual time when we start recording
+    t_str_rec = pd.to_datetime(dt["Timestamp"][0], dayfirst="True")  # Actual time when we start recording
     T_in_DHW = dt["T°in DHW [°C]"]  # Inlet temperature coming from the grid [°C]
-    T_out_avg = dt[
-        "T°out TC  [°C]"
-    ]  # Average outlet temperature for the domestic hot water [°C]
-    T_fume = dt[
-        "T°Fume [°C]"
-    ]  # Outlet temperature of the smoke exiting the Heat Master [°C]
-    flow_DHW_kg = dt[
-        "FLDHW [kg/min]"
-    ]  # Water flow [kg/min]. This is the flow corrected with the density and Cp. It is not computed if the value is less than 0.5. It will be considered as 0.
+    T_out_avg = dt["T°out TC  [°C]"]  # Average outlet temperature for the domestic hot water [°C]
+    T_fume = dt["T°Fume [°C]"]  # Outlet temperature of the smoke exiting the Heat Master [°C]
+    flow_DHW_kg = dt["FLDHW [kg/min]"]  # Water flow [kg/min]. This is the flow corrected with the density and Cp. It is not computed if the value is less than 0.5. It will be considered as 0.
     Gas_vol = dt["Cumul. Gaz Vol. Corr.[L]"]  # Volume of gas consumption [L]
     P_val_in = dt["pin DHW [bar]"]  # Pressure of the inlet valve [bar]
-    Pow_cons = dt[
-        "Power Absorbed [W]"
-    ]  # Energy consumption of the whole electronic: fan, pump and boards [W]
+    Pow_cons = dt["Power Absorbed [W]"]  # Energy consumption of the whole electronic: fan, pump and boards [W]
+    T_amb = dt["T°Amb [°C]"]  # Cumulative consunmption of energy [kWh]
     Cum_energy = dt["Cumul. QDHW  [kWh]"]  # Cumulative consunmption of energy [kWh]
 
     return (
@@ -311,6 +303,7 @@ def read_df_SEEB_Enr5(dt):
         P_val_in,
         Pow_cons,
         Cum_energy,
+        T_amb
     )
 
 
@@ -1695,6 +1688,7 @@ elif test_req_num == "25027":
 
 elif test_req_num == "25063":
 
+
     fol_test = test_req_num + test_num
     name_test_descp = fol_test + "_XXL_HM35TC_Algo" + alg_typ
 
@@ -1703,6 +1697,42 @@ elif test_req_num == "25063":
         T_DHW = 55  # DHW Setpoint temperature [°C]
         T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "B":
+
+        T_DHW = 55  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "C":
+
+        T_DHW = 55  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+
+
+
+elif test_req_num == "25066":
+
+    fol_test = test_req_num + test_num
+    name_test_descp = fol_test + "_XXL_HM70TC_Algo" + alg_typ
+
+    if test_num == "A":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "B":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 7  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "C":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25013":
 
@@ -1834,6 +1864,8 @@ if not (Plt_SEEB.upper() in negativeAnswer):
         P_val_in,
         Pow_cons,
         Cum_energy,
+        T_amb
+        
     ) = read_df_SEEB_Enr5(dt_SEEB_Enr5)
 
 if not (Plt_MiCOM.upper() in negativeAnswer):
@@ -2461,6 +2493,17 @@ if not (Plt_SEEB.upper() in negativeAnswer):
         "SEEB",
         "Delta T NORM [°C]",
         "darkorange",
+        False,
+        op_main_lin,
+        lin_typ_1,
+    )
+    trace_fig(
+        add_cor_time_SEEB,
+        T_amb,
+        "SEEB",
+        "SEEB",
+        "T°Amb [°C]",
+        "pink",
         False,
         op_main_lin,
         lin_typ_1,
