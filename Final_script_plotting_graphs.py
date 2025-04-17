@@ -22,8 +22,8 @@ import plotly.graph_objects as go  # importing plotly for plotting figures
 from plotly.offline import plot
 from plotly.subplots import (make_subplots)  # importing subplots to plot several curves in the same graph
 
-import tkinter as tk  # importing the GUI toolkit interface
-from tkinter import messagebox
+# import tkinter as tk  # importing the GUI toolkit interface
+# from tkinter import messagebox
 
 # %% THIS SECTION HAS ALL THE FUNCTIONS THAT ARE USED LATER IN THE SCRIPT
 
@@ -1707,9 +1707,6 @@ elif test_req_num == "25063":
         T_DHW = 55  # DHW Setpoint temperature [°C]
         T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
-
-
-
 
 elif test_req_num == "25066":
 

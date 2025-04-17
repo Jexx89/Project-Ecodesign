@@ -4,11 +4,24 @@
 @author: Marcello Nitti
 """
 
-import os
-import pandas as pd # importing pandas dataframe
-
 #%% CLASS
 
+# class file_parameters:
+#     test_req_num:str #Test number as such YYXXX (YY year)(XXXtest number)
+#     test_num:str # Test Itereation from A to Z
+#     alg_typ:int  # The algo type from 1 to 99
+#     T_DHW: int # DHW Setpoint temperature [°C]
+#     T_ADD: int # This is the delta T between the T_CH and T_DHW_SP [°C]
+#     T_HYS: int # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    
+#     def __init__(self):
+#         pass
+
+#     def fol_test()->str:
+#         return  test_req_num + test_num
+    
+#     def name_test_descp()->str:
+#         return fol_test() + "_XXL_HM70TC_Algo" + alg_typ
 
 class name_files:
 
