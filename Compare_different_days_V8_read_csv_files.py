@@ -120,15 +120,17 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 # test_num = [["HM", "60kW", "HM60TC", "25028", "I", 8, "SEEB", 909],
 #             ["HM", "60kW", "HM60TC", "25013", "A", 1, "microPLAN", 0]]
 
-test_num = [["HM", "85kW", "HM85TC", "25021", "V", 16, "SEEB", 58],
-            ["HM", "85kW", "HM85TC", "25021", "U", 16, "SEEB", 0]]
+# test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
+#             ["HM", "70kW", "HM70TC", "25066", "D", 2, "SEEB", 24]]
+test_num = [["HM", "35kW", "HM35TC", "24123", "C", 3, "microPLAN", 0],
+             ["HM", "35kW", "HM35TC", "25063", "C", 1, "microPLAN", 0]]
 
 Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
 Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
 Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
 Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-Plt_PLC = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 microPLAN_data_prm_ax = [
     ["_Test_T_in_DHW","T°in DHW [°C]"], # Inlet temperature coming from the grid [°C]

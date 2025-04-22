@@ -1731,6 +1731,12 @@ elif test_req_num == "25066":
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    if test_num == "D":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 elif test_req_num == "25013":
 
     fol_test = test_req_num + test_num
