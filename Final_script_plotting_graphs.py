@@ -818,60 +818,24 @@ def align_input_user(s: str) -> str:
 # filter data day 1 - Use Scattergl
 # no filter data day 1 - Use Scatter
 
-# test_req_num = "24108" # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-# test_appl = "HM" # The appliance used for the test: HM or Monotank
-# pow_appl = "120" # The power of the appliance in kW: 25, 35, 45, 70, 85, 120, 45X, 25X
-# fol_appl = test_appl + os.sep + pow_appl + "kW" + os.sep # The master folder where the different tests for one appliance are stored
-# test_num = "L" # The test number. It can be A, B, C, D, etc.
-# alg_typ = "11" # The algorithm type/number we use for the tests
-
-
-# Plt_MiPLAN = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-# Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
-# Plt_MiCOM = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-# Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
-# Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-# Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
-
-
 negativeAnswer = ("NO", "NON", "N", "", "0")
 
-test_req_num = input(
-    align_input_user("Enter the test request number(yyxxx): ")
-)  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-test_appl = input(
-    align_input_user("Enter the test appliance type (HM or Monotank):")
-)  # The appliance used for the test: HM or Monotank
-pow_appl = input(
-    align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): ")
-)  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-fol_appl = (
-    test_appl + os.sep + pow_appl + "kW" + os.sep
-)  # The master folder where the different tests for one appliance are stored
-test_num = input(
-    align_input_user("Enter the test letter: ")
-)  # The test number. It can be A, B, C, D, etc.
-alg_typ = input(
-    align_input_user("Enter the alorithm number:")
-)  # The algorithm type/number we use for the tests
-Plt_MiPLAN = input(
-    align_input_user("Plot MicroPLAN data?       Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = input(
-    align_input_user("Plot SEEB data?            Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
-Plt_MiCOM = input(
-    align_input_user("Plot MicroCOM data?        Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
-Plt_DHW = input(
-    align_input_user("Plot FieldLogger data?     Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
-Plt_Side_T = input(
-    align_input_user("Side temperature data?     Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
-Plt_PLC = input(
-    align_input_user("Plot PLC data?             Yes or No:")
-)  # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+test_req_num = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+test_appl = input(align_input_user("Enter the test appliance type (HM or Monotank):"))  # The appliance used for the test: HM or Monotank
+pow_appl = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
+fol_appl = (test_appl + os.sep + pow_appl + "kW" + os.sep)  # The master folder where the different tests for one appliance are stored
+test_num = input(align_input_user("Enter the test letter: "))  # The test number. It can be A, B, C, D, etc.
+alg_typ =''
+# alg_typ = input(
+#     align_input_user("Enter the alorithm number:")
+# )  # The algorithm type/number we use for the tests
+Plt_MiPLAN = input(align_input_user("Plot MicroPLAN data?       Yes or No:")).upper() not in negativeAnswer  # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+
+Plt_SEEB = input(align_input_user("Plot SEEB data?            Yes or No:")).upper()  not in negativeAnswer   # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_MiCOM = input(align_input_user("Plot MicroCOM data?        Yes or No:")).upper()  not in negativeAnswer   # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
+Plt_DHW = input(align_input_user("Plot FieldLogger data?     Yes or No:")).upper()  not in negativeAnswer   # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
+Plt_Side_T = input(align_input_user("Side temperature data?     Yes or No:")).upper()  not in negativeAnswer   # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
+Plt_PLC = input(align_input_user("Plot PLC data?             Yes or No:")).upper()  not in negativeAnswer   # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
 
 if test_req_num == "23146":
 
@@ -1690,7 +1654,8 @@ elif test_req_num == "25063":
 
 
     fol_test = test_req_num + test_num
-    name_test_descp = fol_test + "_XXL_HM35TC_Algo" + alg_typ
+    name_test_descp = fol_test + "_XXL_HM35TC" #_Algo" + alg_typ"
+    # name_test_descp = fol_test + "_XXL_HM35TC_Algo" + alg_typ
 
     if test_num == "A":
 
@@ -1707,11 +1672,29 @@ elif test_req_num == "25063":
         T_DHW = 55  # DHW Setpoint temperature [°C]
         T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "D":
+
+        T_DHW = 55  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "E":
+
+        T_DHW = 55  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "F":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 6  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25066":
 
     fol_test = test_req_num + test_num
-    name_test_descp = fol_test + "_XXL_HM70TC_Algo" + alg_typ
+    name_test_descp = fol_test + "_XXL_HM70TC" #_Algo" + alg_typ"
+    # name_test_descp = fol_test + "_XXL_HM70TC_Algo" + alg_typ
 
     if test_num == "A":
 
@@ -1737,16 +1720,33 @@ elif test_req_num == "25066":
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    if test_num == "E":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "F":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 elif test_req_num == "25013":
 
     fol_test = test_req_num + test_num
-    name_test_descp = fol_test + "_XXL_HM60TC_Algo" + alg_typ
+    name_test_descp = fol_test + "_XXL_HM60TC"#_Algo" + alg_typ
+    # name_test_descp = fol_test + "_XXL_HM60TC_Algo" + alg_typ
 
     if test_num == "A":
 
         T_DHW = 50  # DHW Setpoint temperature [°C]
         T_ADD = 13  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "B":
+        T_DHW = 50  # DHW Setpoint temperature [°C]
+        T_ADD = 13  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 
 elif test_req_num == "25028":
 
@@ -1799,28 +1799,28 @@ compl_path = (fol_appl + fol_test)  # complete path where we saved the csv file 
 st = time.time()
 
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     dt_microplan = read_csv_file(compl_path, name_test_miplan, ",")
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     # dt_SEEB = read_csv_file(compl_path,name_test_SEEB,"\t")
     dt_SEEB_Enr5 = read_csv_file(compl_path, name_test_SEEB_Enr5, ",")
 
-if not (Plt_MiCOM.upper() in negativeAnswer):
+if Plt_MiCOM:
 
     dt_microcom = read_csv_file(compl_path, name_test_micom, ",")
 
-if not (Plt_DHW.upper() in negativeAnswer):
+if Plt_DHW:
 
     dt_DHW = read_csv_file(compl_path, name_test_DHW, ",")
 
-if not (Plt_Side_T.upper() in negativeAnswer):
+if Plt_Side_T:
 
     dt_side_T = read_csv_file(compl_path, name_test_side_T, ",")
 
-if not (Plt_PLC.upper() in negativeAnswer):
+if Plt_PLC:
 
     dt_PLC = read_csv_file(compl_path, name_test_PLC, ",")
 
@@ -1830,11 +1830,11 @@ et_rd_df = time.time()
 # get the execution time
 rd_time = et_rd_df - st
 
-print("Finish reading data in " + str(rd_time) + " seconds")
+print(f"Finish reading data in {rd_time:.3f} seconds")
 
 # %% THIS SECTION READ THE CSV DATA AND STORE THEIR VALUES IN DIFFERENT ARRAYS
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     (
         t_st_rec_miplan,
@@ -1854,7 +1854,7 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
         T_amb
     ) = read_df_microplan(dt_microplan)
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     # t_st_rec_SEEB,T_in_DHW,T_out_avg,T_fume,flow_valve_1_L,flow_valve_2_L,P_val_in,By_pass_val_ON,Tap_val_ON,Gas_vol,Gas_counter_L = read_df_SEEB(dt_SEEB)
     (
@@ -1871,7 +1871,7 @@ if not (Plt_SEEB.upper() in negativeAnswer):
         
     ) = read_df_SEEB_Enr5(dt_SEEB_Enr5)
 
-if not (Plt_MiCOM.upper() in negativeAnswer):
+if Plt_MiCOM:
 
     # T_sup,T_ret,T_DHW_stor,Flame_current,T_fume_mc,Burn_mod = read_df_microcom(dt_microcom,"no") # Storing the MICROCOM
     (
@@ -1888,16 +1888,14 @@ if not (Plt_MiCOM.upper() in negativeAnswer):
         dt_microcom, "yes"
     )  # Storing the MICROCOM
 
-if not (Plt_DHW.upper() in negativeAnswer):
+if Plt_DHW:
 
     # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"Normal") # Storing the DHW data
     # T1, T2, T3, T4, T5, T6, T7, T8 = read_df_DHW_sens(dt_DHW,"Monotank") # Storing the DHW data
     # T1, T2, T3, T4, T5 = read_df_DHW_sens(dt_DHW,"45TC") # Storing the DHW data
-    T1, T2, T3, T4, T5, T6, T7 = read_df_DHW_sens(
-        dt_DHW, "70TC"
-    )  # Storing the DHW data
+    T1, T2, T3, T4, T5, T6, T7 = read_df_DHW_sens( dt_DHW, "70TC")  # Storing the DHW data
 
-if not (Plt_Side_T.upper() in negativeAnswer):
+if Plt_Side_T:
 
     # CH1, CH2, CH3, CH4 = read_df_side_T(dt_side_T) # Storing the side temperature data
     CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9 = read_df_side_T(
@@ -1906,7 +1904,7 @@ if not (Plt_Side_T.upper() in negativeAnswer):
     # CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9, CH10, CH11, CH12, CH13, CH14, = read_df_side_T(dt_side_T) # Storing the side temperature data
     # CH1, CH2, CH3, CH4, CH5, CH6, CH7, CH8, CH9, CH10, CH11, CH12, CH13, CH14, CH15, CH16, = read_df_side_T(dt_side_T) # Storing the side temperature data
 
-if not (Plt_PLC.upper() in negativeAnswer):
+if Plt_PLC:
 
     # pump_onoff,pump_stp,pump_speed = read_df_PLC(dt_PLC,"No") # Storing the PLC data
     (
@@ -1927,46 +1925,46 @@ if not (Plt_PLC.upper() in negativeAnswer):
 # PLOT THEM WITH THE CORRECT TIME DELAY AND MATCH THE MICROPLAN DATASET
 
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     add_cor_time_miPLAN = res_timing(dt_microplan, "Timestamp", t_st_rec_miplan)
 
-    if not (Plt_MiCOM.upper() in negativeAnswer):
+    if Plt_MiCOM:
 
         add_cor_time_miCOM = res_timing(dt_microcom, "Time DMY", t_st_rec_miplan)
 
-    if not (Plt_DHW.upper() in negativeAnswer):
+    if Plt_DHW:
 
         add_cor_time_DHW = res_timing(dt_DHW, "Date-Time", t_st_rec_miplan)
 
-    if not (Plt_Side_T.upper() in negativeAnswer):
+    if Plt_Side_T:
 
         add_cor_time_side_T = res_timing(dt_side_T, "Date&Time", t_st_rec_miplan)
 
-    if not (Plt_PLC.upper() in negativeAnswer):
+    if Plt_PLC:
 
         add_cor_time_PLC = res_timing(dt_PLC, "DATE-TIME", t_st_rec_miplan)
 
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     # # add_cor_time_SEEB = res_timing(dt_SEEB,"Unnamed: 0",t_st_rec_SEEB)
     # add_cor_time_SEEB = res_timing(dt_SEEB_Enr5,"Date Time",t_st_rec_SEEB)
     add_cor_time_SEEB = res_timing(dt_SEEB_Enr5, "Timestamp", t_st_rec_SEEB)
 
-    if not (Plt_MiCOM.upper() in negativeAnswer):
+    if Plt_MiCOM:
 
         add_cor_time_miCOM = res_timing(dt_microcom, "Time DMY", t_st_rec_SEEB)
 
-    if not (Plt_DHW.upper() in negativeAnswer):
+    if Plt_DHW:
 
         add_cor_time_DHW = res_timing(dt_DHW, "Date-Time", t_st_rec_SEEB)
 
-    if not (Plt_Side_T.upper() in negativeAnswer):
+    if Plt_Side_T:
 
         add_cor_time_side_T = res_timing(dt_side_T, "Date&Time", t_st_rec_SEEB)
 
-    if not (Plt_PLC.upper() in negativeAnswer):
+    if Plt_PLC:
 
         add_cor_time_PLC = res_timing(dt_PLC, "DATE-TIME", t_st_rec_SEEB)
 
@@ -2051,13 +2049,13 @@ for t in day_and_ind:
 
 # %% EXTRACTING THE STARTING AND ENDING DATE OF THE TESTS
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     rec_time_dt = pd.to_datetime(
         dt_microplan["Timestamp"], dayfirst="True"
     )  # Recording time array
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     # # rec_time_dt = pd.to_datetime(dt_SEEB["Unnamed: 0"],dayfirst="True") # Recording time array
     # rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Date Time"],dayfirst="True") # Recording time array
@@ -2085,13 +2083,13 @@ T_30 = (np.ones(len(T_out_avg)) * 30)  # This is a straight line at 30 [°C] to 
 T_45 = (np.ones(len(T_out_avg)) * 45)  # This is a straight line at 45 [°C] to see when we are below the delta T requested from the norm
 T_55 = (np.ones(len(T_out_avg)) * 55)  # This is a straight line at 55 [°C] to see if T OUT is above or below this treshold
 
-if not (Plt_MiPLAN.upper() in negativeAnswer) or not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_MiPLAN or Plt_SEEB:
     delta_T_req = (T_out_avg - T_in_DHW)  # Delta T required by the norm between T DHW out and T DHW [°C]
 
-if not (Plt_MiCOM.upper() in negativeAnswer):
+if Plt_MiCOM:
     delta_T_boil = T_sup - T_ret  # Delta T between T supply and T of the pump [°C]
 
-if not (Plt_PLC.upper() in negativeAnswer):
+if Plt_PLC:
     delta_T_boil_PLC = (T_sup_PLC - T_ret_PLC)  # Delta T between T supply and T of the pump [°C]
 
 # %% THIS SECTION SETS SOME PARAMETERS FOR THE PLOTTING CURVE
@@ -2109,14 +2107,14 @@ fig = make_subplots(specs=[[{"secondary_y": True}]])
 
 # Add traces
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
     add_time_set = add_cor_time_miPLAN
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
     add_time_set = add_cor_time_SEEB
 
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     trace_fig(
         add_cor_time_miPLAN,
@@ -2163,7 +2161,7 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
         lin_typ_1,
     )
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     trace_fig(
         add_cor_time_SEEB,
@@ -2210,7 +2208,7 @@ if not (Plt_SEEB.upper() in negativeAnswer):
         lin_typ_1,
     )
 
-if not (Plt_MiCOM.upper() in negativeAnswer):
+if Plt_MiCOM:
 
     trace_fig(
         add_cor_time_miCOM,
@@ -2257,7 +2255,7 @@ if not (Plt_MiCOM.upper() in negativeAnswer):
         lin_typ_1,
     )
 
-if not (Plt_MiPLAN.upper() in negativeAnswer):
+if Plt_MiPLAN:
 
     trace_fig(
         add_cor_time_miPLAN,
@@ -2406,7 +2404,7 @@ if not (Plt_MiPLAN.upper() in negativeAnswer):
     )
     # trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 
-if not (Plt_SEEB.upper() in negativeAnswer):
+if Plt_SEEB:
 
     trace_fig(
         add_cor_time_SEEB,
@@ -2513,7 +2511,7 @@ if not (Plt_SEEB.upper() in negativeAnswer):
     )
     # # trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 
-if not (Plt_MiCOM.upper() in negativeAnswer):
+if Plt_MiCOM:
 
     trace_fig(
         add_cor_time_miCOM,
@@ -2695,7 +2693,7 @@ trace_fig(
     lin_type_2,
 )
 
-if not (Plt_PLC.upper() in negativeAnswer):
+if Plt_PLC:
 
     trace_fig(
         add_cor_time_PLC,
@@ -2809,7 +2807,7 @@ if not (Plt_PLC.upper() in negativeAnswer):
         lin_typ_1,
     )
 
-if not (Plt_DHW.upper() in negativeAnswer):
+if Plt_DHW:
 
     trace_fig(
         add_cor_time_DHW,
@@ -2890,7 +2888,7 @@ if not (Plt_DHW.upper() in negativeAnswer):
     )
     # trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
 
-if not (Plt_Side_T.upper() in negativeAnswer):
+if Plt_Side_T:
 
     trace_fig(
         add_cor_time_side_T,
