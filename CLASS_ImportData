@@ -1,0 +1,83 @@
+import csv
+import pandas as pd
+
+def read_txt_to_dict(file_path):
+    data = []
+    try:
+        with open(file_path, mode='r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                row['ID'] = int(row['ID'])
+                row['SetpointDHW'] = int(row['SetpointDHW'])
+                row['ParamADDER'] = int(row['ParamADDER'])
+                row['ParamHysteresis'] = int(row['ParamHysteresis'])
+                row['ParamAdderCoef'] = float(row['ParamAdderCoef'])
+                data.append(row)
+    except FileNotFoundError:
+        print(f"Le fichier {file_path} n'a pas été trouvé.")
+    except Exception as e:
+        print(f"Une erreur s'est produite : {e}")
+    return data
+
+def read_tsv_to_dict(file_path):
+    data = []
+    try:
+        with open(file_path, mode='r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file, delimiter='\t')
+            for row in csv_reader:
+                row['ID'] = int(row['ID'])
+                row['SetpointDHW'] = int(row['SetpointDHW'])
+                row['ParamADDER'] = int(row['ParamADDER'])
+                row['ParamHysteresis'] = int(row['ParamHysteresis'])
+                row['ParamAdderCoef'] = float(row['ParamAdderCoef'])
+                data.append(row)
+    except FileNotFoundError:
+        print(f"Le fichier {file_path} n'a pas été trouvé.")
+    except Exception as e:
+        print(f"Une erreur s'est produite : {e}")
+    return data
+
+def read_xlsx_to_dict(file_path, sheet_name=0):
+    data = []
+    try:
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
+        df['ID'] = df['ID'].astype(int)
+        df['SetpointDHW'] = df['SetpointDHW'].astype(int)
+        df['ParamADDER'] = df['ParamADDER'].astype(int)
+        df['ParamHysteresis'] = df['ParamHysteresis'].astype(int)
+        df['ParamAdderCoef'] = df['ParamAdderCoef'].astype(float)
+        data = df.to_dict(orient='records')
+    except FileNotFoundError:
+        print(f"Le fichier {file_path} n'a pas été trouvé.")
+    except Exception as e:
+        print(f"Une erreur s'est produite : {e}")
+    return data
+
+def read_file_to_dict(file_path, file_type='xlsx', sheet_name=0):
+    if file_type.lower() == 'txt':
+        return read_txt_to_dict(file_path)
+    elif file_type.lower() == 'csv':
+        return read_txt_to_dict(file_path)
+    elif file_type.lower() == 'tsv':
+        return read_tsv_to_dict(file_path)
+    elif file_type.lower() == 'xlsx':
+        return read_xlsx_to_dict(file_path, sheet_name)
+    else:
+        raise ValueError("Type de fichier non pris en charge. Utilisez 'txt', 'csv', 'tsv', ou 'xlsx'.")
+
+# Exemple d'utilisation
+if __name__ == "__main__":
+    file_path_xlsx = 'chemin_vers_votre_fichier.xlsx'
+    data_dict_xlsx = read_file_to_dict(file_path_xlsx, file_type='xlsx')
+    print("Données du fichier Excel:")
+    print(data_dict_xlsx)
+
+    file_path_csv = 'chemin_vers_votre_fichier.csv'
+    data_dict_csv = read_file_to_dict(file_path_csv, file_type='csv')
+    print("Données du fichier CSV:")
+    print(data_dict_csv)
+
+    file_path_tsv = 'chemin_vers_votre_fichier.tsv'
+    data_dict_tsv = read_file_to_dict(file_path_tsv, file_type='tsv')
+    print("Données du fichier TSV:")
+    print(data_dict_tsv)
