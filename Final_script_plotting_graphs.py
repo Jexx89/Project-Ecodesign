@@ -620,33 +620,19 @@ def res_timing(dt, col_name_time, t0_miplan):
         An array countaining all the sincronised seconds [s]
     """
 
-    dt_time = pd.to_datetime(
-        dt[col_name_time], dayfirst="True"
-    )  # have the date and hour in dataframe
+    dt_time = pd.to_datetime(dt[col_name_time], dayfirst="True")  # have the date and hour in dataframe
     st_year = dt_time.dt.year[0]  # Year when we start recording
     st_month = dt_time.dt.month[0]  # Month when we start recording
     st_day = dt_time.dt.day[0]  # Day when we start recording
-    sec_array = (
-        dt_time.dt.hour * 60 + dt_time.dt.minute
-    ) * 60 + dt_time.dt.second  # have all the hours, min and sec in one array with only seconds
+    sec_array = (dt_time.dt.hour * 60 + dt_time.dt.minute) * 60 + dt_time.dt.second  # have all the hours, min and sec in one array with only seconds
     date_array = dt_time.dt.date  # saving only the date
-    index_day = (
-        date_array - date_array[0]
-    )  # having index of how many days havcce passed
-    ind_arr_days_int = index_day / np.timedelta64(
-        1, "s"
-    )  # array with the number of days passed in seconds
-    st_rec_miplan = (
-        t0_miplan.hour * 3600 + t0_miplan.minute * 60 + t0_miplan.second
-    )  # Staring time of the microplan in seconds
-    new_sec_arr = (
-        sec_array + ind_arr_days_int - st_rec_miplan
-    )  # Correct time to be added from the reference date, corrected from the 0 of the microplan
+    index_day = (date_array - date_array[0])  # having index of how many days havcce passed
+    ind_arr_days_int = index_day / np.timedelta64(1, "s")  # array with the number of days passed in seconds
+    st_rec_miplan = (t0_miplan.hour * 3600 + t0_miplan.minute * 60 + t0_miplan.second)  # Staring time of the microplan in seconds
+    new_sec_arr = (sec_array + ind_arr_days_int - st_rec_miplan)  # Correct time to be added from the reference date, corrected from the 0 of the microplan
     # ind_arr_days_int = (index_day/np.timedelta64(1, "s"))/86400 # array with the number of days passed. Just number as integer in days and not seconds
     # new_sec_arr = sec_array + ind_arr_days_int*86400 - (17*3600+22*60+33) # - sec_array[0] # Correct time to be added from the reference date, corrected from the 0 of the microplan
-    ref_time = datetime.datetime(
-        year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00
-    )  # make a reference time for the tests
+    ref_time = datetime.datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
     adj_rec_time = [ref_time + datetime.timedelta(seconds=i) for i in new_sec_arr]
 
     return adj_rec_time
@@ -1730,6 +1716,11 @@ elif test_req_num == "25066":
         T_DHW = 51  # DHW Setpoint temperature [°C]
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "G":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25013":
 
@@ -2051,17 +2042,13 @@ for t in day_and_ind:
 
 if Plt_MiPLAN:
 
-    rec_time_dt = pd.to_datetime(
-        dt_microplan["Timestamp"], dayfirst="True"
-    )  # Recording time array
+    rec_time_dt = pd.to_datetime(dt_microplan["Timestamp"], dayfirst="True")  # Recording time array
 
 if Plt_SEEB:
 
     # # rec_time_dt = pd.to_datetime(dt_SEEB["Unnamed: 0"],dayfirst="True") # Recording time array
     # rec_time_dt = pd.to_datetime(dt_SEEB_Enr5["Date Time"],dayfirst="True") # Recording time array
-    rec_time_dt = pd.to_datetime(
-        dt_SEEB_Enr5["Timestamp"], dayfirst="True"
-    )  # Recording time array
+    rec_time_dt = pd.to_datetime( dt_SEEB_Enr5["Timestamp"], dayfirst="True")  # Recording time array
 
 
 st_y = str(rec_time_dt.dt.year[0])  # Year when we start recording
