@@ -1689,6 +1689,17 @@ elif test_req_num == "25063":
         T_DHW = 54  # DHW Setpoint temperature [°C]
         T_ADD = 6  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "H":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 8  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 5  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "G":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 8  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25066":
 
@@ -1730,6 +1741,11 @@ elif test_req_num == "25066":
         T_DHW = 51  # DHW Setpoint temperature [°C]
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 8  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "G":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
 elif test_req_num == "25013":
 
