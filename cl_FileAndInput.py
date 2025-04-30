@@ -3,6 +3,7 @@ from time import time as ti
 from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd
 from os.path import isfile, join, dirname, normpath
+from cl_EcoParam import *
 # from CLASS_ImportData import read_file_to_dict
 # from sys import exit
 from enum import Enum
@@ -206,7 +207,7 @@ class MicroplanFile(InputFile):
         """
             # df['InertiaMBTPercent'] = df['InertiaMBTPercent'].astype(int)
             # data = df.to_dict(orient='records')
-        T_in_DHW = self.df["T°in DHW [°C]"].astype(int)  # Inlet temperature coming from the grid [°C]
+        T_in_DHW= self.df["T°in DHW [°C]"]  # Inlet temperature coming from the grid [°C]
         T_out_avg = self.df["T°out AV.  [°C]"]  # Average outlet temperature for the domestic hot water [°C]
         T_out_PT100 = self.df["T°out PT100  [°C]"]  # Outlet temperature for the domestic hot water - sensor PT100 [°C]
         T_out_TC1 = self.df["T°out TC1  [°C]"]  # Outlet temperature for the domestic hot water - sensor TC1 [°C]
@@ -644,52 +645,6 @@ class EcoDesign(Ecodesign_folder):
             break
         return dict()
 
-#class to handle the parameter section of the ecodesign function
-class cl_EcoDesign_Parameter():
-    def __init__(self, Test_request:int=1,Test_Num:str='A'):
-        self.test_parameters = self.import_test_param(Test_request,Test_Num)
-
-    #import parameter from test
-    def import_test_param(self,test_req_num:int,test_letter:str)->list:
-        #file path of our parameter table  
-        file_path_xlsx = f"{getcwd()}{sep}DataTable_TestParam.xlsx"
-        #filtering to get only the good test parameter
-        # print(read_file_to_dict(file_path_xlsx, file_type='xlsx'))
-        test_parameters = list(filter(lambda data: data['TestRequest'] == test_req_num and data['TestNum'] == test_letter, self.read_xlsx_to_dict(file_path_xlsx, 0)))
-        
-        if len(test_parameters) < 1:
-            raise ErrorFile(f"No parameters found for this test :  '{test_req_num}{test_letter}'")
-        elif len(test_parameters) > 1:
-            for i in test_parameters: print(i)
-            idTest = input("A few parameter set was found please enter the correct 'ID' :")
-            test_parameters = list(filter(lambda data: data['ID'] == int(idTest) , test_parameters))
-        return test_parameters
-
-    #function used to read the xlsx database of all the parameters
-    def read_xlsx_to_dict(self,file_path, sheet_name=0):
-        data = []
-        try:
-            df = read_excel(file_path, sheet_name=sheet_name)
-            df['ID'] = df['ID'].astype(int)
-            df['SetpointDHW'] = df['SetpointDHW'].astype(int)
-            df['ParamADDER'] = df['ParamADDER'].astype(int)
-            df['ParamHysteresis'] = df['ParamHysteresis'].astype(int)
-            df['ParamAdderCoef'] = df['ParamAdderCoef'].astype(float)
-            df['P_factor'] = df['P_factor'].astype(int)
-            df['I_Factor'] = df['I_Factor'].astype(int)
-            df['SetPointDeltaPump'] = df['SetPointDeltaPump'].astype(int)
-            df['PrePumpPercent'] = df['PrePumpPercent'].astype(int)
-            df['PrePumpTime'] = df['PrePumpTime'].astype(int)
-            df['PrePumpBurningPercent'] = df['PrePumpBurningPercent'].astype(int)
-            df['PostPumpPercent'] = df['PostPumpPercent'].astype(int)
-            df['PostPumpTime'] = df['PostPumpTime'].astype(int)
-            df['InertiaMBTPercent'] = df['InertiaMBTPercent'].astype(int)
-            data = df.to_dict(orient='records')
-        except FileNotFoundError:
-            print(f"Le fichier {file_path} n'a pas été trouvé.")
-        except Exception as e:
-            print(f"Une erreur s'est produite : {e}")
-        return data
 
 
 # %% run main function 
