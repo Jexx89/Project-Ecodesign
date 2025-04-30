@@ -10,7 +10,7 @@ from os import getcwd, sep
 class ErrorFile(Exception):
     pass
 
-#class to handle the parameter section of the ecodesign function
+# %% class to handle the parameter section of the ecodesign function
 class cl_EcoDesign_Parameter():
     def __init__(self, Test_request:int=1,Test_Num:str='A'):
         self.ALL_DF:DataFrame = []
@@ -62,9 +62,6 @@ class cl_EcoDesign_Parameter():
         except Exception as e:
             print(f"Une erreur s'est produite : {e}")
         return data
-
-
-
 
     def read_txt_to_dict(self,file_path):
         data = DataFrame
@@ -136,9 +133,9 @@ class cl_EcoDesign_Parameter():
         else:
             raise ValueError("Type de fichier non pris en charge. Utilisez 'txt', 'csv', 'tsv', ou 'xlsx'.")
 
-# Exemple d'utilisation
+#%% Exemple d'utilisation
 if __name__ == "__main__":
-    dataFile = cl_EcoDesign_Parameter(25063,"G").test_parameters
+    dataFile = cl_EcoDesign_Parameter(25066,"H").test_parameters
     print("\nDonnées du fichier Excel:")
     for i in dataFile: print(f"{i} = {dataFile[i].values}")
     
