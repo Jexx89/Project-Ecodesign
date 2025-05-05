@@ -123,10 +123,13 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 # test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
 #             ["HM", "70kW", "HM70TC", "25066", "D", 2, "SEEB", 24]]
 test_num = [["HM", "35kW", "HM35TC", "24123", "C", 3, "microPLAN", 0],
-             ["HM", "35kW", "HM35TC", "25063", "C", 1, "microPLAN", 0]]
+             ["HM", "35kW", "HM35TC", "25063", "H", 1, "microPLAN", 102]]
+             
+# test_num = [["HM", "70kW", "HM70TC", "25027", "A", 3, "SEEB", 0], # si le test 1 est devant alors on avance l'autre
+#              ["HM", "70kW", "HM70TC", "25066", "H", 1, "SEEB", 392]] #si le test 2 est devant alors on avance l'autre
 
 Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
-Plt_SEEB = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
+Plt_SEEB = "No" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
 Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
 Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
 Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
@@ -261,13 +264,18 @@ for i in tqdm(test_num, desc="ESTIMATOR LOOP 1"):
 
     fol_path = i[0] + os.sep + i[1] + os.sep + i[3] + i[4]
 
-    file_name_microPLAN = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Microplan_Log"
-    file_name_SEEB = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_SEEB_Enr5"
-    file_name_microCOM = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Microcom"
-    file_name_DHW = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_DHW_Temperature"
-    file_name_side_T = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Side_Temperature"
-    file_name_PLC = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_PLC"
-
+    # file_name_microPLAN = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Microplan_Log"
+    # file_name_SEEB = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_SEEB_Enr5"
+    # file_name_microCOM = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Microcom"
+    # file_name_DHW = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_DHW_Temperature"
+    # file_name_side_T = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_Side_Temperature"
+    # file_name_PLC = i[3] + i[4] + "_XXL_" + i[2] + "_Algo" + str(i[5]) + "_PLC"
+    file_name_microPLAN = i[3] + i[4] + "_XXL_" + i[2] + "_Microplan_Log"
+    file_name_SEEB = i[3] + i[4] + "_XXL_" + i[2] + "_SEEB_Enr5"
+    file_name_microCOM = i[3] + i[4] + "_XXL_" + i[2] + "_Microcom"
+    file_name_DHW = i[3] + i[4] + "_XXL_" + i[2] + "_DHW_Temperature"
+    file_name_side_T = i[3] + i[4] + "_XXL_" + i[2] + "_Side_Temperature"
+    file_name_PLC = i[3] + i[4] + "_XXL_" + i[2] + "_PLC"
     if i[6] == "microPLAN":
         
         dt_microPLAN = impt_csv_txt_obj.read_csv_file_v2(fol_path,file_name_microPLAN,",")
