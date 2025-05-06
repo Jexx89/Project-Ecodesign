@@ -3,7 +3,7 @@ from pandas import read_excel, read_csv, to_datetime, to_numeric, DataFrame
 from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd
 from os.path import isfile, join, dirname, normpath
-from enum import Enum
+
 
 # %% error handling
 class ErrorFile(Exception):

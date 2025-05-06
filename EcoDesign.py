@@ -1,15 +1,5 @@
 from cl_FileAndInput import *
-
-
-
-# %% enum classes
-class FILE_NAME(Enum):
-    MICROPLAN = 1
-    MICROCOM = 2
-    DHW_TEMPERATURE = 3
-    SIDE_TEMPERATURE = 4
-    PLC = 5
-    SEEB = 6
+from cl_EcoParam import *
 
 
 # %% Ecodesign classes
@@ -18,7 +8,7 @@ class EcoDesign(FilterFileFromFolder):
     Class specific for ecodesign ploting, incorporating up to 5 differents kind of file to plot in one .html file.
     This class enherit from the class: FilterFileFromFolder -> InputFolder because we a selecting the files first by selecting a folder. 
     '''
-    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[[FILES_LIST.fCSV]],Test_request:str='',Test_Num:str='',Appliance_power:str=''):
+    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value],Test_request:str='',Test_Num:str='',Appliance_power:str=''):
         '''
         Initialize whent he class is called
 
@@ -43,6 +33,9 @@ class EcoDesign(FilterFileFromFolder):
         Initialize the class
 
         '''
+        if Path_Folder == '' and Test_request!='':
+                Path_Folder = f"HM\\{Appliance_power}kW\\{Test_request}{Test_Num}\\"
+
         super().__init__(currDir, Path_Folder, FileType)
         self.test_req_num:str=Test_request
         self.test_letter:str=Test_Num
@@ -55,6 +48,7 @@ class EcoDesign(FilterFileFromFolder):
             self.paramSet = cl_EcoDesign_Parameter(int(self.test_req_num), self.test_letter)
             self.dictFileToPlot = self.dict_file_to_plot(self.FilterdFile,self.Path_Folder)
             self.FilesDataFrame = self.import_all_ploting_data(self.dictFileToPlot)
+            self.add_parameter()
         except ErrorFile as error:
             print(f"\nOpening files interupted : {error}")
 
@@ -123,11 +117,22 @@ class EcoDesign(FilterFileFromFolder):
             a dictionary with the name as a key and the full path as a value of all the files we found to plot
 
         '''
-        fileFoundToPlot = dict()
+        header_list = dict(
+                MICROPLAN = 'Timestamp',
+                MICROCOM = 'Time DMY',
+                DHW_TEMPERATURE = 'Date-Time',
+                SIDE_TEMPERATURE = 'Date&Time',
+                PLC = 'DATE-TIME',
+                SEEB = 'Timestamp')
+
+        fileFoundToPlot=[]
         for f in listFiles:
-            for xf in FILE_NAME : 
-                if xf.name in f.upper():
-                    fileFoundToPlot[xf]=join(Path_Folder,f)
+            for xf in header_list:
+                if xf in f.upper():
+                    fileFoundToPlot.append({
+                        "type": xf, 
+                        "path":join(Path_Folder,f), 
+                        "header_time":header_list[xf]})
                     break
         if len(fileFoundToPlot) == 0:
             raise ErrorFile(f"No file '.csv' files found in '{Path_Folder}'")
@@ -137,8 +142,7 @@ class EcoDesign(FilterFileFromFolder):
     def import_all_ploting_data(self,dictFileToPlot)->dict:
         '''
         Function to go trough all the files in the dictionary and launch :
-            - reading 
-            - ploting
+            - reading
 
         Parameter
         -----------------
@@ -150,20 +154,30 @@ class EcoDesign(FilterFileFromFolder):
         -----------------
             void
         '''
-        for d in dictFileToPlot:
-            if d == FILE_NAME.MICROPLAN:
-                print(f"fileName :{dictFileToPlot[d]}")
+        self.files=[]
+        if "MICROPLAN" in dictFileToPlot:
+            fl = InputFile(Path_File=dictFileToPlot["MICROPLAN"].get(),header_time=FILE_NAME.MICROPLAN.value,FileType=FILES_LIST.fCSV)
 
-                #do the stuuuuf
-            elif d == FILE_NAME.MICROCOM:
-                print(f"fileName :{dictFileToPlot[d]}")
-                #do the stuuuuf
-            elif d == FILE_NAME.SEEB:
-                print(f"fileName :{dictFileToPlot[d]}")
-                #do the stuuuuf
-            break
-        return 0
+        elif "SEEB" in dictFileToPlot:
+            fl = InputFile(Path_File=dictFileToPlot[FILE_NAME.SEEB],header_time=FILE_NAME.SEEB.value,FileType=FILES_LIST.fCSV)
+        else:
+            raise ErrorFile(f"No main file found in '{self.Path_Folder}'")
+        st_start= fl.df[FILE_NAME.MICROPLAN.value][0]
+        st_year = st_start.dt.year
+        st_month = st_start.dt.month
+        st_day = st_start.dt.day
+        ref_time = to_datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
+        diff_time_to_normalise = ref_time - st_start
+        fl.df[FILE_NAME.MICROPLAN.value]  = fl.df[FILE_NAME.MICROPLAN.value] - diff_time_to_normalise
+        self.files.append(fl)
 
+
+
+
+        self.files.append([InputFile(Path_File=dictFileToPlot[d],header_time=d.value,FileType=FILES_LIST.fCSV) for d in dictFileToPlot if d != FILE_NAME.SEEB & d != FILE_NAME.MICROPLAN])
+
+    def add_parameter(self):
+        w=1
 
 # %% run main function 
 if __name__ == "__main__":
