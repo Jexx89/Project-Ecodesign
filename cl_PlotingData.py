@@ -208,7 +208,8 @@ class GeneratePlot():
             dict(x=df[self.header_time],y=df["T°out TC2  [°C]"]           ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T TC2  [°C]"              , visible=False ,opacity = 1,line=dict(color="peru"       , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[self.header_time],y=df["T°out TC3  [°C]"]           ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T TC3  [°C]"              , visible=False ,opacity = 1,line=dict(color="papayawhip"       , width=1.5, dash="solid"),secondary_y = False),
            ]
-        self.trace_param.append(trace_param)
+#tofinish
+self.trace_param.append(trace_param)
 
 
 # %% run main function 

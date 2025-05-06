@@ -3,7 +3,7 @@ from pandas import read_excel, read_csv, to_datetime, to_numeric, DataFrame
 from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd
 from os.path import isfile, join, dirname, normpath
-
+from enum import Enum
 
 # %% error handling
 class ErrorFile(Exception):
@@ -42,7 +42,7 @@ class InputFile():
             self.Path_Folder:str= dirname(self.Path_File)
 
         if FileType[0] == FILES_LIST.fCSV:
-            self.df, self.time_start, self.time_end = self.read_csv_to_df(',',0)
+            self.df = self.read_csv_to_df(',',0)
         elif FileType[0] == FILES_LIST.fEXCELX:
             # do stuff
             i=1
@@ -91,7 +91,7 @@ class InputFile():
             )
         df[self.header_time] = to_datetime(df[self.header_time], dayfirst="True")  # Actual time when we start recording
     
-        return df , df[self.header_time][0], df[self.header_time][len(df[self.header_time])-1]
+        return df
 
 
 # %% folder class
@@ -99,7 +99,6 @@ class InputFolder():
     def __init__(self, currDir:str='', Path_Folder:str=''):
         self.currDir:str=currDir
         self.Path_Folder:str= Path_Folder
-
         if not currDir:
             self.currDir:str=f"{getcwd}{sep}HM"
         if not Path_Folder:
@@ -135,11 +134,11 @@ class InputFolder():
 
 class FilterFileFromFolder(InputFolder):
 
-    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[[FILES_LIST.fCSV]]):
+    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]):
         super().__init__(currDir,Path_Folder)
         self.FilterdFile = self.dict_file_type_in_folder(self.Path_Folder,FileType)
     
-    def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[[FILES_LIST.fCSV]])->list[str]:
+    def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->list[str]:
         ''' 
         Check if files type in a folder exist and return the list of them
 
@@ -157,8 +156,8 @@ class FilterFileFromFolder(InputFolder):
                 the list of all the files from a certain type
 
         '''
-        a,b = FileType[0]
+        b = FileType[0]
         filtered=[f for f in listdir(folder) if isfile(join(folder,f)) and f.lower().endswith(b)]
         if len(filtered) == 0:
-            raise ErrorFile(f"No file ({a}() files found in {folder}")
+            raise ErrorFile(f"No file ({b}() files found in {folder}")
         return filtered
