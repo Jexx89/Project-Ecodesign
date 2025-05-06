@@ -2113,881 +2113,102 @@ if Plt_SEEB:
     add_time_set = add_cor_time_SEEB
 
 
-if Plt_MiPLAN:
-
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_in_DHW,
-        "Rep_plot",
-        "Report_plot",
-        "T in DHW [°C]",
-        "cyan",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_out_avg,
-        "Rep_plot",
-        "Report_plot",
-        "T out avg [°C]",
-        "red",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        flow_DHW_kg,
-        "Rep_plot",
-        "Report_plot",
-        "FLDHW [kg/min]",
-        "darkgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        delta_T_req,
-        "Rep_plot",
-        "Report_plot",
-        "Delta T NORM [°C]",
-        "darkorange",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-
-if Plt_SEEB:
-
-    trace_fig(
-        add_cor_time_SEEB,
-        T_in_DHW,
-        "Rep_plot",
-        "Report_plot",
-        "T in DHW [°C]",
-        "cyan",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        T_out_avg,
-        "Rep_plot",
-        "Report_plot",
-        "T out avg [°C]",
-        "red",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        flow_kg,
-        "Rep_plot",
-        "Report_plot",
-        "FLDHW [kg/min]",
-        "darkgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        delta_T_req,
-        "Rep_plot",
-        "Report_plot",
-        "Delta T NORM [°C]",
-        "darkorange",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-
-if Plt_MiCOM:
-
-    trace_fig(
-        add_cor_time_miCOM,
-        T_sup,
-        "Rep_plot",
-        "Report_plot",
-        "T sup [°C]",
-        "darksalmon",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        T_DHW_stor,
-        "Rep_plot",
-        "Report_plot",
-        "T DHW storage [°C]",
-        "mediumblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        Flame_current,
-        "Rep_plot",
-        "Report_plot",
-        "Flame current [micr A]",
-        "peru",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        Burn_mod,
-        "Rep_plot",
-        "Report_plot",
-        "Burner mod[%]",
-        "violet",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
 
 if Plt_MiPLAN:
-
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_in_DHW,
-        "miPLAN",
-        "microPLAN",
-        "T in DHW [°C]",
-        "cyan",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_out_avg,
-        "miPLAN",
-        "microPLAN",
-        "T out avg [°C]",
-        "red",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_out_PT100,
-        "miPLAN",
-        "microPLAN",
-        "T out PT100 [°C]",
-        "maroon",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_amb,
-        "miPLAN",
-        "microPLAN",
-        "T°Amb [°C]",
-        "pink",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_out_TC1,
-        "miPLAN",
-        "microPLAN",
-        "T out TC1 [°C]",
-        "olivedrab",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_miPLAN,T_out_TC2,"miPLAN","microPLAN","T out TC2 [°C]","bisque",False,op_main_lin,lin_typ_1)
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_out_TC3,
-        "miPLAN",
-        "microPLAN",
-        "T out TC3 [°C]",
-        "fuchsia",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        T_fume,
-        "miPLAN",
-        "microPLAN",
-        "T fume MP[°C]",
-        "gray",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        flow_DHW_L,
-        "miPLAN",
-        "microPLAN",
-        "FLDHW [L/min]",
-        "lightgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        flow_DHW_kg,
-        "miPLAN",
-        "microPLAN",
-        "FLDHW [kg/min]",
-        "darkgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        Gas_vol,
-        "miPLAN",
-        "microPLAN",
-        "Cumul. Gaz Vol. Corr. [L]",
-        "orange",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        P_valv_in,
-        "miPLAN",
-        "microPLAN",
-        "P in [bar]",
-        "maroon",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        Pow_cons,
-        "miPLAN",
-        "microPLAN",
-        "Pow consumption [W]",
-        "tomato",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miPLAN,
-        delta_T_req,
-        "miPLAN",
-        "microPLAN",
-        "Delta T NORM [°C]",
-        "darkorange",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
-
+	trace_fig(add_cor_time_miPLAN,T_in_DHW,"Rep_plot","Report_plot","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_out_avg,"Rep_plot","Report_plot","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,flow_DHW_kg,"Rep_plot","Report_plot","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,delta_T_req,"Rep_plot","Report_plot","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
 if Plt_SEEB:
-
-    trace_fig(
-        add_cor_time_SEEB,
-        T_in_DHW,
-        "SEEB",
-        "SEEB",
-        "T in DHW [°C]",
-        "cyan",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        T_out_avg,
-        "SEEB",
-        "SEEB",
-        "T out avg [°C]",
-        "red",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        T_fume,
-        "SEEB",
-        "SEEB",
-        "T fume MP[°C]",
-        "gray",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        flow_kg,
-        "SEEB",
-        "SEEB",
-        "FLDHW [kg/min]",
-        "darkgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_SEEB,flow_valve_1_L,"SEEB","SEEB","FLDHW [L/min] valve 1","lightgreen",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_SEEB,flow_valve_2_L,"SEEB","SEEB","FLDHW [L/min] valve 2","darkgreen",False,op_main_lin,lin_typ_1)
-    # trace_fig(add_cor_time_SEEB,Tap_val_ON,"SEEB","SEEB","Flow valve ON","darkblue",False,op_main_lin,lin_typ_1)
-    trace_fig(
-        add_cor_time_SEEB,
-        Gas_vol,
-        "SEEB",
-        "SEEB",
-        "Total Gas consumed [L]",
-        "orange",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_SEEB,Gas_counter_L,"SEEB","SEEB","Gas counter [L/min]","tomato",True,op_main_lin,lin_typ_1)
-    trace_fig(
-        add_cor_time_SEEB,
-        P_val_in,
-        "SEEB",
-        "SEEB",
-        "P in [bar]",
-        "maroon",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        Pow_cons,
-        "SEEB",
-        "SEEB",
-        "Pow consumption [W]",
-        "tomato",
-        True,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        delta_T_req,
-        "SEEB",
-        "SEEB",
-        "Delta T NORM [°C]",
-        "darkorange",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_SEEB,
-        T_amb,
-        "SEEB",
-        "SEEB",
-        "T°Amb [°C]",
-        "pink",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # # trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
-
+	trace_fig(add_cor_time_SEEB,T_in_DHW,"Rep_plot","Report_plot","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,T_out_avg,"Rep_plot","Report_plot","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,flow_kg,"Rep_plot","Report_plot","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,delta_T_req,"Rep_plot","Report_plot","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
 if Plt_MiCOM:
-
-    trace_fig(
-        add_cor_time_miCOM,
-        T_sup,
-        "miCOM",
-        "microCOM",
-        "T sup [°C]",
-        "darksalmon",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        T_ret,
-        "miCOM",
-        "microCOM",
-        "T return [°C]",
-        "deeppink",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        T_DHW_stor,
-        "miCOM",
-        "microCOM",
-        "T DHW storage [°C]",
-        "mediumblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        Flame_current,
-        "miCOM",
-        "microCOM",
-        "Flame current [micr A]",
-        "peru",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        T_fume_mc,
-        "miCOM",
-        "microCOM",
-        "T fume MC[°C]",
-        "darkblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        Burn_mod,
-        "miCOM",
-        "microCOM",
-        "Burner mod[%]",
-        "violet",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        delta_T_boil,
-        "miCOM",
-        "microCOM",
-        "Delta T boiler [°C]",
-        "olivedrab",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        pump_speed_mCOM,
-        "miCOM",
-        "microCOM",
-        "Pump modulation [%]",
-        "mediumslateblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        pump_pwr_MicroCOM,
-        "miCOM",
-        "microCOM",
-        "Pump power consumed [W]",
-        "mediumspringgreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_miCOM,
-        burner_status,
-        "miCOM",
-        "microCOM",
-        "Burner status",
-        "tomato",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-
-    burner_status
-
-trace_fig(
-    add_time_set,
-    T_CH,
-    "Set",
-    "Settings",
-    "T CH STP [°C]",
-    "orange",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-trace_fig(
-    add_time_set,
-    Burn_ON,
-    "Set",
-    "Settings",
-    "T BURN ON [°C]",
-    "purple",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-trace_fig(
-    add_time_set,
-    T_DHW_SP,
-    "Set",
-    "Settings",
-    "T DHW Setpoint [°C]",
-    "red",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-trace_fig(
-    add_time_set,
-    T_30,
-    "Set",
-    "Settings",
-    "T = 30 [°C]",
-    "black",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-trace_fig(
-    add_time_set,
-    T_45,
-    "Set",
-    "Settings",
-    "T = 45 [°C]",
-    "black",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-trace_fig(
-    add_time_set,
-    T_55,
-    "Set",
-    "Settings",
-    "T = 55 [°C]",
-    "black",
-    False,
-    op_sec_lin,
-    lin_type_2,
-)
-
+	trace_fig(add_cor_time_miCOM,T_sup,"Rep_plot","Report_plot","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,T_DHW_stor,"Rep_plot","Report_plot","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,Flame_current,"Rep_plot","Report_plot","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,Burn_mod,"Rep_plot","Report_plot","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
+if Plt_MiPLAN:
+	trace_fig(add_cor_time_miPLAN,T_in_DHW,"miPLAN","microPLAN","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_out_avg,"miPLAN","microPLAN","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_out_PT100,"miPLAN","microPLAN","T out PT100 [°C]","maroon",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_amb,"miPLAN","microPLAN","T°Amb [°C]","pink",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_out_TC1,"miPLAN","microPLAN","T out TC1 [°C]","olivedrab",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_miPLAN,T_out_TC2,"miPLAN","microPLAN","T out TC2 [°C]","bisque",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_out_TC3,"miPLAN","microPLAN","T out TC3 [°C]","fuchsia",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,T_fume,"miPLAN","microPLAN","T fume MP[°C]","gray",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,flow_DHW_L,"miPLAN","microPLAN","FLDHW [L/min]","lightgreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,flow_DHW_kg,"miPLAN","microPLAN","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,Gas_vol,"miPLAN","microPLAN","Cumul. Gaz Vol. Corr. [L]","orange",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,P_valv_in,"miPLAN","microPLAN","P in [bar]","maroon",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,Pow_cons,"miPLAN","microPLAN","Pow consumption [W]","tomato",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miPLAN,delta_T_req,"miPLAN","microPLAN","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)# 
+	trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
+if Plt_SEEB:
+	trace_fig(add_cor_time_SEEB,T_in_DHW,"SEEB","SEEB","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,T_out_avg,"SEEB","SEEB","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,T_fume,"SEEB","SEEB","T fume MP[°C]","gray",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,flow_kg,"SEEB","SEEB","FLDHW [kg/min]","darkgreen",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_SEEB,flow_valve_1_L,"SEEB","SEEB","FLDHW [L/min] valve 1","lightgreen",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_SEEB,flow_valve_2_L,"SEEB","SEEB","FLDHW [L/min] valve 2","darkgreen",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_SEEB,Tap_val_ON,"SEEB","SEEB","Flow valve ON","darkblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,Gas_vol,"SEEB","SEEB","Total Gas consumed [L]","orange",True,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_SEEB,Gas_counter_L,"SEEB","SEEB","Gas counter [L/min]","tomato",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,P_val_in,"SEEB","SEEB","P in [bar]","maroon",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,Pow_cons,"SEEB","SEEB","Pow consumption [W]","tomato",True,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,delta_T_req,"SEEB","SEEB","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_SEEB,T_amb,"SEEB","SEEB","T°Amb [°C]","pink",False,op_main_lin,lin_typ_1)# # 
+	trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
+if Plt_MiCOM:
+	trace_fig(add_cor_time_miCOM,T_sup,"miCOM","microCOM","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,T_ret,"miCOM","microCOM","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,T_DHW_stor,"miCOM","microCOM","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,Flame_current,"miCOM","microCOM","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,T_fume_mc,"miCOM","microCOM","T fume MC[°C]","darkblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,Burn_mod,"miCOM","microCOM","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,delta_T_boil,"miCOM","microCOM","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,pump_speed_mCOM,"miCOM","microCOM","Pump modulation [%]","mediumslateblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,pump_pwr_MicroCOM,"miCOM","microCOM","Pump power consumed [W]","mediumspringgreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_miCOM,burner_status,"miCOM","microCOM","Burner status","tomato",False,op_main_lin,lin_typ_1)
+    # burner_status
+	trace_fig(add_time_set,T_CH,"Set","Settings","T CH STP [°C]","orange",False,op_sec_lin,lin_type_2,)
+	trace_fig(add_time_set,Burn_ON,"Set","Settings","T BURN ON [°C]","purple",False,op_sec_lin,lin_type_2,)
+	trace_fig(add_time_set,T_DHW_SP,"Set","Settings","T DHW Setpoint [°C]","red",False,op_sec_lin,lin_type_2,)
+	trace_fig(add_time_set,T_30,"Set","Settings","T = 30 [°C]","black",False,op_sec_lin,lin_type_2,)
+	trace_fig(add_time_set,T_45,"Set","Settings","T = 45 [°C]","black",False,op_sec_lin,lin_type_2,)
+	trace_fig(add_time_set,T_55,"Set","Settings","T = 55 [°C]","black",False,op_sec_lin,lin_type_2,)
 if Plt_PLC:
-
-    trace_fig(
-        add_cor_time_PLC,
-        pump_onoff,
-        "PLC",
-        "PLC",
-        "ON/OFF Pump",
-        "mediumpurple",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        pump_stp,
-        "PLC",
-        "PLC",
-        "Pump setpoint [°C]",
-        "mediumslateblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        pump_speed,
-        "PLC",
-        "PLC",
-        "Pump speed [%]",
-        "mediumvioletred",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_PLC,volt_flame_burn,"PLC","PLC","Voltage PLC [V]","rosybrown",False,op_main_lin,lin_typ_1)
-    trace_fig(
-        add_cor_time_PLC,
-        T_sup_PLC,
-        "PLC",
-        "PLC",
-        "T sup [°C]",
-        "darksalmon",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        T_ret_PLC,
-        "PLC",
-        "PLC",
-        "T return [°C]",
-        "deeppink",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        T_DHW_stor_PLC,
-        "PLC",
-        "PLC",
-        "T DHW storage [°C]",
-        "mediumblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        Flame_current_PLC,
-        "PLC",
-        "PLC",
-        "Flame current [micr A]",
-        "peru",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        T_fume_mc_PLC,
-        "PLC",
-        "PLC",
-        "T fume MC[°C]",
-        "darkblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        Burn_mod_PLC,
-        "PLC",
-        "PLC",
-        "Burner mod[%]",
-        "violet",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_PLC,
-        delta_T_boil_PLC,
-        "PLC",
-        "PLC",
-        "Delta T boiler [°C]",
-        "olivedrab",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-
+	trace_fig(add_cor_time_PLC,pump_onoff,"PLC","PLC","ON/OFF Pump","mediumpurple",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,pump_stp,"PLC","PLC","Pump setpoint [°C]","mediumslateblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,pump_speed,"PLC","PLC","Pump speed [%]","mediumvioletred",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_PLC,volt_flame_burn,"PLC","PLC","Voltage PLC [V]","rosybrown",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,T_sup_PLC,"PLC","PLC","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,T_ret_PLC,"PLC","PLC","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,T_DHW_stor_PLC,"PLC","PLC","T DHW storage [°C]","mediumblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,Flame_current_PLC,"PLC","PLC","Flame current [micr A]","peru",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,T_fume_mc_PLC,"PLC","PLC","T fume MC[°C]","darkblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,Burn_mod_PLC,"PLC","PLC","Burner mod[%]","violet",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_PLC,delta_T_boil_PLC,"PLC","PLC","Delta T boiler [°C]","olivedrab",False,op_main_lin,lin_typ_1)
 if Plt_DHW:
-
-    trace_fig(
-        add_cor_time_DHW,
-        T1,
-        "DHW",
-        "DHW",
-        "T1 [°C]",
-        "black",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T2,
-        "DHW",
-        "DHW",
-        "T2 [°C]",
-        "blue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T3,
-        "DHW",
-        "DHW",
-        "T3 [°C]",
-        "coral",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T4,
-        "DHW",
-        "DHW",
-        "T4 [°C]",
-        "pink",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T5,
-        "DHW",
-        "DHW",
-        "T5 [°C]",
-        "purple",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T6,
-        "DHW",
-        "DHW",
-        "T6 [°C]",
-        "moccasin",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_DHW,
-        T7,
-        "DHW",
-        "DHW",
-        "T7 [°C]",
-        "navy",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    # trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
-
+	trace_fig(add_cor_time_DHW,T1,"DHW","DHW","T1 [°C]","black",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T2,"DHW","DHW","T2 [°C]","blue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T3,"DHW","DHW","T3 [°C]","coral",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T4,"DHW","DHW","T4 [°C]","pink",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T5,"DHW","DHW","T5 [°C]","purple",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T6,"DHW","DHW","T6 [°C]","moccasin",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_DHW,T7,"DHW","DHW","T7 [°C]","navy",False,op_main_lin,lin_typ_1)# 
+	# trace_fig(add_cor_time_DHW,T8,"DHW","DHW","T8 [°C]","khaki",False,op_main_lin,lin_typ_1)
 if Plt_Side_T:
-
-    trace_fig(
-        add_cor_time_side_T,
-        CH1,
-        "Side",
-        "Side Temperature",
-        "CH1 [°C]",
-        "red",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH2,
-        "Side",
-        "Side Temperature",
-        "CH2 [°C]",
-        "rebeccapurple",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH3,
-        "Side",
-        "Side Temperature",
-        "CH3 [°C]",
-        "palegreen",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH4,
-        "Side",
-        "Side Temperature",
-        "CH4 [°C]",
-        "salmon",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH5,
-        "Side",
-        "Side Temperature",
-        "CH5 [°C]",
-        "lightskyblue",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH6,
-        "Side",
-        "Side Temperature",
-        "CH6 [°C]",
-        "darkviolet",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH7,
-        "Side",
-        "Side Temperature",
-        "CH7 [°C]",
-        "darkcyan",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH8,
-        "Side",
-        "Side Temperature",
-        "CH8 [°C]",
-        "brown",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
-    trace_fig(
-        add_cor_time_side_T,
-        CH9,
-        "Side",
-        "Side Temperature",
-        "CH9 [°C]",
-        "blueviolet",
-        False,
-        op_main_lin,
-        lin_typ_1,
-    )
+	trace_fig(add_cor_time_side_T,CH1,"Side","Side Temperature","CH1 [°C]","red",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH2,"Side","Side Temperature","CH2 [°C]","rebeccapurple",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH3,"Side","Side Temperature","CH3 [°C]","palegreen",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH4,"Side","Side Temperature","CH4 [°C]","salmon",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH5,"Side","Side Temperature","CH5 [°C]","lightskyblue",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH6,"Side","Side Temperature","CH6 [°C]","darkviolet",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH7,"Side","Side Temperature","CH7 [°C]","darkcyan",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH8,"Side","Side Temperature","CH8 [°C]","brown",False,op_main_lin,lin_typ_1)
+	trace_fig(add_cor_time_side_T,CH9,"Side","Side Temperature","CH9 [°C]","blueviolet",False,op_main_lin,lin_typ_1)
     # trace_fig(add_cor_time_side_T,CH10,"Side","Side Temperature","CH10 [°C]","plum",False,op_main_lin,lin_typ_1)
     # trace_fig(add_cor_time_side_T,CH11,"Side","Side Temperature","CH11 [°C]","orchid",False,op_main_lin,lin_typ_1)
     # trace_fig(add_cor_time_side_T,CH12,"Side","Side Temperature","CH12 [°C]","olive",False,op_main_lin,lin_typ_1)
