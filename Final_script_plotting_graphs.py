@@ -1682,6 +1682,23 @@ elif test_req_num == "25063":
         T_ADD = 8  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 6  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    if test_num == "I":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 8  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 6  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+    if test_num == "J":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 8  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 4  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+        
+    if test_num == "K":
+
+        T_DHW = 54  # DHW Setpoint temperature [°C]
+        T_ADD = 7  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 4  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
 elif test_req_num == "25066":
 
     fol_test = test_req_num + test_num
@@ -1734,6 +1751,23 @@ elif test_req_num == "25066":
         T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
         T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 
+    if test_num == "I":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 12  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "J":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 5  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 3  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
+
+    if test_num == "K":
+
+        T_DHW = 51  # DHW Setpoint temperature [°C]
+        T_ADD = 11  # This is the delta T between the T_CH and T_DHW_SP [°C]
+        T_HYS = 9  # This is the delta T between the T_DHW_SP and the starting of the burner [°C]
 elif test_req_num == "25013":
 
     fol_test = test_req_num + test_num
@@ -2144,7 +2178,7 @@ if Plt_MiPLAN:
 	trace_fig(add_cor_time_miPLAN,P_valv_in,"miPLAN","microPLAN","P in [bar]","maroon",True,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_miPLAN,Pow_cons,"miPLAN","microPLAN","Pow consumption [W]","tomato",True,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_miPLAN,delta_T_req,"miPLAN","microPLAN","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)# 
-	trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
+	#trace_fig(add_cor_time_miPLAN,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 if Plt_SEEB:
 	trace_fig(add_cor_time_SEEB,T_in_DHW,"SEEB","SEEB","T in DHW [°C]","cyan",False,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_SEEB,T_out_avg,"SEEB","SEEB","T out avg [°C]","red",False,op_main_lin,lin_typ_1)
@@ -2159,7 +2193,7 @@ if Plt_SEEB:
 	trace_fig(add_cor_time_SEEB,Pow_cons,"SEEB","SEEB","Pow consumption [W]","tomato",True,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_SEEB,delta_T_req,"SEEB","SEEB","Delta T NORM [°C]","darkorange",False,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_SEEB,T_amb,"SEEB","SEEB","T°Amb [°C]","pink",False,op_main_lin,lin_typ_1)# # 
-	trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
+#	trace_fig(add_cor_time_SEEB,Cum_energy,"Cum ener [kWh]","maroon",False,op_main_lin,lin_typ_1)
 if Plt_MiCOM:
 	trace_fig(add_cor_time_miCOM,T_sup,"miCOM","microCOM","T sup [°C]","darksalmon",False,op_main_lin,lin_typ_1)
 	trace_fig(add_cor_time_miCOM,T_ret,"miCOM","microCOM","T return [°C]","deeppink",False,op_main_lin,lin_typ_1)

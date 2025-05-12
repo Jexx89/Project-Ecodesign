@@ -31,8 +31,21 @@ currdir = os.getcwd()
 #     print(f"You chose {currdir}{os.sep}HM")
 
 
-test=[('CSV file','.csv')]
-print(test[0])
-a,b = test[0]
-print(a)
-print(b)
+# test=[('CSV file','.csv')]
+# print(test[0])
+# a,b = test[0]
+# print(a)
+# print(b)
+
+
+s = 'frist'
+l=['1','2','3','4','5','6']
+
+m=s.join(map(str,l))
+
+print(m,sep='\n')
+
+g=50
+yaxis = "y" if g> 49 else"y2"
+
+print(yaxis)

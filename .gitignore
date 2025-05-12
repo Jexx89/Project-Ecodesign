@@ -3,3 +3,5 @@ __pycache__/
 Comparaison/
 *.html
 *.xlsx
+*.log
+log/

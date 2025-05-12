@@ -1,6 +1,7 @@
 from cl_FileAndInput import *
 from cl_EcoParam import *
-
+import sys
+from datetime import datetime
 
 # %% Ecodesign classes
 class EcoDesign(FilterFileFromFolder):
@@ -33,8 +34,8 @@ class EcoDesign(FilterFileFromFolder):
         Initialize the class
 
         '''
-        if Path_Folder == '' and Test_request!='':
-                Path_Folder = f"HM\\{Appliance_power}kW\\{Test_request}{Test_Num}\\"
+        # if Path_Folder == '' and Test_request!='':
+        #         Path_Folder = f"HM\\{Appliance_power}kW\\{Test_request}{Test_Num}\\"
 
         super().__init__(currDir, Path_Folder, FileType)
         self.test_req_num:str=Test_request
@@ -44,11 +45,17 @@ class EcoDesign(FilterFileFromFolder):
         #start the script
         if self.test_req_num=='':
             self.getting_input_user()
+        if self.test_req_num not in self.Path_Folder: 
+            answer=input("Test request num isn't in the file name are you sure you want to continue? [y/n]")
+            negativeAnswer = ("NO", "NON", "N", "", "0")
+            if answer in negativeAnswer:
+                sys.exit("The folder is different from test request num")
+            
         try:
             self.paramSet = cl_EcoDesign_Parameter(int(self.test_req_num), self.test_letter)
-            self.dictFileToPlot = self.dict_file_to_plot(self.FilterdFile,self.Path_Folder)
-            self.FilesDataFrame = self.import_all_ploting_data(self.dictFileToPlot)
-            self.add_parameter()
+            self.list_of_file_info = self.detect_file_to_plot(self.CompletePath)
+            self.normalizing_datetime()
+        #     self.add_parameter()
         except ErrorFile as error:
             print(f"\nOpening files interupted : {error}")
 
@@ -96,9 +103,9 @@ class EcoDesign(FilterFileFromFolder):
         self.test_req_num = input(self.align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
         self.test_letter = input(self.align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
         self.pow_appl = input(self.align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-
+        
     # check all files to be plot
-    def dict_file_to_plot(self,listFiles=[str], Path_Folder:str='')->dict:
+    def detect_file_to_plot(self,listFiles=[str]):
         '''
         Function to filter all the file that we need to plot for ecodesign ploting
         this dictionary is build base on the condition of the naming of the file
@@ -108,77 +115,67 @@ class EcoDesign(FilterFileFromFolder):
 
         listFiles : list[str]
             list of the avaible file in the folder
-        Path_Folder : str
-            The path of the folder to reconstruct the complete path of the file
-        
+
         Returns
         -----------------
         fileFoundToPlot : dictionary
             a dictionary with the name as a key and the full path as a value of all the files we found to plot
 
         '''
+        MIP = dict(header_time='Timestamp',name='MICROPLAN', delimiter=',',row_to_ignore=0)
+        MIC = dict(header_time='Time DMY',name='MICROCOM', delimiter=',',row_to_ignore=0)
+        SEB = dict(header_time='Timestamp',name='SEEB', delimiter=',',row_to_ignore=0)
+        DHW = dict(header_time='Date-Time',name='DHW_TEMPERATURE', delimiter=',',row_to_ignore=0)
+        SID = dict(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0)
+        PLC = dict(header_time='DATE-TIME',name='PLC', delimiter=',',row_to_ignore=0)
         header_list = dict(
-                MICROPLAN = 'Timestamp',
-                MICROCOM = 'Time DMY',
-                DHW_TEMPERATURE = 'Date-Time',
-                SIDE_TEMPERATURE = 'Date&Time',
-                PLC = 'DATE-TIME',
-                SEEB = 'Timestamp')
+                MICROPLAN = MIP,
+                SEEB = SEB,
+                MICROCOM = MIC,
+                DHW_TEMPERATURE = DHW,
+                SIDE_TEMPERATURE = SID,
+                PLC = PLC,
+                )
 
-        fileFoundToPlot=[]
+        File={}
         for f in listFiles:
             for xf in header_list:
-                if xf in f.upper():
-                    fileFoundToPlot.append({
-                        "type": xf, 
-                        "path":join(Path_Folder,f), 
-                        "header_time":header_list[xf]})
+                if header_list[xf]['name'] in f['name'].upper():
+                    File[xf] = InputFile(
+                        Path_File=[f['full_path']],
+                        header_time=header_list[xf]['header_time'],
+                        delimiter=header_list[xf]['delimiter'],
+                        row_to_ignore=header_list[xf]['row_to_ignore'])
                     break
-        if len(fileFoundToPlot) == 0:
-            raise ErrorFile(f"No file '.csv' files found in '{Path_Folder}'")
-        return fileFoundToPlot
 
-    # this function allow us to import the data from the csv files put then in dataframe
-    def import_all_ploting_data(self,dictFileToPlot)->dict:
-        '''
-        Function to go trough all the files in the dictionary and launch :
-            - reading
+        if len(File) == 0:
+            logging.error("Probleme detecting the files in the list")
+            sys.exit("Probleme detecting the files in the list")
+        return File
 
-        Parameter
-        -----------------
-
-        dictFileToPlot : dictionary
-            Dictionary with the file path of all the files to plot
-        
-        Returns
-        -----------------
-            void
-        '''
-        self.files=[]
-        if "MICROPLAN" in dictFileToPlot:
-            fl = InputFile(Path_File=dictFileToPlot["MICROPLAN"].get(),header_time=FILE_NAME.MICROPLAN.value,FileType=FILES_LIST.fCSV)
-
-        elif "SEEB" in dictFileToPlot:
-            fl = InputFile(Path_File=dictFileToPlot[FILE_NAME.SEEB],header_time=FILE_NAME.SEEB.value,FileType=FILES_LIST.fCSV)
+    def normalizing_datetime(self):
+        if 'MICROPLAN' in self.list_of_file_info:
+            ref_file:InputFile = self.list_of_file_info['MICROPLAN']
+        elif 'SEEB' in self.list_of_file_info:
+            ref_file:InputFile = self.list_of_file_info['SEEB']
         else:
-            raise ErrorFile(f"No main file found in '{self.Path_Folder}'")
-        st_start= fl.df[FILE_NAME.MICROPLAN.value][0]
-        st_year = st_start.dt.year
-        st_month = st_start.dt.month
-        st_day = st_start.dt.day
-        ref_time = to_datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
+            logging.error("No reference file for normalizing date time found")
+            sys.exit("No reference file for normalizing date time found")
+
+        st_start= ref_file.file_info[0]['data'][ref_file.file_info[0]['header_time']][0]
+        st_year = st_start.year
+        st_month = st_start.month
+        st_day = st_start.day
+        ref_time = datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
         diff_time_to_normalise = ref_time - st_start
-        fl.df[FILE_NAME.MICROPLAN.value]  = fl.df[FILE_NAME.MICROPLAN.value] - diff_time_to_normalise
-        self.files.append(fl)
 
-
-
-
-        self.files.append([InputFile(Path_File=dictFileToPlot[d],header_time=d.value,FileType=FILES_LIST.fCSV) for d in dictFileToPlot if d != FILE_NAME.SEEB & d != FILE_NAME.MICROPLAN])
-
-    def add_parameter(self):
-        w=1
+        for f in self.list_of_file_info:
+             self.list_of_file_info[f].file_info[0]['data'][self.list_of_file_info[f].file_info[0]['header_time']]=self.list_of_file_info[f].file_info[0]['data'][self.list_of_file_info[f].file_info[0]['header_time']]+diff_time_to_normalise
+        i=0
+    # this function allow us to import the data from the csv files put then in dataframe
+    def ploting_files(self,file_info):
+        i=0
 
 # %% run main function 
 if __name__ == "__main__":
-    Traitement = EcoDesign(Test_request="25066",Test_Num="A",Appliance_power="70")
+    Traitement = EcoDesign(Test_request='25066',Test_Num='A',Appliance_power='70', Path_Folder="C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066A")
