@@ -125,22 +125,34 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 # test_num = [["HM", "35kW", "HM35TC", "25063", "I", 1, "microPLAN", 0],
 #              ["HM", "35kW", "HM35TC", "25063", "K", 1, "microPLAN", 0]]
 
-test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
-             ["HM", "70kW", "HM70TC", "25066", "K", 1, "SEEB", 416]]
+# test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
+#              ["HM", "70kW", "HM70TC", "25066", "K", 1, "SEEB", 416]]
 # test_num = [["HM", "35kW", "HM35TC", "24123", "C", 3, "microPLAN", 0],
 #              ["HM", "35kW", "HM35TC", "25063", "k", 1, "microPLAN", 101]]
-
+test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
+             ["HM", "70kW", "HM70TC", "25066", "K", 1, "SEEB", 415],
+             ["HM", "70kW", "HM70TC", "25066", "F", 1, "SEEB", 431]]
 
              
 # test_num = [["HM", "70kW", "HM70TC", "25027", "A", 3, "SEEB", 0], # si le test 1 est devant alors on avance l'autre
 #              ["HM", "70kW", "HM70TC", "25066", "H", 1, "SEEB", 392]] #si le test 2 est devant alors on avance l'autre
 
-Plt_MiPLAN = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
+Plt_MiPLAN = "No" # [Yes or No] - Sting type. Variable to define if we have to load MicroPLAN data and plot them
 Plt_SEEB = "No" # [Yes or No] - Sting type. Variable to define if we have to load SEEB data and plot them
 Plt_MiCOM = "Yes" # [Yes or No] - Sting type. Variable to define if we have to load MicroCOM data and plot them
 Plt_DHW = "No" # [Yes or No] - Sting type. Variable to define if we have to load FieldLogger data and plot them
 Plt_Side_T = "No" # [Yes or No] - Sting type. Variable to define if we have to load thermocouples data and plot them
 Plt_PLC = "No" # [Yes or No] - Sting type. Variable to define if we have to load PLC data and plot them
+
+filter_trace= [
+    "_Test_flow_DHW_kg/min",
+    "_Test_T_out_avg",
+    "Cumul. Gaz Vol. Corr.[L]",
+    "_Test_Gas_vol_L",
+    "_Test_Gas_vol_consp",
+    "FLDHW [kg/min]",
+    "T°out TC  [°C]",
+    "T°out AV.  [°C]"]
 
 microPLAN_data_prm_ax = [
     ["_Test_T_in_DHW","T°in DHW [°C]"], # Inlet temperature coming from the grid [°C]
@@ -577,7 +589,7 @@ def update_lay_fig(
 
     fig.update_xaxes(spikemode="toaxis+across") # "toaxis" (will stop at the height of the mouse) / "across" goes for the whole lenght
     fig.update_xaxes(spikesnap="hovered data")
-    fig.update_layout(hovermode="x") # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
+    fig.update_layout(hovermode="x unified") # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
 
     # fig.update_xaxes(range=[0, 3000])
     # fig.update_layout(xaxis_range=['2023-11-30','2023-12-03'])
@@ -650,26 +662,28 @@ for i in test_num:
         # tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
 
         for key,value in all_dict_prm_ax_mPLAN["dict_" + i[2] + "_test_%s" %i[4]].items():
-            trace_fig(tm_ax_microPLAN,
-                    value,
-                    i[2] + "_microPLAN_" + i[4] + "_Algo_" + str(i[5]),
-                    i[6] + "_test_" + i[4] + "_Algo_" + str(i[5]),
-                    key,
-                    #   "darkblue",
-                    False,
-                    op_main_lin,lin_typ_1
-                    )
+            if key[4:] in filter_trace:
+                trace_fig(tm_ax_microPLAN,
+                        value,
+                        i[2] + "_microPLAN_" + i[4] + "_Algo_" + str(i[5]),
+                        i[6] + "_test_" + i[4] + "_Algo_" + str(i[5]),
+                        key,
+                        #   "darkblue",
+                        False,
+                        op_main_lin,lin_typ_1
+                        )
 
         for key,value in all_dict_scd_ax_mPLAN["dict_" + i[2] + "_test_%s" %i[4]].items():
-            trace_fig(tm_ax_microPLAN,
-                    value,
-                    i[2] + "_microPLAN_" + i[4] + "_Algo_" + str(i[5]),
-                    i[6] + "_test_" + i[4] + "_Algo_" + str(i[5]),
-                    key,
-                    #   "darkblue",
-                    True,
-                    op_main_lin,lin_typ_1
-                    )
+            if key[4:] in filter_trace:
+                trace_fig(tm_ax_microPLAN,
+                        value,
+                        i[2] + "_microPLAN_" + i[4] + "_Algo_" + str(i[5]),
+                        i[6] + "_test_" + i[4] + "_Algo_" + str(i[5]),
+                        key,
+                        #   "darkblue",
+                        True,
+                        op_main_lin,lin_typ_1
+                        )
         
     elif i[6] == "SEEB":
 
@@ -680,7 +694,8 @@ for i in test_num:
         # tm_ax_PLC = all_dict_corr_time["dict_" + i[2] + "_test_%s" %i[4]]["Time_PLC"]
 
         for key,value in all_dict_prm_ax_SEEB["dict_" + i[2] + "_test_%s" %i[4]].items():
-            trace_fig(tm_ax_SEEB,
+            if key[4:] in filter_trace:
+                trace_fig(tm_ax_SEEB,
                     value,
                     i[2] + "_SEEB_" + i[4] + "_Algo_" + str(i[5]),
                     "SEEB_test_" + i[4] + "_Algo_" + str(i[5]),
@@ -691,7 +706,8 @@ for i in test_num:
                     )
         
         for key,value in all_dict_scd_ax_SEEB["dict_" + i[2] + "_test_%s" %i[4]].items():
-            trace_fig(tm_ax_SEEB,
+            if key[4:] in filter_trace:
+                trace_fig(tm_ax_SEEB,
                     value,
                     i[2] + "_SEEB",
                     "SEEB_test_" + i[4] + "_Algo_" + str(i[5]),

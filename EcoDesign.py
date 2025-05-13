@@ -53,7 +53,7 @@ class EcoDesign(FilterFileFromFolder):
             
         try:
             self.paramSet = cl_EcoDesign_Parameter(int(self.test_req_num), self.test_letter)
-            self.list_of_file_info = self.detect_file_to_plot(self.CompletePath)
+            self.collection_file = self.detect_file_to_plot(self.CompletePath)
             self.normalizing_datetime()
         #     self.add_parameter()
         except ErrorFile as error:
@@ -122,12 +122,12 @@ class EcoDesign(FilterFileFromFolder):
             a dictionary with the name as a key and the full path as a value of all the files we found to plot
 
         '''
-        MIP = dict(header_time='Timestamp',name='MICROPLAN', delimiter=',',row_to_ignore=0)
-        MIC = dict(header_time='Time DMY',name='MICROCOM', delimiter=',',row_to_ignore=0)
-        SEB = dict(header_time='Timestamp',name='SEEB', delimiter=',',row_to_ignore=0)
-        DHW = dict(header_time='Date-Time',name='DHW_TEMPERATURE', delimiter=',',row_to_ignore=0)
-        SID = dict(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0)
-        PLC = dict(header_time='DATE-TIME',name='PLC', delimiter=',',row_to_ignore=0)
+        MIP = dict(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
+        MIC = dict(header_time='Time DMY',name='MICROCOM',          delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
+        SEB = dict(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
+        DHW = dict(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
+        SID = dict(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
+        PLC = dict(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=list('CSV File','*.csv'))
         header_list = dict(
                 MICROPLAN = MIP,
                 SEEB = SEB,
@@ -136,22 +136,23 @@ class EcoDesign(FilterFileFromFolder):
                 SIDE_TEMPERATURE = SID,
                 PLC = PLC,
                 )
-
-        File={}
+        File=[ConfigFile]
         for f in listFiles:
             for xf in header_list:
                 if header_list[xf]['name'] in f['name'].upper():
-                    File[xf] = InputFile(
-                        Path_File=[f['full_path']],
+                    File.append(ConfigFile(
+                        name=xf,
+                        path=[f['full_path']],
                         header_time=header_list[xf]['header_time'],
                         delimiter=header_list[xf]['delimiter'],
-                        row_to_ignore=header_list[xf]['row_to_ignore'])
+                        row_to_ignore=header_list[xf]['row_to_ignore'],
+                        FileType=header_list[xf]['FileType'],
+                        value_to_filter=header_list[xf]['value_to_filter']))
                     break
-
         if len(File) == 0:
             logging.error("Probleme detecting the files in the list")
             sys.exit("Probleme detecting the files in the list")
-        return File
+        return File_Ecodesign (File)
 
     def normalizing_datetime(self):
         if 'MICROPLAN' in self.list_of_file_info:

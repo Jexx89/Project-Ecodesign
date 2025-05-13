@@ -1,13 +1,11 @@
 from pandas import read_csv, to_datetime, DataFrame #read_excel, 
+from dataclasses import dataclass
 # from time import time as ti
 from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd
 from os.path import isfile, join, dirname, normpath
 from enum import Enum
 import logging
-
-# Configuration du logging
-
 
 # %% Enum
 
@@ -20,55 +18,23 @@ class FILES_LIST(Enum):
     fLOG = ('LOG file','.log')
     fENR = ('CSV file','.enr')
 
-
-# %% READ files and store in Dataframe
-class InputFile():
-    # init for the class
-    def __init__(self, currDir:str='', Path_File:list[str]=None, FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value], delimiter:str=',', row_to_ignore:int=0):
-        logging.basicConfig(filename='log\\InputFile.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-        logging.info("Starting file opening")
-        self.currDir = currDir
-        self.Path_File = Path_File
-        self.FileType = FileType
-        self.delimiter = delimiter
-        self.row_to_ignore = row_to_ignore
+@dataclass
+class ConfigFile:
+    name: str
+    path: str
+    header_time: str =''
+    data: DataFrame=None
+    delimiter:str=','
+    row_to_ignore:int = 0
+    FileType:tuple[str,str]=FILES_LIST.fCSV.value
+    value_to_filter:int=0
+# %%
+class multipleFile():
+    def __init__(self, currDir:str='', FileData=ConfigFile):
         if not self.currDir:
             self.currDir:str     = getcwd()
-        if not self.Path_File:
-            Path_File       = self.get_File_path(self.currDir,self.FileType)
+    def get_File_path(self,currdir:str,FileType:list[tuple[str,str]]):
 
-    def get_file_to_df(self):
-        logging.info("Loop trough all files selected")
-        nbr = len(self.Path_File)
-        if nbr==1:
-            logging.info("Import one file")
-            self.df = self.check_data_type(self.Path_File[0])
-        if nbr>1:
-            self.df=[]
-            logging.info(f"Loop and import {nbr} files")
-            for p in self.Path_File:
-                self.df.append(self.check_data_type(p))
-        else:
-            logging.info("No file input")
-
-    def import_data_by_type(self, p:str)->DataFrame:
-            if FILES_LIST.fCSV.value[1] in p:
-                data = self.read_csv_to_df(p,self.delimiter,self.row_to_ignore)
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=2
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=3
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=4
-            else:
-                i=5
-                #not handle
-            return data
-
-    def get_File_path(self,currdir:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->str:
         '''
         This function will open a file dialogue window to get the path of one file
 
@@ -92,10 +58,52 @@ class InputFile():
         if len(filez) > 0:
             list_as_string = '\n'.join(map(str, filez))
             logging.info("You chose :\n%s",list_as_string)
+            for p in list_as_string:
+                self.FileData.name
             return filez
         else:
              logging.info("No file selected!")
-    
+
+
+# %% READ files and store in Dataframe
+class InputFile():
+    # init for the class
+    def __init__(self, FileData=ConfigFile):
+        logging.basicConfig(filename='log\\InputFile.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.info("Starting file opening")
+        self.FileData:ConfigFile = FileData
+
+    def Get_file_to_df(self):
+        logging.info("Loop trough all files selected")
+        nbr = len(self.FileData)
+        if nbr==1:
+            logging.info("Import one file")
+            self.FileData.data = self.import_data_by_type(self.FileData.path)
+        if nbr>1:
+            self.test=[]
+            logging.info(f"Loop and import {nbr} files")
+            # for p in self.Path_File:
+            #     self.df.append(self.import_data_by_type(p))
+        else:
+            logging.info("No file input")
+
+    def import_data_by_type(self, p:str)->DataFrame:
+            if FILES_LIST.fCSV.value[1] in p:
+                data = self.read_csv_to_df(p,self.FileData.delimiter,self.FileData.row_to_ignore)
+            elif FILES_LIST.fCSV.value[1] in p:
+                # do stuff
+                i=2
+            elif FILES_LIST.fCSV.value[1] in p:
+                # do stuff
+                i=3
+            elif FILES_LIST.fCSV.value[1] in p:
+                # do stuff
+                i=4
+            else:
+                i=5
+                #not handle
+            return data
+
     def read_csv_to_df(self,path_File, dlm=',',sk=0)->DataFrame:
         if path_File!='':
             logging.info("Import data from .csv")
@@ -111,75 +119,28 @@ class InputFile():
         else:
             logging.error("No path to import data")
             df=None
+        df=self.down_sample_dataframe(df)
+        df=self.parse_column_date(df)
         return df
 
-
-class File_Ecodesign(InputFile):
-    def __Init__(self, currDir:str='', Eco_File:list[dict[str,str]]=None, FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value], delimiter:str=',', row_to_ignore:int=0):
-        super.__init__(currDir,[x['File'] for x in Eco_File],FileType,delimiter,row_to_ignore)
-        self.number_file = len(Eco_File)
-        if self.number_file == 1:
-            self.header_time        = Eco_File[0]['header_time']
-            self.file_info          = None
-        elif self.number_file > 1:
-            self.header_time        = [x['header_time'] for x in Eco_File]
-            self.file_info          = []
-
-
-    def Get_file_to_df(self):
-        logging.info("Loop trough all files selected")
-        for p in self.Path_File:
-            if FILES_LIST.fCSV.value[1] in p:
-                self.df.append[self.read_csv_to_df(p,self.delimiter,self.row_to_ignore)]
-                if header_time !='':
-                    df = self.convert_col_date(df,header_time)
-                self.file_info.append(dict(
-                    file_type       = FILES_LIST.fCSV, 
-                    file_path       = p, 
-                    file_directory  = dirname(p), 
-                    data            = df,
-                    header_time     = header_time
-                    ))
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=2
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=3
-            elif FILES_LIST.fCSV.value[1] in p:
-                # do stuff
-                i=4
-            else:
-                i=5
-                #not handle
+    def down_sample_dataframe(self,df)->DataFrame:
+        if len(df)*10 > self.FileData.value_to_filter and self.FileData.value_to_filter > 1:
+            return df.iloc[::self.FileData.value_to_filter]
+        else:
+             return None
 
     def parse_column_date(self):
-        df: DataFrame
-        ht: str
-        if type(self.df) == 'list':
-
-            for df in self.df:
-                conv_col_to_date(df,self.header_time)
-        elif type(self.df) == 'dataframe':
-            df = self.df
-            conv_col_to_date(self.df,self.header_time)
-
-        def conv_col_to_date()->DataFrame:
-            nonlocal df
-            nonlocal ht
-            logging.info("Convert the date columns from string to datetime")
-            if ht in df:
-                df[ht] = to_datetime(df[ht], dayfirst="True",errors='raise', format='mixed')  # Actual time when we start recording
-            else:
-                logging.info("Parsing date failed : no column found")
-            return df
-
-    def down_sample_dataframe(self,value_to_filter:int=1):
-        if df is None:
-            df=self.file_info[0]['data']
-        return df.iloc[::value_to_filter]
+        if self.FileData.header_time !='' and self.FileData.header_time in self.FileData.data:
+             self.FileData.data[self.FileData.header_time] = to_datetime(self.FileData.data[self.FileData.header_time], dayfirst="True",errors='raise', format='mixed')  # Actual time when we start recording
+        else:
+            logging.info("Parsing date failed : no column found")
 
 
+class File_Ecodesign():
+    def __Init__(self, FileData:list[ConfigFile]=None):
+        self.coll_file={}
+        for c in FileData:
+            self.coll_file[c.name]=InputFile(c)
 
 
 # %% folder class
