@@ -11,9 +11,9 @@ import random as rd
 
 #%% GeneratePlot
 class GeneratePlot():
-    def __init__(self, header_time:str='Timestamp', file_path='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Template.html',plot_name='Template'):
+    def __init__(self, header_time:str='Timestamp', new_file_path='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Template.html',plot_name='Template'):
         self.header_time = header_time
-        self.file_path = file_path
+        self.new_file_path = new_file_path
         self.plot_name = plot_name
         self.trace_param = []
 
@@ -68,15 +68,10 @@ class GeneratePlot():
             margin=dict(l=60, r=120, t=50, b=50)
         )
 
-    def creat_fig_express(self,df):
-        # do not use
-        self.fit = px.scatter(df)
-        self.fit.show()
-
     def creat_html_file(self):
         self.fig.show()
         # or 
-        # plot(self.fig,filename="C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\test" + ".html")
+        # plot(self.fig,filename=self.new_file_path)
 
     def add_filtered_trace(self):
         for t in self.trace_param :
@@ -119,7 +114,7 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color="black"         , width=0.25, dash="dash"),secondary_y = False),
             dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color="black"         , width=0.25, dash="dash"),secondary_y = False),
             ]
-        self.trace_param.append(trace_param)
+        self.trace_param.extend(trace_param)
 
     def add_trace_seeb(self,df:DataFrame,header_time:str):
         trace_param = [
@@ -144,7 +139,7 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color="black"         , width=0.25, dash="dash"),secondary_y = False),
             
             ]
-        self.trace_param.append(trace_param)
+        self.trace_param.extend(trace_param)
 
     def add_trace_microcom(self,df:DataFrame,header_time:str):
         trace_param = [
@@ -167,7 +162,7 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T DHW Setpoint [°C]", visible=False ,opacity = 1,line=dict(color="red"       , width=0.25, dash="dash"),secondary_y = False),
            ]
 
-        self.trace_param.append(trace_param)
+        self.trace_param.extend(trace_param)
     
     def color_randomized(self)->str:
         color = ["aliceblue"," antiquewhite"," aqua"," aquamarine"," azure",

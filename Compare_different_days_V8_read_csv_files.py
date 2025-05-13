@@ -761,8 +761,8 @@ for i in test_num:
     #             op_main_lin,lin_typ_1
     #             )
     
-trace_fig(tm_ax_T_45,T_30,"Set","Settings","T = 30 [°C]",False,op_sec_lin,lin_type_2)
-trace_fig(tm_ax_T_45,T_45,"Set","Settings","T = 45 [°C]",False,op_sec_lin,lin_type_2)
+# trace_fig(tm_ax_T_45,T_30,"Set","Settings","T = 30 [°C]",False,op_sec_lin,lin_type_2)
+# trace_fig(tm_ax_T_45,T_45,"Set","Settings","T = 45 [°C]",False,op_sec_lin,lin_type_2)
 
 
 # Editing layout traces

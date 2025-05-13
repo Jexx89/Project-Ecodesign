@@ -15,8 +15,18 @@ class cl_EcoDesign_Parameter():
     def __init__(self, Test_request:int=1,Test_Num:str='A'):
         self.ALL_DF:DataFrame = []
         self.test_parameters = self.import_test_param(Test_request,Test_Num)
-        
 
+        
+    def status_param(self):
+        if len(self.test_parameters)>1:
+            return {'test':False,'len':len(self.test_parameters)}
+        if len(self.test_parameters)==1:
+            return {'test':True,'len':len(self.test_parameters)}
+        else : 
+            return {'test':False,'len':len(self.test_parameters)}
+
+
+        
     #import parameter from test
     def import_test_param(self,test_req_num:int,test_letter:str)->DataFrame:
         #file path of our parameter table  
@@ -34,6 +44,8 @@ class cl_EcoDesign_Parameter():
             idTest = input("A few parameter set was found please enter the correct 'ID' :")
             tp=tp[tp['ID'].apply(lambda x:x==idTest) ]
             #tp = list(filter(lambda data: data['ID'] == int(idTest) , test_parameters))
+
+        
         return tp
 
     #function used to read the xlsx database of all the parameters
