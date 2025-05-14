@@ -24,7 +24,7 @@ Class:
 TODO:
 --------------
 * in inputfile
-    - add importation excel file, tab file, txt file, log file, and other
+    - add importation, tab file, txt file, log file, and other
 * in inputfolder :
     - get all the file present in folder and subfolder
     - output a structure file that give us the name, path, type, date creation, size
@@ -32,14 +32,16 @@ TODO:
 
 Created by JSB(based on Marcello😍🍕 script)
 --------------
-
+V1.1 : 
+    * add the read_excel function
+    * add a var to class ConfigFile: sheet_name to handle the name of the sheet
 V1.0 : initial rev
     * open file and put data in dataframe
     * filter and data manipulation
     * open folder and gather all the file in it
 '''
 # %% import lib
-from pandas import read_csv, to_datetime, DataFrame #read_excel, 
+from pandas import read_csv, to_datetime, DataFrame ,read_excel
 from dataclasses import dataclass
 from time import time
 from tkinter import Tk, filedialog
@@ -99,6 +101,8 @@ class ConfigFile:
         The file type of the selected file
     value_to_filter:int default value = 0
         The filter to apply on the dataframe, this is to reduce the number of row
+    sheet_name:object default value = 0
+        a value to defin the sheet name or the sheet int in a workbook
 
     '''
     name: str=''
@@ -109,6 +113,7 @@ class ConfigFile:
     row_to_ignore:int = 0
     FileType:tuple[str,str]=FILES_LIST.fCSV.value
     value_to_filter:int=0
+    sheet_name : object = 0
 
 # %% READ files and store in Dataframe
 class InputFile():
@@ -135,7 +140,10 @@ class InputFile():
         '''
         to update, function to call the right function in order to update self.FileData.data
         '''
-        self.FileData.data = self.import_data_by_type(self.FileData.path)
+        df = self.import_data_by_type(self.FileData.path)
+        df = self.down_sample_dataframe(df)
+        df = self.parse_column_date(df)
+        self.FileData.data = df
 
     def import_data_by_type(self, p:str)->DataFrame:
         '''
@@ -145,15 +153,15 @@ class InputFile():
             df = self.read_csv_to_df(p,self.FileData.delimiter,self.FileData.row_to_ignore)
             print(f"INPUT_FILE - CSV importation")
             logging.info(f"INPUT_FILE - CSV importation")
-        elif FILES_LIST.fCSV.value[1] in p:
-            # do stuff
-            i=2
-            df= None
-        elif FILES_LIST.fCSV.value[1] in p:
+        elif FILES_LIST.fEXCELX.value[1] in p:
+            df = self.read_xlsx_to_df(p,self.FileData.sheet_name,self.FileData.row_to_ignore)
+            print(f"INPUT_FILE - Excel importation")
+            logging.info(f"INPUT_FILE - Excel importation")
+        elif FILES_LIST.fENR.value[1] in p:
             # do stuff
             i=3
             df= None
-        elif FILES_LIST.fCSV.value[1] in p:
+        elif FILES_LIST.fLOG.value[1] in p:
             # do stuff
             i=4
             df= None
@@ -181,23 +189,62 @@ class InputFile():
         The ouput is dataframe with the dataframe of all the data
         '''
         if path_File!='':
-            df = read_csv(
-                path_File,
-                skiprows=sk,
-                encoding_errors="ignore",
-                low_memory="False",
-                delimiter=dlm,
-                # header=None, # This option is to have the header as raw stored in the dataframe. In this case we should also activare dtype = "unicode"
-                # dtype = "unicode",
-                )
+            try:
+                df = read_csv(
+                    path_File,
+                    skiprows=sk,
+                    encoding_errors="ignore",
+                    low_memory="False",
+                    delimiter=dlm,
+                    # header=None, # This option is to have the header as raw stored in the dataframe. In this case we should also activare dtype = "unicode"
+                    # dtype = "unicode",
+                    )
+            except FileNotFoundError:
+                print(f"Le fichier {path_File} n'a pas été trouvé.")
+            except Exception as e:
+                print(f"Une erreur s'est produite : {e}")
             print(f"INPUT_FILE - Opening file : {path_File}")
             logging.info(f"INPUT_FILE - Opening file : {path_File}")
         else:
             print("No path to import data")
             logging.error("No path to import data")
             return None
-        df=self.down_sample_dataframe(df)
-        df=self.parse_column_date(df)
+        return df
+    
+    def read_xlsx_to_df(self,path_File, sheet_name=0 ,sk=0)->DataFrame:
+        '''
+        This function read an excel file and convert the data correctly to use it later. 
+    
+        Parameters
+        -----------
+        path_File:str
+            the path of the file we a trying to open
+        sheet_name : Any - deault val =0
+            the name or the number of the excel sheet
+        sk : int - deault val = 0
+            the number of row ignored
+
+        Output
+        -------
+        The ouput is dataframe with the dataframe of all the data
+        '''
+        if path_File!='':
+            try:
+                df = read_excel(
+                    io=path_File,
+                    sheet_name=sheet_name,
+                    skiprows=sk,
+                    )
+            except FileNotFoundError:
+                print(f"Le fichier {path_File} n'a pas été trouvé.")
+            except Exception as e:
+                print(f"Une erreur s'est produite : {e}")
+            print(f"INPUT_FILE - Opening file : {path_File}")
+            logging.info(f"INPUT_FILE - Opening file : {path_File}")
+        else:
+            print("No path to import data")
+            logging.error("No path to import data")
+            return None
         return df
 
     def down_sample_dataframe(self,df:DataFrame)->DataFrame:
@@ -455,7 +502,7 @@ class FilterFileFromFolder(InputFolder):
         '''
         super().__init__(currDir,Path_Folder)
         self.FilterdFile = self.dict_file_type_in_folder(self.Path_Folder,FileType)
-        self.CompletePath = [dict(full_path=f"{self.Path_Folder}{item}",name=item) for item in self.FilterdFile]
+        self.CompletePath = [dict(full_path=f"{self.Path_Folder}\\{item}",name=item) for item in self.FilterdFile]
 
     def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->list[str]:
         ''' 

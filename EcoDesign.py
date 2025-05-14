@@ -13,7 +13,8 @@ TODO:
 
 Created by JSB(based on Marcello😍🍕 script)
 --------------
-
+V1.1 : 
+    * add the possibility to read excel file's
 V1.0 : initial rev
     * open files based on test req num and alphabetic test
     * open files with the folder
@@ -160,12 +161,12 @@ class EcoDesign(FilterFileFromFolder):
             This function return a complete set of configfile that we can found in the folder
             We initialize all the file with there parameters
             '''
-            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
-            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
-            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
-            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
-            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
-            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
+            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
+            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
+            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
+            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
             hl = dict(
                     MICROPLAN = MIP,
                     SEEB = SEB,
@@ -254,8 +255,9 @@ class EcoDesign(FilterFileFromFolder):
             plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
 
         plotter.add_filtered_trace()
-        plotter.show_html_figure()
+        # plotter.show_html_figure()
+        plotter.creat_html_figure(f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html")
 
 # %% run main function 
 if __name__ == "__main__":
-    Traitement = EcoDesign(Test_request='25066',Test_Num='F',Appliance_power='70', Path_Folder="C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066F")
+    Traitement = EcoDesign(FileType=[FILES_LIST.fEXCELX.value],Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',Test_Num='L',Test_request='25063',Appliance_power='35')

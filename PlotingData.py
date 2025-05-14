@@ -127,11 +127,11 @@ class GeneratePlot():
             xaxis=dict(title=self.lab_x_axe,title_font={"size": self.txt_siz_lbl_xy},spikesnap="hovered data",spikemode="toaxis+across", domain=[0.0, 0.95]),
             yaxis=dict(title=self.lab_prim_y_axe, title_font={"size": self.txt_siz_lbl_xy}),
             yaxis2=dict(title=self.lab_sec_y_axe, overlaying="y", side="right", title_font={"size": self.txt_siz_lbl_xy},anchor="y"),
-            hovermode="x",  # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
+            hovermode="x unified",  # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
             margin=dict(l=60, r=120, t=50, b=50)
         )
         print(f"PLOT - Creating figure and initialisasing layout : {time() - self.stime:.2f} sec")
-        logging.info(f"PLOT - Creating figure and initialisasing layout : {time() - self.stime:.2f} sec")
+        logging.info(f"PLOT - Creating figure and initialising layout : {time() - self.stime:.2f} sec")
 
     def creat_html_figure(self, new_file_path:str='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Template.html'):
         '''
@@ -201,9 +201,9 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["Cumul. Gaz Vol. Corr.[L]"]  ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "Total Gas consumed [L]"   , visible='legendonly' ,opacity = 1,line=dict(color="orange"       , width=1.5, dash="solid"),secondary_y = True),
             dict(x=df[header_time],y=df["Power Absorbed [W]"]        ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "Pow consumption [W]"      , visible='legendonly' ,opacity = 1,line=dict(color="tomato"       , width=1.5, dash="solid"),secondary_y = True),
             # Microplan parameter serie 
-            dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "Microplan",legendgrouptitle_text = "Microplan" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
             ]
         self.trace_param.extend(trace_param)
         print(f"PLOT - Adding microplan trace to the dictonary : {time() - self.stime:.2f} sec")
@@ -229,9 +229,9 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["Cumul. Gaz Vol. Corr.[L]"]  ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "Total Gas consumed [L]"   , visible='legendonly' ,opacity = 1,line=dict(color="orange"       , width=1.5, dash="solid"),secondary_y = True),
             dict(x=df[header_time],y=df["Power Absorbed [W]"]        ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "Power consum. [Watt]"     , visible='legendonly' ,opacity = 1,line=dict(color="tomato"       , width=1.5, dash="solid"),secondary_y = True),
             # SEEB paramter serie 
-            dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized(), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = "SEEB",legendgrouptitle_text = "SEEB" ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
             
             ]
         self.trace_param.extend(trace_param)
@@ -245,8 +245,8 @@ class GeneratePlot():
             # REPORT series
             dict(x=df[header_time],y=df["Supply [°C]"]               ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "T sup [°C]"         , visible=True ,opacity = 1,line=dict(color="darksalmon"    , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["DHW stor (°C)"]             ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "T DHW [°C]"         , visible=True ,opacity = 1,line=dict(color="mediumblue"    , width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["Actual measured load"]      ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "Flame curr [µA]", visible=True ,opacity = 1,line=dict(color="peru"          , width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["Flame Curent [uA]"]         ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "Burner mod[%]"      , visible=True ,opacity = 1,line=dict(color="violet"        , width=1.5, dash="solid"),secondary_y = False),
+            dict(x=df[header_time],y=df["Flame Curent [uA]"]         ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "Flame curr [µA]"    , visible=True ,opacity = 1,line=dict(color="peru"          , width=1.5, dash="solid"),secondary_y = False),
+            dict(x=df[header_time],y=df["Actual measured load"]      ,legendgroup = "Report",legendgrouptitle_text = "Report" ,name = "Burner mod[%]"      , visible=True ,opacity = 1,line=dict(color="violet"        , width=1.5, dash="solid"),secondary_y = False),
             # microcom series - first axes Y
             dict(x=df[header_time],y=df["Return [°C]"]               ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T ret [°C]"         , visible='legendonly' ,opacity = 1,line=dict(color="deeppink"         , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["Flue temp [0,01°C]"]        ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T fume MC[°C]"      , visible='legendonly' ,opacity = 1,line=dict(color="darkblue"          , width=1.5, dash="solid"),secondary_y = False),
@@ -255,20 +255,26 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["Pump Power W(65F2)"]        ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "Pump power [Watt]"  , visible='legendonly' ,opacity = 1,line=dict(color="mediumspringgreen"       , width=1.5, dash="solid"),secondary_y = False),
             #dict(x=df[header_time],y=df["Burner State"]              ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "Burner status"      , visible=False ,opacity = 1,line=dict(color="tomato"       , width=1.5, dash="solid"),secondary_y = False),
             # microcom serie for parameter line
-            dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color=self.color_randomized()       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color=self.color_randomized()       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color=self.color_randomized()       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T DHW Setpoint [°C]", visible=True ,opacity = 1,line=dict(color=self.color_randomized()       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = "Microcom",legendgrouptitle_text = "Microcom" ,name = "T DHW Setpoint [°C]", visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
            ]
 
         self.trace_param.extend(trace_param)
         print(f"PLOT - Adding microcom trace to the dictonary : {time() - self.stime:.2f} sec")
         logging.info(f"PLOT - Adding microcom trace to the dictonary : {time() - self.stime:.2f} sec")
 
-    def color_randomized(self)->str:
+    def color_randomized(self, collection:str='all')->str:
         '''
-        This function allow to randomly select a color'''
-        color = ["aliceblue"," antiquewhite"," aqua"," aquamarine"," azure",
+        This function allow to randomly select a color
+
+        Parameter
+        ---------
+        collection : str defautl value = 'all' 
+            all|dark|ligth|red|blue|gray
+        '''
+        all = ["aliceblue"," antiquewhite"," aqua"," aquamarine"," azure",
                 "beige"," bisque"," black"," blanchedalmond"," blue",
                 "blueviolet"," brown"," burlywood"," cadetblue",
                 "chartreuse"," chocolate"," coral"," cornflowerblue",
@@ -303,7 +309,32 @@ class GeneratePlot():
                 "steelblue"," tan"," teal"," thistle"," tomato"," turquoise",
                 "violet"," wheat"," white"," whitesmoke"," yellow",
                 "yellowgreen"]
-        return rd.choice(color)
+        dark = [x for x in all if 'dark' in x]
+        light = [x for x in all if 'light' in x]
+        classic = [" black"," blue"," red"," yellow"," green"," brown", "orange", "turquoise"]
+        red = [x for x in all if 'red' in x].extend([" firebrick"," salmon"," tomato"," darksalmon","maroon","brown","coral"])
+        blue = [x for x in all if 'blue' in x].extend([" turquoise"," teal"," paleturquoise"," mediumturquoise","cyan","darkcyan","aqua"])
+        green = [x for x in all if 'green' in x].extend(["chartreuse","lime","olive","olivedrab"])
+
+
+        if collection =='all':
+            colorCollection=all
+        elif collection =='dark': 
+            colorCollection=dark
+        elif collection =='classic': 
+            colorCollection=classic
+        elif collection =='light': 
+            colorCollection=light
+        elif collection =='blue': 
+            colorCollection=blue
+        elif collection =='red': 
+            colorCollection=red
+        elif collection =='green': 
+            colorCollection=green
+        else:
+            colorCollection=all
+
+        return rd.choice(colorCollection)
 
 
 # %% run main function 
