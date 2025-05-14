@@ -1,10 +1,37 @@
-from cl_FileAndInput import *
-from cl_PlotingData import *
-from cl_EcoParam import *
-from numpy import ones 
-import sys
+'''
+Library Ecodesign project
+
+Class: 
+* 'EcoDesign' :
+    Class specific for ecodesign ploting, incorporating up to 5 differents kind of file to plot in one .html file.
+
+TODO:
+--------------
+* add a comparaison file 
+* add a comparaison of each day
+* generate file into HTML offline
+
+Created by JSB(based on Marcello😍🍕 script)
+--------------
+
+V1.0 : initial rev
+    * open files based on test req num and alphabetic test
+    * open files with the folder
+    * ask info to user if we don't have all the info
+
+'''
+#%% import library
+from FileManager import *
+from PlotingData import *
+from EcoDesign_Param import *
+
+from numpy import ones # to creat single vector
+from sys import exit
 from datetime import datetime
 
+
+class errorEcodesign(Exception):
+    pass
 # %% Ecodesign classes
 class EcoDesign(FilterFileFromFolder):
     '''
@@ -33,34 +60,29 @@ class EcoDesign(FilterFileFromFolder):
         
         Returns
         -----------------
-        Initialize the class
+        return in output a HTML file that help us to analyse the data from all the ecodesign tests
 
         '''
+        negativeAnswer = ("NO", "NON", "N", "", "0")
         self.getting_input_user(Test_request,Test_Num,Appliance_power)
         if Path_Folder !='':
             Path_Folder = f"HM\\{self.pow_appl}kW\\{self.test_req_num}{self.test_letter}\\"
         super().__init__(currDir, Path_Folder, FileType)
 
-        # if self.paramSet.status_param()['test']:
-        # #start the script
-        # if self.test_req_num not in self.Path_Folder : 
-        #     answer=input("Test request num isn't in the file name are you sure you want to continue? [y/n]")
-        #     negativeAnswer = ("NO", "NON", "N", "", "0")
-        #     if answer in negativeAnswer:
-        #         sys.exit("The folder is different from test request num")
+        if self.test_req_num not in self.Path_Folder : 
+            answer = input("Test request num isn't in the file name are you sure you want to continue? [y/n]")
+            if answer.upper() in negativeAnswer:
+                exit("The folder is different from test request num")
             
         try:
-            self.paramSet = cl_EcoDesign_Parameter(int( self.test_req_num), self.test_letter)
-            self.collection_file = self.detect_file_to_plot(self.CompletePath)
+            self.paramSet = EcoDesign_Parameter(int( self.test_req_num), self.test_letter)
+            self.collection_file = self.get_file_to_plot(self.CompletePath)
             self.normalizing_datetime()
             self.adding_parameters()
-            self.ploting_files()
-        except ErrorFile as error:
-            print(f"\nOpening files interupted : {error}")
+            self.ploting_files_eco_design()
+        except errorEcodesign as error :
+            print(f"\nError will post processing the file : \n\n{error}")
 
-
-
-    # getting input from user
     def getting_input_user(self,Test_request:str='',Test_Num:str='',Appliance_power:str=''):
         '''
         Getting input from the user :
@@ -70,23 +92,24 @@ class EcoDesign(FilterFileFromFolder):
 
         Parameters
         -----------------
-
-            none
+        Test_request : str, default val = ''
+            the test request number 
+        Test_Num : str, default val = ''
+            the test index, here a letter
+        Appliance_power : str, default val = ''
+            the power of the appliance (boiler)
         
         Returns
         -----------------
             void
 
         '''
-
-        #allow to align the input in the terminal
-        def align_input_user(self,s: str) -> str:
+        def align_input_user(s: str) -> str:
             '''
             Function align the user input command
 
             Parameter
             -----------------
-
             s : str
                 The string to align
             
@@ -101,6 +124,7 @@ class EcoDesign(FilterFileFromFolder):
             if len(s) < spacementForAnswer:
                 x = spacementForAnswer - len(s)
             return s + (" " * x)
+        
         if not Test_request: 
             self.test_req_num = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
         else:
@@ -114,8 +138,7 @@ class EcoDesign(FilterFileFromFolder):
         else:
             self.pow_appl = Appliance_power
 
-    # check all files to be plot
-    def detect_file_to_plot(self,listFiles=[str]):
+    def get_file_to_plot(self,listFiles=[str]):
         '''
         Function to filter all the file that we need to plot for ecodesign ploting
         this dictionary is build base on the condition of the naming of the file
@@ -133,6 +156,10 @@ class EcoDesign(FilterFileFromFolder):
 
         '''
         def file_database():
+            '''
+            This function return a complete set of configfile that we can found in the folder
+            We initialize all the file with there parameters
+            '''
             MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
             MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
             SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV)
@@ -149,42 +176,42 @@ class EcoDesign(FilterFileFromFolder):
                     )
             return hl
 
-        files_to_plot=[]
+        files_to_plot={}
         header_list = file_database()
         for f in listFiles:
             for xf in header_list:
                 if header_list[xf].name in f['name'].upper():
                     header_list[xf].path = f['full_path']
-                    files_to_plot.append(header_list[xf])
+                    if header_list[xf].name == 'MICROPLAN' or header_list[xf].name == 'SEEB':
+                        files_to_plot['reference']= header_list[xf]
+                    else:
+                        files_to_plot[header_list[xf].name]= header_list[xf]
                     break
-        
         if len(files_to_plot) == 0:
+            print("Probleme detecting the files in the list")
             logging.error("Probleme detecting the files in the list")
-            sys.exit("Probleme detecting the files in the list")
+            exit("-_-_-_-_-_-_-_-\n\nBye bye")
+
+        print(f"ECO_DESIGN - {len(files_to_plot)} file(s) found")
+        logging.info(f"ECO_DESIGN - {len(files_to_plot)} file(s) found")
         return Collection_inputFile(files_config=files_to_plot)
 
     def normalizing_datetime(self):
-        ref_file = InputFile|None
-        for x in self.collection_file.Files:
-            if x.FileData.name == 'MICROPLAN':
-                ref_file = x
-            if x.FileData.name == 'SEEB':
-                ref_file = x
-        if ref_file is None :
+        '''
+        This function help us to normalize the date and time for each files an start all the file at 21h30m00s as defined in standard 
+        '''
+        diff_time_to_normalise = self.collection_file.Files['reference'].diff_standard_time_normalize()
+        if diff_time_to_normalise is None :
+            print("No reference file for normalizing date time found")
             logging.error("No reference file for normalizing date time found")
-            sys.exit("No reference file for normalizing date time found")
-
-        st_start= ref_file.FileData.data[ref_file.FileData.header_time][0]
-        st_year = st_start.year
-        st_month = st_start.month
-        st_day = st_start.day
-        ref_time = datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
-        diff_time_to_normalise = ref_time - st_start
-
-        for f in self.collection_file.Files:
-             f.normalize_date_time(diff_time_to_normalise)
+        else:
+            for f in self.collection_file.Files:
+                self.collection_file.Files[f].normalize_date_time(diff_time_to_normalise)
 
     def adding_parameters(self):
+        '''
+        This function is there to creat new trace from the parameter section taht help the used for analysing the data
+        '''
         t_DHW_setPoint = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'SetpointDHW']
         t_adder = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'ParamADDER']
         t_adder_coef = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'ParamAdderCoef']
@@ -194,39 +221,40 @@ class EcoDesign(FilterFileFromFolder):
         BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
         t_ch_setPoint = t_DHW_setPoint + t_adder
         
-
-        for x in self.collection_file.Files:
-            if x.FileData.name == 'MICROPLAN':
-                x.FileData.data['Delta T NORM [°C]'] = x.FileData.data['T°out AV.  [°C]'] - x.FileData.data['T°in DHW [°C]']
-                x.FileData.data['T = 30 [°C]'] = 30 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-                x.FileData.data['T = 45 [°C]'] = 45 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-                x.FileData.data['T = 55 [°C]'] = 55 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-            if x.FileData.name == 'SEEB':
-                x.FileData.data['Delta T NORM [°C]'] = x.FileData.data['T°out TC  [°C]'] - x.FileData.data['T°in DHW [°C]']
-                x.FileData.data['T = 30 [°C]'] = 30 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-                x.FileData.data['T = 45 [°C]'] = 45 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-                x.FileData.data['T = 55 [°C]'] = 55 * ones(len(x.FileData.data['T°in DHW [°C]'])) 
-            if x.FileData.name == 'MICROCOM':
-                x.FileData.data['Delta T boiler [°C]'] = x.FileData.data['Supply [°C]'] - x.FileData.data['Return [°C]']
-                x.FileData.data['T BURN ON [°C]'] =  BurnerON * ones(len(x.FileData.data['Return [°C]'])) 
-                x.FileData.data['T BURN OFF [°C]'] = BurnerOFF * ones(len(x.FileData.data['Return [°C]'])) 
-                x.FileData.data['T CH STP [°C]'] = t_ch_setPoint * ones(len(x.FileData.data['Return [°C]'])) 
-                x.FileData.data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(x.FileData.data['Return [°C]']))
+        if 'reference' in self.collection_file.Files.keys():
+            self.collection_file.Files['reference'].FileData.data['T = 30 [°C]'] = 30 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
+            self.collection_file.Files['reference'].FileData.data['T = 45 [°C]'] = 45 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
+            self.collection_file.Files['reference'].FileData.data['T = 55 [°C]'] = 55 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
+            self.collection_file.Files['reference'].FileData.data['T = 30 [°C]'] = 30 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
+            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
+                t_out_name = 'T°out AV.  [°C]'
+            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
+                t_out_name = 'T°out TC  [°C]'
+            self.collection_file.Files['reference'].FileData.data['Delta T NORM [°C]'] = self.collection_file.Files['reference'].FileData.data[t_out_name] - self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]']
+        if 'MICROCOM' in self.collection_file.Files.keys():
+            self.collection_file.Files['MICROCOM'].FileData.data['Delta T boiler [°C]'] = self.collection_file.Files['MICROCOM'].FileData.data['Supply [°C]'] - self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]']
+            self.collection_file.Files['MICROCOM'].FileData.data['T BURN ON [°C]'] =  BurnerON * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
+            self.collection_file.Files['MICROCOM'].FileData.data['T BURN OFF [°C]'] = BurnerOFF * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
+            self.collection_file.Files['MICROCOM'].FileData.data['T CH STP [°C]'] = t_ch_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
+            self.collection_file.Files['MICROCOM'].FileData.data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]']))
 
     # this function allow us to import the data from the csv files put then in dataframe
-    def ploting_files(self):
+    def ploting_files_eco_design(self):
+        '''
+        This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
+        '''
         plotter = GeneratePlot(plot_name=f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}")
-        plotter.creat_fig()
+        plotter.creat_figure()
+        if 'reference' in self.collection_file.Files.keys():
+            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
+                plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
+                plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+        if 'MICROCOM' in self.collection_file.Files.keys():
+            plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
 
-        for f in self.collection_file.Files:
-            if f.FileData.name == 'MICROPLAN':
-                plotter.add_trace_microplan(f.FileData.data,f.FileData.header_time)
-            if f.FileData.name == 'MICROCOM':
-                plotter.add_trace_microcom(f.FileData.data,f.FileData.header_time)
-            if f.FileData.name == 'SEEB':
-                plotter.add_trace_seeb(f.FileData.data,f.FileData.header_time)
         plotter.add_filtered_trace()
-        plotter.creat_html_file()
+        plotter.show_html_figure()
 
 # %% run main function 
 if __name__ == "__main__":
