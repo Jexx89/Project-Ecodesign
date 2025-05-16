@@ -45,8 +45,8 @@ from pandas import read_csv, to_datetime, DataFrame ,read_excel
 from dataclasses import dataclass
 from time import time
 from tkinter import Tk, filedialog
-from os import listdir, sep, getcwd
-from os.path import isfile, join, basename, normpath
+from os import listdir, sep, getcwd, path
+from os.path import basename, normpath, isdir
 from enum import Enum
 from datetime import datetime
 from sys import exit
@@ -140,7 +140,6 @@ class InputFile():
             self.FileData = self.get_File_path([]) # accept anyfiletype
         else:
             self.FileData = FileData
-        self.stime = time()
         self.get_df_from_file()
         self.transfrom_data()
 
@@ -332,7 +331,7 @@ class InputFile():
         
         file:ConfigFile
         for file in self.FileData:
-            file.data = import_data_by_type(file.path, file.delimiter,file.row_to_ignore, file.sheet_name)
+            self.FileData[file].data = import_data_by_type(self.FileData[file].path, self.FileData[file].delimiter,self.FileData[file].row_to_ignore, self.FileData[file].sheet_name)
     
     def transfrom_data(self):
         '''
@@ -377,76 +376,66 @@ class InputFile():
         
         file:ConfigFile
         for file in self.FileData:
-            down_sample_dataframe(file)
-            parse_column_date(file)
+            down_sample_dataframe(self.FileData[file])
+            parse_column_date(self.FileData[file])
 
-    def calc_sync_time_difference(self, df, header_time, ref_time=datetime(hour=21,minute=30, seconde=0)):
+    def sync_file_togheter(self,criteria=None, header='',rising_edge_num=1):
         '''
-        Allow us to found the différente between the standard normalize hour from the EN15502 : 
-        test start at 21h30m00s
+        Function to sync ann the data from a criteria defined by the user
 
-        Output
-        -------
-        return the difference between the reference time and the starting time from the test
-        '''
-        for x in self.FileData:
-            st_start= self.start_time(df,header_time)
-            if ref_time == datetime(hour=21,minute=30, seconde=0):
-                st_year = st_start.year
-                st_month = st_start.month
-                st_day = st_start.day
-                ref_time = datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
-        return ref_time - st_start
-
-    def start_time(self,df,header_time):
-        '''
-        Allow us to found the difference between 2 datatimeval 
-
-        Output
-        -------
-        return the difference between the reference time and the starting time from the test
-        '''
-        return df[header_time][0]
-
-    def list_of_rising_edge(self,tappingSyncName, n:int=1, criteria=None):
-        if type(criteria)==list:
-            conditional :DataFrame = self.FileData.data[tappingSyncName].between(min(criteria), max(criteria), inclusive='both')
-        elif type(criteria)==int:
-            conditional :DataFrame = self.FileData.data[tappingSyncName].between(2.5, 3.5, inclusive='both')
-        else:
-            return 0
-
-        conditional :DataFrame = self.FileData.data[tappingSyncName].between(2.5, 3.5, inclusive='both')
-        rising_edge:DataFrame = conditional & (~conditional.shift(fill_value=False))
-        rising_edge_indices = self.FileData.data.index[rising_edge]
-
-        # Sélectionner le nième front montant (attention : n commence à 1 ici)
-        if len(rising_edge_indices) >= n:
-            target_index = rising_edge_indices[n - 1]  # n-1 car indexation Python
-            rising_time = self.FileData.data.loc[target_index, self.FileData.header_time]
-            print(f"{n}ᵉ front montant détecté à : {rising_time} sur {len(rising_edge_indices)}")
-        else:
-            print(f"Moins de {n} fronts montants trouvés.")
-        return rising_time, target_index, [{'index':x,'time':self.FileData.data.loc[x, self.FileData.header_time]} for x in rising_edge_indices]
-
-    def normalize_date_time(self, diff_time_to_normalise):
-        '''
-        Function to modify the date time columns by adding a define time to it.
-        This is usefull when we need to synchronize different file
-        
         Parameter
         --------
-        diff_time_to_normalise:int
-            value in datatime format to add to the datatime column
+        criteria:Any = None
+            select how the sync is done : 
+            if None, sync the file from orgine and the reference 21h30m00s from the start of the file of from a specifique critera
 
         Output
         ------
         Return the dataframe updated with a new date time frame
         '''
         self.stime = time()
-        self.FileData.data[self.FileData.header_time] = self.FileData.data[self.FileData.header_time] + diff_time_to_normalise
-        print(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
-        logging.info(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
+
+        if criteria==None:
+            # if no criteria a mention, we set the synchronisation to 21h30m00s as this would be for the ecodisign mode and we estimate that the time frame a sync allready
+            now = datetime.now()
+            self.ref_time = datetime(year=now.year(),month=now.month(),day=now.day(),hour=21,minute=30, seconde=0)
+            for k,file in self.FileData:
+                diff_with_ref_time = self.ref_time - self.FileData[k].data[self.FileData[k].header_time][0]
+                self.FileData[k].data[self.FileData[k].header_time] = self.FileData[k].data[self.FileData[k].header_time] + diff_with_ref_time
+        else:
+            # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
+            for k,file in self.FileData:
+                # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
+                first_tapping = datetime(year=now.year(),month=now.month(),day=now.day(),hour=7,minute=0, seconde=0)
+                file_rising_time, target_index,l=self.list_of_rising_edge(self.FileData[k].data,header,rising_edge_num,criteria)
+
+                diff_with_ref_time = first_tapping-file_rising_time
+                self.FileData[k].data[self.FileData[k].header_time] = self.FileData[k].data[self.FileData[k].header_time] + diff_with_ref_time
+
+
+        print(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
+        logging.info(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
+
+    def list_of_rising_edge(self,df,header_sync_name, n:int=1, criteria=None):
+        if type(criteria)==list:
+            conditional :DataFrame = df[header_sync_name].between(min(criteria), max(criteria), inclusive='both')
+        elif type(criteria)==int:
+            conditional :DataFrame = df[header_sync_name].between(2.5, 3.5, inclusive='both')
+        else:
+            return 0
+
+        conditional :DataFrame = df[header_sync_name].between(2.5, 3.5, inclusive='both')
+        rising_edge:DataFrame = conditional & (~conditional.shift(fill_value=False))
+        rising_edge_indices = df.index[rising_edge]
+
+        # Sélectionner le nième front montant (attention : n commence à 1 ici)
+        if len(rising_edge_indices) >= n:
+            target_index = rising_edge_indices[n - 1]  # n-1 car indexation Python
+            rising_time = df.loc[target_index, self.FileData.header_time]
+            print(f"{n}ᵉ front montant détecté à : {rising_time} sur {len(rising_edge_indices)}")
+        else:
+            print(f"Moins de {n} fronts montants trouvés.")
+        return rising_time, target_index, [{'index':x,'time':df.loc[x, self.FileData.header_time]} for x in rising_edge_indices]
 
 
 # %% folder class
@@ -473,8 +462,9 @@ class InputFolder():
         if not currDir:
             self.currDir:str=f"{getcwd}{sep}HM"
         logging.info(f"INPUT_FOLDER - Initial folder : {self.currDir}")
-        if not Path_Folder:
+        if not isdir(Path_Folder):
             self.Path_Folder:str= self.Get_Folder_path(self.currDir)
+        self.dict_file_type_in_folder()
 
     def Get_Folder_path(self,currdir)->str:
         ''' 
@@ -505,54 +495,79 @@ class InputFolder():
             logging.error("INPUT_FOLDER - No folder selected!!")
             exit("-_-_-_-_-_-_-_-\n\nBye bye")
             return None
-            
 
-class FilterFileFromFolder(InputFolder):
-    '''
-    class calling InputFolder and from the folder gather all the file in it and return a collection of file that is filtered by a critéria of type
-    '''
-    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]):
-        '''
-        Initialize the class
-
-        Parameter
-        ---------
-        currDir : str - default value = ''
-            set the initial directory, if none set, it will automatically select the dir from the script
-        Path_Folder:str=''
-            if path '' then a windows appeard 
-            if all ready initialize, keep the value in class
-        FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]
-            the criteria based on the file type 
-        '''
-        super().__init__(currDir,Path_Folder)
-        self.FilterdFile = self.dict_file_type_in_folder(self.Path_Folder,FileType)
-        self.CompletePath = [dict(full_path=f"{self.Path_Folder}\\{item}",name=item) for item in self.FilterdFile]
-
-    def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->list[str]:
+    def dict_file_type_in_folder(self)->list[str]:
         ''' 
         Check if files type in a folder exist and return the list of them
 
-        Parameter
-        -----------------
-
-        folder : str, default val = ''
-            set the path of the folder
-        FileType : list[tuple[str,str]], default val = [[FILES_LIST.fCSV]]
-            Type of file we need to find
-        
         Returns
         -----------------
             filtered : list[str]
                 the list of all the files from a certain type
-
         '''
-        b = FileType[0]
-        filtered=[f for f in listdir(folder) if isfile(join(folder,f)) and f.lower().endswith(b)]
-        if len(filtered) == 0:
-            print(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
-            logging.info(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
-        return filtered
+        bad_chars = set("%$^¨µ£~§!&")
+        self.all_path_only=[]
+        for file in listdir(self.Path_Folder):
+            if bad_chars.isdisjoint(file):
+                    self.all_path_only.append(file)
+
+        if len(self.all_path_only) == 0:
+            print(f"INPUT_FOLDER - No file files found in {self.Path_Folder}")
+            logging.info(f"INPUT_FOLDER - No file files found in {self.Path_Folder}")
+        else:
+
+            self.files_in_folder=[]
+            for item in self.all_path_only:
+                    self.files_in_folder.append({"FileName":item,
+                                                "Path":f"{self.Path_Folder}\\{item}",
+                                                "FileType":path.splitext(item)[-1]})
+
+# class FilterFileFromFolder(InputFolder):
+#     '''
+#     class calling InputFolder and from the folder gather all the file in it and return a collection of file that is filtered by a critéria of type
+#     '''
+#     def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]):
+#         '''
+#         Initialize the class
+
+#         Parameter
+#         ---------
+#         currDir : str - default value = ''
+#             set the initial directory, if none set, it will automatically select the dir from the script
+#         Path_Folder:str=''
+#             if path '' then a windows appeard 
+#             if all ready initialize, keep the value in class
+#         FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]
+#             the criteria based on the file type 
+#         '''
+#         super().__init__(currDir,Path_Folder)
+#         self.FilterdFile = self.dict_file_type_in_folder(self.Path_Folder,FileType)
+#         self.CompletePath = [dict(full_path=f"{self.Path_Folder}\\{item}",name=item) for item in self.FilterdFile]
+
+#     def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->list[str]:
+#         ''' 
+#         Check if files type in a folder exist and return the list of them
+
+#         Parameter
+#         -----------------
+
+#         folder : str, default val = ''
+#             set the path of the folder
+#         FileType : list[tuple[str,str]], default val = [[FILES_LIST.fCSV]]
+#             Type of file we need to find
+        
+#         Returns
+#         -----------------
+#             filtered : list[str]
+#                 the list of all the files from a certain type
+
+#         '''
+#         b = FileType[0]
+#         filtered=[f for f in listdir(folder) if isfile(join(folder,f)) and f.lower().endswith(b)]
+#         if len(filtered) == 0:
+#             print(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
+#             logging.info(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
+#         return filtered
 
  
  # %% main function on how to use it
@@ -569,5 +584,4 @@ if __name__ == "__main__":
         sheet_name='Seeb Data',
     )
     fi = InputFile(file)
-    print(fi.small_water_flow_rising_edge('FLDHW [kg/min]'))
 
