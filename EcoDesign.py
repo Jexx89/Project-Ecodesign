@@ -66,8 +66,8 @@ class EcoDesign(FilterFileFromFolder):
         '''
         negativeAnswer = ("NO", "NON", "N", "", "0")
         self.getting_input_user(Test_request,Test_Num,Appliance_power)
-        if Path_Folder !='':
-            Path_Folder = f"HM\\{self.pow_appl}kW\\{self.test_req_num}{self.test_letter}\\"
+        if Path_Folder =='':
+            Path_Folder = f"HM\\{self.pow_appl}kW\\{self.test_req_num}{self.test_letter}"
         super().__init__(currDir, Path_Folder, FileType)
 
         if self.test_req_num not in self.Path_Folder : 
@@ -78,9 +78,6 @@ class EcoDesign(FilterFileFromFolder):
         try:
             self.paramSet = EcoDesign_Parameter(int( self.test_req_num), self.test_letter)
             self.collection_file = self.get_file_to_plot(self.CompletePath)
-            self.normalizing_datetime()
-            self.adding_parameters()
-            self.ploting_files_eco_design()
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
 
@@ -201,13 +198,13 @@ class EcoDesign(FilterFileFromFolder):
         '''
         This function help us to normalize the date and time for each files an start all the file at 21h30m00s as defined in standard 
         '''
-        diff_time_to_normalise = self.collection_file.Files['reference'].diff_standard_time_normalize()
-        if diff_time_to_normalise is None :
+        self.diff_time_to_normalise = self.collection_file.Files['reference'].diff_standard_time_normalize()
+        if self.diff_time_to_normalise is None :
             print("No reference file for normalizing date time found")
             logging.error("No reference file for normalizing date time found")
         else:
             for f in self.collection_file.Files:
-                self.collection_file.Files[f].normalize_date_time(diff_time_to_normalise)
+                self.collection_file.Files[f].normalize_date_time(self.diff_time_to_normalise)
 
     def adding_parameters(self):
         '''
@@ -239,25 +236,116 @@ class EcoDesign(FilterFileFromFolder):
             self.collection_file.Files['MICROCOM'].FileData.data['T CH STP [°C]'] = t_ch_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
             self.collection_file.Files['MICROCOM'].FileData.data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]']))
 
-    # this function allow us to import the data from the csv files put then in dataframe
-    def ploting_files_eco_design(self):
+    def plot_initiate_figure(self, PlotTitle:str=''):
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
-        plotter = GeneratePlot(plot_name=f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}")
-        plotter.creat_figure()
+        if PlotTitle=='':
+            PlotTitle = f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}"
+        self.plotter = GeneratePlot(plot_name=PlotTitle)
+        self.plotter.creat_figure()
+
+    def plot_files_eco_design(self):
+        '''
+        This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
+        '''
         if 'reference' in self.collection_file.Files.keys():
             if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-                plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+                self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
             if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-                plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+                self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
         if 'MICROCOM' in self.collection_file.Files.keys():
-            plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
+            self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
 
-        plotter.add_filtered_trace()
-        # plotter.show_html_figure()
-        plotter.creat_html_figure(f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html")
+        self.plotter.add_filtered_trace(self.plotter.fig)
 
+    def plot_generate_html(self, File_name:str=''):
+        if File_name=='':
+            File_name = f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html"
+        self.plotter.creat_html_figure(File_name)
+
+class CompareTests(EcoDesign):
+    def __init__(self,comparelist:list[dict[str, any]]):
+        flag=False
+        self.FullName = f"Compare{[ f"_{x['Test_request']}{x['Test_Num']}" for x in comparelist]}"
+        self.plot_initiate_figure(self.FullName)
+        collection={}
+        for t in comparelist:
+            if 'Test_Num' in t and 'Test_request' in t and 'Appliance_power' in t:
+                EcoTest = EcoDesign(
+                                FileType=t['FileType'],
+                                #Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
+                                Test_Num=t['Test_Num'],
+                                Test_request=t['Test_request'],
+                                Appliance_power=t['Appliance_power'])
+                EcoTest.normalizing_datetime()
+                EcoTest.adding_parameters()
+                if not flag:
+                    flag=True
+                    self.timeSync, self.indexSync, self.listRisingEdge = EcoTest.collection_file.Files['reference'].list_of_rising_edge('FLDHW [kg/min]',1,[2.5,3.5])
+                else:
+                    self.sync_time_between_test(EcoTest)
+                collection[[f"{t['Test_request']}{t['Test_Num']}"]] = EcoTest
+                
+    def plot_files_eco_design(self):
+        '''
+        This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
+        '''
+        if 'reference' in self.collection_file.Files.keys():
+            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
+                self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
+                self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+        if 'MICROCOM' in self.collection_file.Files.keys():
+            self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
+
+        self.plotter.add_filtered_trace(self.plotter.fig)
+
+    def sync_time_between_test(self, EcoTest:EcoDesign):
+        for f in EcoTest.collection_file.Files:
+            followingSync, i, listRisingEdge = EcoTest.collection_file.Files['reference'].small_water_flow_rising_edge('FLDHW [kg/min]')
+            EcoTest.collection_file.Files[f].normalize_date_time(self.timeSync-followingSync)
+
+            
 # %% run main function 
 if __name__ == "__main__":
-    Traitement = EcoDesign(FileType=[FILES_LIST.fEXCELX.value],Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',Test_Num='L',Test_request='25063',Appliance_power='35')
+
+#%% single file
+    Traitement = EcoDesign(
+        FileType=[FILES_LIST.fEXCELX.value],
+        #Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
+        Test_Num='M',
+        Test_request='25066',
+        Appliance_power='70')
+    # Traitement = EcoDesign(
+    #     FileType=[FILES_LIST.fEXCELX.value],
+    #     Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',
+    #     Test_Num='L',
+    #     Test_request='25063',
+    #     Appliance_power='35')
+
+            
+    Traitement.normalizing_datetime()
+    Traitement.adding_parameters()
+
+    Traitement.plot_initiate_figure()
+    Traitement.plot_files_eco_design()
+    Traitement.plot_generate_html()
+
+
+#%% compare file
+    # compare = CompareTests([
+    #         {
+    #             'Test_request':'25066', 
+    #             'Test_Num' : 'L',
+    #             'Appliance_power':'70',
+    #             'FileType':[FILES_LIST.fEXCELX.value],
+    #         },
+    #         {
+    #             'Test_request':'25066', 
+    #             'Test_Num' : 'K',
+    #             'Appliance_power':'70',
+    #             'FileType':[FILES_LIST.fEXCELX.value],
+    #         },
+    # ])
+

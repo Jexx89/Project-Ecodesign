@@ -50,6 +50,7 @@ from os.path import isfile, join, basename, normpath
 from enum import Enum
 from datetime import datetime
 from sys import exit
+from typing import Union
 import logging
 
 # %% structural classes
@@ -121,7 +122,7 @@ class InputFile():
     This class allow us to open a file and import all the data in a dataframe
     Later the user can post process the dataframe with basic function
     '''
-    def __init__(self, FileData=ConfigFile):
+    def __init__(self, FileData:Union[dict[str,ConfigFile],list[dict[str,ConfigFile]]], initialDir:str=''):
         '''
         Initialise the class
 
@@ -132,219 +133,16 @@ class InputFile():
             set of parameter used to open a new file
         '''
         logging.basicConfig(filename='log\\trace.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-        self.FileData:ConfigFile = FileData
-        self.stime = time()
-        self.Get_file_to_df()
-    
-    def Get_file_to_df(self):
-        '''
-        to update, function to call the right function in order to update self.FileData.data
-        '''
-        df = self.import_data_by_type(self.FileData.path)
-        df = self.down_sample_dataframe(df)
-        df = self.parse_column_date(df)
-        self.FileData.data = df
-
-    def import_data_by_type(self, p:str)->DataFrame:
-        '''
-        to update ,Function to select the correct method to get the data from file into a dataframe
-        '''
-        if FILES_LIST.fCSV.value[1] in p:
-            df = self.read_csv_to_df(p,self.FileData.delimiter,self.FileData.row_to_ignore)
-            print(f"INPUT_FILE - CSV importation")
-            logging.info(f"INPUT_FILE - CSV importation")
-        elif FILES_LIST.fEXCELX.value[1] in p:
-            df = self.read_xlsx_to_df(p,self.FileData.sheet_name,self.FileData.row_to_ignore)
-            print(f"INPUT_FILE - Excel importation")
-            logging.info(f"INPUT_FILE - Excel importation")
-        elif FILES_LIST.fENR.value[1] in p:
-            # do stuff
-            i=3
-            df= None
-        elif FILES_LIST.fLOG.value[1] in p:
-            # do stuff
-            i=4
-            df= None
-        else:
-            i=5
-            #not handle
-            df= None
-        return df
-
-    def read_csv_to_df(self,path_File, dlm=',',sk=0)->DataFrame:
-        '''
-        This function read an CSV file and convert the data correctly to use it later. 
-    
-        Parameters
-        -----------
-        path_File:str
-            the path of the file we a trying to open
-        dlm : str - deault val =','
-            the delimiter used to parse data
-        sk : int - deault val = 0
-            the number of row ignored
-
-        Output
-        -------
-        The ouput is dataframe with the dataframe of all the data
-        '''
-        if path_File!='':
-            try:
-                df = read_csv(
-                    path_File,
-                    skiprows=sk,
-                    encoding_errors="ignore",
-                    low_memory="False",
-                    delimiter=dlm,
-                    # header=None, # This option is to have the header as raw stored in the dataframe. In this case we should also activare dtype = "unicode"
-                    # dtype = "unicode",
-                    )
-            except FileNotFoundError:
-                print(f"Le fichier {path_File} n'a pas été trouvé.")
-            except Exception as e:
-                print(f"Une erreur s'est produite : {e}")
-            print(f"INPUT_FILE - Opening file : {path_File}")
-            logging.info(f"INPUT_FILE - Opening file : {path_File}")
-        else:
-            print("No path to import data")
-            logging.error("No path to import data")
-            return None
-        return df
-    
-    def read_xlsx_to_df(self,path_File, sheet_name=0 ,sk=0)->DataFrame:
-        '''
-        This function read an excel file and convert the data correctly to use it later. 
-    
-        Parameters
-        -----------
-        path_File:str
-            the path of the file we a trying to open
-        sheet_name : Any - deault val =0
-            the name or the number of the excel sheet
-        sk : int - deault val = 0
-            the number of row ignored
-
-        Output
-        -------
-        The ouput is dataframe with the dataframe of all the data
-        '''
-        if path_File!='':
-            try:
-                df = read_excel(
-                    io=path_File,
-                    sheet_name=sheet_name,
-                    skiprows=sk,
-                    )
-            except FileNotFoundError:
-                print(f"Le fichier {path_File} n'a pas été trouvé.")
-            except Exception as e:
-                print(f"Une erreur s'est produite : {e}")
-            print(f"INPUT_FILE - Opening file : {path_File}")
-            logging.info(f"INPUT_FILE - Opening file : {path_File}")
-        else:
-            print("No path to import data")
-            logging.error("No path to import data")
-            return None
-        return df
-
-    def down_sample_dataframe(self,df:DataFrame)->DataFrame:
-        '''
-        Function for filtering a line on x
-        x : self.FileData.value_to_filter
-        
-        Parameter
-        --------
-        df:DataFrame
-            the data frame to filter
-        '''
-        x=self.FileData.value_to_filter
-        if len(df)*10 > x and x > 1:
-            self.stime = time()
-            df =  df.iloc[::x]
-            print(f"INPUT_FILE - Filtering data  from {self.FileData.name} : {time()-self.stime:.2f}")
-            logging.info(f"INPUT_FILE - Filtering data  from {self.FileData.name} : {time()-self.stime:.2f}")
-        return df
-
-    def parse_column_date(self, df):
-        '''
-        Parse the date time column
-
-        Parameter
-        --------
-        df:DataFrame
-            the data frame to filter
-        
-        '''
-        if self.FileData.header_time !='':
-            if self.FileData.header_time in df:
-                self.stime = time()
-                df[self.FileData.header_time] = to_datetime(df[self.FileData.header_time], dayfirst="True",errors='raise', format='mixed')  # Actual time when we start recording
-                print(f"INPUT_FILE - Parsing date time columns from {self.FileData.name} : {time()-self.stime:.2f}")
-                logging.info(f"INPUT_FILE - Parsing date time columns  from {self.FileData.name} : {time()-self.stime:.2f}")
-            else:
-                print("Parsing date failed : no column found")
-                logging.error("Parsing date failed : no column found")
-        return df
-    
-    def diff_standard_time_normalize(self):
-        '''
-        Allow us to found the différente between the standard normalize hour from the EN15502 : 
-        test start at 21h30m00s
-
-        Output
-        -------
-        return the difference between the reference time and the starting time from the test
-        '''
-        st_start= self.FileData.data[self.FileData.header_time][0]
-        st_year = st_start.year
-        st_month = st_start.month
-        st_day = st_start.day
-        ref_time = datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
-        return ref_time - st_start
-
-    def normalize_date_time(self, diff_time_to_normalise):
-        '''
-        Function to modify the date time columns by adding a define time to it.
-        This is usefull when we need to synchronize different file
-        
-        Parameter
-        --------
-        diff_time_to_normalise:int
-            value in datatime format to add to the datatime column
-
-        Output
-        ------
-        Return the dataframe updated with a new date time frame
-        '''
-        self.stime = time()
-        self.FileData.data[self.FileData.header_time] = self.FileData.data[self.FileData.header_time] + diff_time_to_normalise
-        print(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
-        logging.info(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
-
-class Collection_inputFile():
-    '''This class is created to handle on or multiple InputFile'''
-    def __init__(self,initialDir:str='', files_config:dict[str,ConfigFile]=None):
-        '''
-        Initialize the class
-
-        Parameters
-        ----------
-        initialDir : str - default value = ''
-            set the initial directory, if none set, it will automatically select the dir from the script
-        files_config :list[ConfigFile] - default value = None
-            a list of all the input files
-        '''
         self.initialDir = initialDir
         if not self.initialDir:
             self.initialDir= getcwd()
-        
-        self.files_config=files_config
-        if self.files_config is None:
-            self.files_config = self.get_File_path([])
-        if len(self.files_config)>1:
-            self.Files = {k:InputFile(v) for k,v in self.files_config.items()}
+        if FileData is None:
+            self.FileData = self.get_File_path([]) # accept anyfiletype
         else:
-            self.File = {self.files_config[0].name:InputFile(self.files_config[0])}
+            self.FileData = FileData
+        self.stime = time()
+        self.get_df_from_file()
+        self.transfrom_data()
 
     def get_File_path(self,FileType:list[tuple[str,str]]):
         '''
@@ -396,16 +194,18 @@ class Collection_inputFile():
             file=[]
             for l in list_file:
                 i+=1
-                file.append(ConfigFile(
+                file.append({basename(l.split('.')[0]) 
+                        : ConfigFile(
                             name=basename(l.split('.')[0]),
                             path=l,
                             header_time='',
                             # data=, (empty)
                             # delimiter=, (default val = ',')
-                            # row_to_ignore= (),
+                            row_to_ignore= 0,
                             FileType=check_file_type(l),
-                            # value_to_filter=,
-                            ))
+                            value_to_filter=0,
+                            sheet_name=0
+                            )})
             return file
                 
         def check_file_type(path):
@@ -423,6 +223,231 @@ class Collection_inputFile():
                     return c.value
 
         return init_config_file(open_file_dialogue())
+
+    def get_df_from_file(self):
+        '''
+        to update, function to call the right function in order to update self.FileData.data
+        '''
+        def import_data_by_type(p:str='', delimiter:str=',', row_to_ignore:int=0, sheet_name=0)->DataFrame:
+            '''
+            to update ,Function to select the correct method to get the data from file into a dataframe
+            '''
+            if FILES_LIST.fCSV.value[1] in p:
+                df = read_csv_to_df(p,delimiter,row_to_ignore)
+                print(f"INPUT_FILE - CSV importation")
+                logging.info(f"INPUT_FILE - CSV importation")
+            elif FILES_LIST.fEXCELX.value[1] in p:
+                df = read_xlsx_to_df(p,sheet_name,row_to_ignore)
+                print(f"INPUT_FILE - Excel importation")
+                logging.info(f"INPUT_FILE - Excel importation")
+            elif FILES_LIST.fENR.value[1] in p:
+                # do stuff
+                i=3
+                df= None
+            elif FILES_LIST.fLOG.value[1] in p:
+                # do stuff
+                i=4
+                df= None
+            else:
+                i=5
+                #not handle
+                df= None
+            return df
+
+        def read_csv_to_df(path_File, dlm=',',sk=0)->DataFrame:
+            '''
+            This function read an CSV file and convert the data correctly to use it later. 
+        
+            Parameters
+            -----------
+            path_File:str
+                the path of the file we a trying to open
+            dlm : str - deault val =','
+                the delimiter used to parse data
+            sk : int - deault val = 0
+                the number of row ignored
+
+            Output
+            -------
+            The ouput is dataframe with the dataframe of all the data
+            '''
+            if path_File!='':
+                try:
+                    df = read_csv(
+                        path_File,
+                        skiprows=sk,
+                        encoding_errors="ignore",
+                        low_memory="False",
+                        delimiter=dlm,
+                        # header=None, # This option is to have the header as raw stored in the dataframe. In this case we should also activare dtype = "unicode"
+                        # dtype = "unicode",
+                        )
+                except FileNotFoundError:
+                    print(f"Le fichier {path_File} n'a pas été trouvé.")
+                except Exception as e:
+                    print(f"Une erreur s'est produite : {e}")
+                print(f"INPUT_FILE - Opening file : {path_File}")
+                logging.info(f"INPUT_FILE - Opening file : {path_File}")
+            else:
+                print("No path to import data")
+                logging.error("No path to import data")
+                return None
+            return df
+        
+        def read_xlsx_to_df(path_File, sheet_name=0 ,sk=0)->DataFrame:
+            '''
+            This function read an excel file and convert the data correctly to use it later. 
+        
+            Parameters
+            -----------
+            path_File:str
+                the path of the file we a trying to open
+            sheet_name : Any - deault val =0
+                the name or the number of the excel sheet
+            sk : int - deault val = 0
+                the number of row ignored
+
+            Output
+            -------
+            The ouput is dataframe with the dataframe of all the data
+            '''
+            if path_File!='':
+                try:
+                    df = read_excel(
+                        io=path_File,
+                        sheet_name=sheet_name,
+                        skiprows=sk,
+                        )
+                except FileNotFoundError:
+                    print(f"Le fichier {path_File} n'a pas été trouvé.")
+                except Exception as e:
+                    print(f"Une erreur s'est produite : {e}")
+                print(f"INPUT_FILE - Opening file : {path_File}")
+                logging.info(f"INPUT_FILE - Opening file : {path_File}")
+            else:
+                print("No path to import data")
+                logging.error("No path to import data")
+                return None
+            return df
+        
+        file:ConfigFile
+        for file in self.FileData:
+            file.data = import_data_by_type(file.path, file.delimiter,file.row_to_ignore, file.sheet_name)
+    
+    def transfrom_data(self):
+        '''
+        to update, 
+        '''
+        def down_sample_dataframe(FileData:ConfigFile)->DataFrame:
+            '''
+            Function for filtering a line on x
+            x : self.FileData.value_to_filter
+            
+            Parameter
+            --------
+            df:DataFrame
+                the data frame to filter
+            '''
+            x=FileData.value_to_filter
+            if len(FileData.data) > 1000 and x > 1:
+                stime = time()
+                FileData.data =  FileData.data.iloc[::x]
+                print(f"INPUT_FILE - Filtering data  from {FileData.name} : {time()-stime:.2f}")
+                logging.info(f"INPUT_FILE - Filtering data  from {FileData.name} : {time()-stime:.2f}")
+
+        def parse_column_date(FileData:ConfigFile):
+            '''
+            Parse the date time column
+
+            Parameter
+            --------
+            df:DataFrame
+                the data frame to filter
+            
+            '''
+            if FileData.header_time !='':
+                if FileData.header_time in FileData.data:
+                    stime = time()
+                    FileData.data[FileData.header_time] = to_datetime(FileData.data[FileData.header_time], dayfirst="True",errors='raise', format='mixed')  # Actual time when we start recording
+                    print(f"INPUT_FILE - Parsing date time columns from {FileData.name} : {time()-stime:.2f}")
+                    logging.info(f"INPUT_FILE - Parsing date time columns  from {FileData.name} : {time()-stime:.2f}")
+                else:
+                    print("Parsing date failed : no column found")
+                    logging.error("Parsing date failed : no column found")
+        
+        file:ConfigFile
+        for file in self.FileData:
+            down_sample_dataframe(file)
+            parse_column_date(file)
+
+    def calc_sync_time_difference(self, df, header_time, ref_time=datetime(hour=21,minute=30, seconde=0)):
+        '''
+        Allow us to found the différente between the standard normalize hour from the EN15502 : 
+        test start at 21h30m00s
+
+        Output
+        -------
+        return the difference between the reference time and the starting time from the test
+        '''
+        for x in self.FileData:
+            st_start= self.start_time(df,header_time)
+            if ref_time == datetime(hour=21,minute=30, seconde=0):
+                st_year = st_start.year
+                st_month = st_start.month
+                st_day = st_start.day
+                ref_time = datetime(year=st_year, month=st_month, day=st_day, hour=21, minute=30, second=00)  # make a reference time for the tests
+        return ref_time - st_start
+
+    def start_time(self,df,header_time):
+        '''
+        Allow us to found the difference between 2 datatimeval 
+
+        Output
+        -------
+        return the difference between the reference time and the starting time from the test
+        '''
+        return df[header_time][0]
+
+    def list_of_rising_edge(self,tappingSyncName, n:int=1, criteria=None):
+        if type(criteria)==list:
+            conditional :DataFrame = self.FileData.data[tappingSyncName].between(min(criteria), max(criteria), inclusive='both')
+        elif type(criteria)==int:
+            conditional :DataFrame = self.FileData.data[tappingSyncName].between(2.5, 3.5, inclusive='both')
+        else:
+            return 0
+
+        conditional :DataFrame = self.FileData.data[tappingSyncName].between(2.5, 3.5, inclusive='both')
+        rising_edge:DataFrame = conditional & (~conditional.shift(fill_value=False))
+        rising_edge_indices = self.FileData.data.index[rising_edge]
+
+        # Sélectionner le nième front montant (attention : n commence à 1 ici)
+        if len(rising_edge_indices) >= n:
+            target_index = rising_edge_indices[n - 1]  # n-1 car indexation Python
+            rising_time = self.FileData.data.loc[target_index, self.FileData.header_time]
+            print(f"{n}ᵉ front montant détecté à : {rising_time} sur {len(rising_edge_indices)}")
+        else:
+            print(f"Moins de {n} fronts montants trouvés.")
+        return rising_time, target_index, [{'index':x,'time':self.FileData.data.loc[x, self.FileData.header_time]} for x in rising_edge_indices]
+
+    def normalize_date_time(self, diff_time_to_normalise):
+        '''
+        Function to modify the date time columns by adding a define time to it.
+        This is usefull when we need to synchronize different file
+        
+        Parameter
+        --------
+        diff_time_to_normalise:int
+            value in datatime format to add to the datatime column
+
+        Output
+        ------
+        Return the dataframe updated with a new date time frame
+        '''
+        self.stime = time()
+        self.FileData.data[self.FileData.header_time] = self.FileData.data[self.FileData.header_time] + diff_time_to_normalise
+        print(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
+        logging.info(f"INPUT_FILE - Normalizing date time from {self.FileData.name} : {time()-self.stime:.2f}")
+
 
 # %% folder class
 class InputFolder():
@@ -532,16 +557,17 @@ class FilterFileFromFolder(InputFolder):
  
  # %% main function on how to use it
 if __name__ == "__main__":
-    # file = ConfigFile(
-    #     #  name=''
-    #     #  path=''
-    #     # header_time=
-    #     # data=
-    #     # delimiter=
-    #     # row_to_ignore=
-    #     # FileType=
-    #     # value_to_filter=
-    # )
-    fi = Collection_inputFile()
-    print(fi.files_config)
+    file = ConfigFile(
+        name='25066L_XXL_HM70TC_SEEB_Enr5.xlsx',
+        path='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L\\25066L_XXL_HM70TC_SEEB_Enr5.xlsx',
+        header_time='Timestamp',
+        # data=
+        delimiter=',',
+        row_to_ignore=0,
+        FileType= FILES_LIST.fEXCELX.value,
+        value_to_filter=0,
+        sheet_name='Seeb Data',
+    )
+    fi = InputFile(file)
+    print(fi.small_water_flow_rising_edge('FLDHW [kg/min]'))
 

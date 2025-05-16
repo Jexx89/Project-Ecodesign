@@ -156,19 +156,25 @@ class GeneratePlot():
         print(f"PLOT - Generating plot : {time() - self.stime:.2f} sec")
         logging.info(f"PLOT - Generating plot : {time() - self.stime:.2f} sec")
 
-    def add_filtered_trace(self):
+    def add_filtered_trace(self,fig:go.Figure, Text2Identify:str=''):
         '''
         This function add trace for each item in trace_param.
+
+        Parameter
+        -------------
+        Text2Identify:str = ''
+            this parameter is use to add a specifique text in front of the legend groups and names of the serie, 
+            it is used when we are comparing files from a same test in order to différenciate them
         '''
         self.stime = time()
         for t in self.trace_param :
-                self.fig.add_trace(
+                fig.add_trace(
                     go.Scatter(
                     x                       = t['x'],
                     y                       = t['y'],
-                    legendgroup             = t['legendgroup'],
-                    legendgrouptitle_text   = t['legendgrouptitle_text'],
-                    name                    = t['name'], 
+                    legendgroup             = Text2Identify + t['legendgroup'],
+                    legendgrouptitle_text   = Text2Identify + t['legendgrouptitle_text'],
+                    name                    = Text2Identify + t['name'], 
                     visible                 = t['visible'], 
                     opacity                 = t['opacity'], 
                     line                    = t['line'], 
