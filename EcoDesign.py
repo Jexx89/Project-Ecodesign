@@ -260,4 +260,16 @@ class EcoDesign(FilterFileFromFolder):
 
 # %% run main function 
 if __name__ == "__main__":
-    Traitement = EcoDesign(FileType=[FILES_LIST.fEXCELX.value],Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',Test_Num='L',Test_request='25063',Appliance_power='35')
+    
+    Traitement = EcoDesign(
+        FileType=[FILES_LIST.fEXCELX.value],
+        Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
+        Test_Num='M',
+        Test_request='25066',
+        Appliance_power='70')
+    # Traitement = EcoDesign(
+    #     FileType=[FILES_LIST.fEXCELX.value],
+    #     Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',
+    #     Test_Num='L',
+    #     Test_request='25063',
+    #     Appliance_power='35')
