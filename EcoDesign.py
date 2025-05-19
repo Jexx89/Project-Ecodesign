@@ -66,7 +66,7 @@ class EcoDesign(FilterFileFromFolder):
         '''
         negativeAnswer = ("NO", "NON", "N", "", "0")
         self.getting_input_user(Test_request,Test_Num,Appliance_power)
-        if Path_Folder !='':
+        if Path_Folder =='':
             Path_Folder = f"HM\\{self.pow_appl}kW\\{self.test_req_num}{self.test_letter}\\"
         super().__init__(currDir, Path_Folder, FileType)
 
@@ -263,7 +263,6 @@ if __name__ == "__main__":
     
     Traitement = EcoDesign(
         FileType=[FILES_LIST.fEXCELX.value],
-        Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
         Test_Num='M',
         Test_request='25066',
         Appliance_power='70')
