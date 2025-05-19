@@ -394,19 +394,19 @@ class InputFile():
         Return the dataframe updated with a new date time frame
         '''
         self.stime = time()
-
+        now = datetime.now()
+            
         if criteria==None:
             # if no criteria a mention, we set the synchronisation to 21h30m00s as this would be for the ecodisign mode and we estimate that the time frame a sync allready
-            now = datetime.now()
-            self.ref_time = datetime(year=now.year(),month=now.month(),day=now.day(),hour=21,minute=30, seconde=0)
-            for k,file in self.FileData:
+            self.ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
+            for k in self.FileData:
                 diff_with_ref_time = self.ref_time - self.FileData[k].data[self.FileData[k].header_time][0]
                 self.FileData[k].data[self.FileData[k].header_time] = self.FileData[k].data[self.FileData[k].header_time] + diff_with_ref_time
         else:
             # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
-            for k,file in self.FileData:
+            for k in self.FileData:
                 # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
-                first_tapping = datetime(year=now.year(),month=now.month(),day=now.day(),hour=7,minute=0, seconde=0)
+                first_tapping = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
                 file_rising_time, target_index,l=self.list_of_rising_edge(self.FileData[k].data,header,rising_edge_num,criteria)
 
                 diff_with_ref_time = first_tapping-file_rising_time

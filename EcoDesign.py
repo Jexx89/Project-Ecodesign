@@ -93,7 +93,7 @@ class EcoDesign():
         try:
             test_param_set:ConfigTest
             for k,test_param_set in self.test_param_sets.items():
-                if test_param_set.Path !='':
+                if test_param_set.Path =='':
                     test_param_set.Path = f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
                 test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
@@ -102,9 +102,10 @@ class EcoDesign():
                     test_param_set.collection_file.sync_file_togheter([2.5,3.5],'FLDHW [kg/min]',1)
                 elif len(self.test_param_sets)==1:
                     test_param_set.collection_file.sync_file_togheter()
+                    self.adding_parameters(test_param_set)
                 else:
                     exit("-_-_-_-_-_-_-_-\n\nBye bye")
-                self.adding_parameters(test_param_set)
+                
 
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
@@ -239,26 +240,27 @@ class EcoDesign():
         BurnerON = t_DHW_setPoint - t_hysteresys
         BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
         t_ch_setPoint = t_DHW_setPoint + t_adder
-        
-        for k,v in test_param_set.collection_file.FileData:
+        v:ConfigFile=None
 
-            if 'MICROPLAN' in v.name or 'SEEB' in v.name:
-                v.data['T = 30 [°C]'] = 30 * ones(len(v.FileData.data['T°in DHW [°C]'])) 
-                v.FileData.data['T = 45 [°C]'] = 45 * ones(len(v.FileData.data['T°in DHW [°C]'])) 
-                v.FileData.data['T = 55 [°C]'] = 55 * ones(len(v.FileData.data['T°in DHW [°C]'])) 
-                v.FileData.data['T = 30 [°C]'] = 30 * ones(len(v.FileData.data['T°in DHW [°C]'])) 
-                if 'MICROPLAN' == v.FileData.name:
+        for v in test_param_set.collection_file.FileData.items():
+
+            if 'MICROPLAN' in v[1].name or 'SEEB' in v[1].name:
+                v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                v[1].data['T = 45 [°C]'] = 45 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                v[1].data['T = 55 [°C]'] = 55 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                if 'MICROPLAN' == v[1].name:
                     t_out_name = 'T°out AV.  [°C]'
-                if 'SEEB' == v.FileData.name:
+                if 'SEEB' == v[1].name:
                     t_out_name = 'T°out TC  [°C]'
-                v.FileData.data['Delta T NORM [°C]'] = v.FileData.data[t_out_name] - v.FileData.data['T°in DHW [°C]']
+                v[1].data['Delta T NORM [°C]'] = v[1].data[t_out_name] - v[1].data['T°in DHW [°C]']
 
-            if 'MICROCOM' in v.name:
-                v.FileData.data['Delta T boiler [°C]'] = v.FileData.data['Supply [°C]'] - v.FileData.data['Return [°C]']
-                v.FileData.data['T BURN ON [°C]'] =  BurnerON * ones(len(v.FileData.data['Return [°C]'])) 
-                v.FileData.data['T BURN OFF [°C]'] = BurnerOFF * ones(len(v.FileData.data['Return [°C]'])) 
-                v.FileData.data['T CH STP [°C]'] = t_ch_setPoint * ones(len(v.FileData.data['Return [°C]'])) 
-                v.FileData.data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(v.FileData.data['Return [°C]']))
+            if 'MICROCOM' in v[1].name:
+                v[1].data['Delta T boiler [°C]'] = v[1].data['Supply [°C]'] - v[1].data['Return [°C]']
+                v[1].data['T BURN ON [°C]'] =  BurnerON * ones(len(v[1].data['Return [°C]'])) 
+                v[1].data['T BURN OFF [°C]'] = BurnerOFF * ones(len(v[1].data['Return [°C]'])) 
+                v[1].data['T CH STP [°C]'] = t_ch_setPoint * ones(len(v[1].data['Return [°C]'])) 
+                v[1].data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(v[1].data['Return [°C]']))
 
     def plot_initiate_figure(self, PlotTitle:str=''):
         '''
@@ -269,17 +271,17 @@ class EcoDesign():
         self.plotter = GeneratePlot(plot_name=PlotTitle)
         self.plotter.creat_figure()
 
-    def plot_files_eco_design(self):
+    def plot_files_eco_design(self,  test_param_set:ConfigTest):
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
-        if 'reference' in self.collection_file.Files.keys():
-            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-                self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-                self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-        if 'MICROCOM' in self.collection_file.Files.keys():
-            self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
+        for v in test_param_set.collection_file.FileData.items():
+            if 'MICROPLAN' in v[1].name:
+                self.plotter.add_trace_microplan(v[1].data,v[1].header_time)
+            elif 'SEEB' in v[1].name:
+                self.plotter.add_trace_seeb(v[1].data,v[1].header_time)
+            elif 'MICROCOM' in v[1].name:
+                self.plotter.add_trace_microcom(v[1].data,v[1].header_time)
 
         self.plotter.add_filtered_trace(self.plotter.fig)
 
@@ -288,47 +290,47 @@ class EcoDesign():
             File_name = f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html"
         self.plotter.creat_html_figure(File_name)
 
-class CompareTests(EcoDesign):
-    def __init__(self,comparelist:list[dict[str, any]]):
-        flag=False
-        self.FullName = f"Compare{[ f"_{x['Test_request']}{x['Test_Num']}" for x in comparelist]}"
-        self.plot_initiate_figure(self.FullName)
-        collection={}
-        for t in comparelist:
-            if 'Test_Num' in t and 'Test_request' in t and 'Appliance_power' in t:
-                EcoTest = EcoDesign(
-                                FileType=t['FileType'],
-                                #Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
-                                Test_Num=t['Test_Num'],
-                                Test_request=t['Test_request'],
-                                Appliance_power=t['Appliance_power'])
-                EcoTest.normalizing_datetime()
-                EcoTest.adding_parameters()
-                if not flag:
-                    flag=True
-                    self.timeSync, self.indexSync, self.listRisingEdge = EcoTest.collection_file.Files['reference'].list_of_rising_edge('FLDHW [kg/min]',1,[2.5,3.5])
-                else:
-                    self.sync_time_between_test(EcoTest)
-                collection[[f"{t['Test_request']}{t['Test_Num']}"]] = EcoTest
+# class CompareTests(EcoDesign):
+#     def __init__(self,comparelist:list[dict[str, any]]):
+#         flag=False
+#         self.FullName = f"Compare{[ f"_{x['Test_request']}{x['Test_Num']}" for x in comparelist]}"
+#         self.plot_initiate_figure(self.FullName)
+#         collection={}
+#         for t in comparelist:
+#             if 'Test_Num' in t and 'Test_request' in t and 'Appliance_power' in t:
+#                 EcoTest = EcoDesign(
+#                                 FileType=t['FileType'],
+#                                 #Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
+#                                 Test_Num=t['Test_Num'],
+#                                 Test_request=t['Test_request'],
+#                                 Appliance_power=t['Appliance_power'])
+#                 EcoTest.normalizing_datetime()
+#                 EcoTest.adding_parameters()
+#                 if not flag:
+#                     flag=True
+#                     self.timeSync, self.indexSync, self.listRisingEdge = EcoTest.collection_file.Files['reference'].list_of_rising_edge('FLDHW [kg/min]',1,[2.5,3.5])
+#                 else:
+#                     self.sync_time_between_test(EcoTest)
+#                 collection[[f"{t['Test_request']}{t['Test_Num']}"]] = EcoTest
                 
-    def plot_files_eco_design(self):
-        '''
-        This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
-        '''
-        if 'reference' in self.collection_file.Files.keys():
-            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-                self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-                self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-        if 'MICROCOM' in self.collection_file.Files.keys():
-            self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
+#     def plot_files_eco_design(self):
+#         '''
+#         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
+#         '''
+#         if 'reference' in self.collection_file.Files.keys():
+#             if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
+#                 self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+#             if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
+#                 self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
+#         if 'MICROCOM' in self.collection_file.Files.keys():
+#             self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
 
-        self.plotter.add_filtered_trace(self.plotter.fig)
+#         self.plotter.add_filtered_trace(self.plotter.fig)
 
-    def sync_time_between_test(self, EcoTest:EcoDesign):
-        for f in EcoTest.collection_file.Files:
-            followingSync, i, listRisingEdge = EcoTest.collection_file.Files['reference'].small_water_flow_rising_edge('FLDHW [kg/min]')
-            EcoTest.collection_file.Files[f].normalize_date_time(self.timeSync-followingSync)
+#     def sync_time_between_test(self, EcoTest:EcoDesign):
+#         for f in EcoTest.collection_file.Files:
+#             followingSync, i, listRisingEdge = EcoTest.collection_file.Files['reference'].small_water_flow_rising_edge('FLDHW [kg/min]')
+#             EcoTest.collection_file.Files[f].normalize_date_time(self.timeSync-followingSync)
 
             
 # %% run main function 
@@ -338,7 +340,6 @@ if __name__ == "__main__":
         Test_request ='25066',
         Test_Num ='M',
         Appliance_power ='70',
-        Path ='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
     )
 
 
@@ -350,6 +351,6 @@ if __name__ == "__main__":
     Traitement = EcoDesign(test)
     Traitement.adding_parameters()
 
-    # Traitement.plot_initiate_figure()
-    # Traitement.plot_files_eco_design()
-    # Traitement.plot_generate_html()
+    Traitement.plot_initiate_figure()
+    Traitement.plot_files_eco_design()
+    Traitement.plot_generate_html()
