@@ -102,6 +102,7 @@ class EcoDesign():
                     test_param_set.collection_file.sync_file_togheter([2.5,3.5],'FLDHW [kg/min]',1)
                 elif len(self.test_param_sets)==1:
                     test_param_set.collection_file.sync_file_togheter()
+
                     self.adding_parameters(test_param_set)
                 else:
                     exit("-_-_-_-_-_-_-_-\n\nBye bye")
@@ -215,52 +216,40 @@ class EcoDesign():
         logging.info(f"ECO_DESIGN - {len(files_to_plot)} file(s) found")
         return InputFile(files_to_plot)
 
-    # def normalizing_datetime(self):
-    #     '''
-    #     This function help us to normalize the date and time for each files an start all the file at 21h30m00s as defined in standard 
-    #     '''
-    #     self.diff_time_to_normalise = self.collection_file.Files['reference'].diff_standard_time_normalize()
-    #     if self.diff_time_to_normalise is None :
-    #         print("No reference file for normalizing date time found")
-    #         logging.error("No reference file for normalizing date time found")
-    #     else:
-    #         for f in self.collection_file.Files:
-    #             self.collection_file.Files[f].normalize_date_time(self.diff_time_to_normalise)
-
-
     def adding_parameters(self, test_param_set:ConfigTest):
         '''
         This function is there to creat new trace from the parameter section taht help the used for analysing the data
         '''
-        t_DHW_setPoint = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'SetpointDHW']
-        t_adder = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamADDER']
-        t_adder_coef = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamAdderCoef']
-        t_hysteresys = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamHysteresis']
+        if test_param_set.ParamSet.status_param()['test']:
+            t_DHW_setPoint = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'SetpointDHW']
+            t_adder = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamADDER']
+            t_adder_coef = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamAdderCoef']
+            t_hysteresys = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamHysteresis']
 
-        BurnerON = t_DHW_setPoint - t_hysteresys
-        BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
-        t_ch_setPoint = t_DHW_setPoint + t_adder
-        v:ConfigFile=None
+            BurnerON = t_DHW_setPoint - t_hysteresys
+            BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
+            t_ch_setPoint = t_DHW_setPoint + t_adder
+            v:ConfigFile=None
 
-        for v in test_param_set.collection_file.FileData.items():
+            for v in test_param_set.collection_file.FileData.items():
 
-            if 'MICROPLAN' in v[1].name or 'SEEB' in v[1].name:
-                v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
-                v[1].data['T = 45 [°C]'] = 45 * ones(len(v[1].data['T°in DHW [°C]'])) 
-                v[1].data['T = 55 [°C]'] = 55 * ones(len(v[1].data['T°in DHW [°C]'])) 
-                v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
-                if 'MICROPLAN' == v[1].name:
-                    t_out_name = 'T°out AV.  [°C]'
-                if 'SEEB' == v[1].name:
-                    t_out_name = 'T°out TC  [°C]'
-                v[1].data['Delta T NORM [°C]'] = v[1].data[t_out_name] - v[1].data['T°in DHW [°C]']
+                if 'MICROPLAN' in v[1].name or 'SEEB' in v[1].name:
+                    v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 45 [°C]'] = 45 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 55 [°C]'] = 55 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    if 'MICROPLAN' == v[1].name:
+                        t_out_name = 'T°out AV.  [°C]'
+                    if 'SEEB' == v[1].name:
+                        t_out_name = 'T°out TC  [°C]'
+                    v[1].data['Delta T NORM [°C]'] = v[1].data[t_out_name] - v[1].data['T°in DHW [°C]']
 
-            if 'MICROCOM' in v[1].name:
-                v[1].data['Delta T boiler [°C]'] = v[1].data['Supply [°C]'] - v[1].data['Return [°C]']
-                v[1].data['T BURN ON [°C]'] =  BurnerON * ones(len(v[1].data['Return [°C]'])) 
-                v[1].data['T BURN OFF [°C]'] = BurnerOFF * ones(len(v[1].data['Return [°C]'])) 
-                v[1].data['T CH STP [°C]'] = t_ch_setPoint * ones(len(v[1].data['Return [°C]'])) 
-                v[1].data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(v[1].data['Return [°C]']))
+                if 'MICROCOM' in v[1].name:
+                    v[1].data['Delta T boiler [°C]'] = v[1].data['Supply [°C]'] - v[1].data['Return [°C]']
+                    v[1].data['T BURN ON [°C]'] =  BurnerON * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T BURN OFF [°C]'] = BurnerOFF * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T CH STP [°C]'] = t_ch_setPoint * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(v[1].data['Return [°C]']))
 
     def plot_initiate_figure(self, PlotTitle:str=''):
         '''
@@ -349,7 +338,6 @@ if __name__ == "__main__":
 
 #sequence :: 
     Traitement = EcoDesign(test)
-    Traitement.adding_parameters()
 
     Traitement.plot_initiate_figure()
     Traitement.plot_files_eco_design()
