@@ -255,82 +255,46 @@ class EcoDesign():
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
+        # PlotTitle = f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}"
         if PlotTitle=='':
-            PlotTitle = f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}"
+            PlotTitle = self.creatPlotName()
         self.plotter = GeneratePlot(plot_name=PlotTitle)
         self.plotter.creat_figure()
 
-    def plot_files_eco_design(self,  test_param_set:ConfigTest):
+    def plot_generate_html(self, File_name:str=''):
+        if PlotTitle=='':
+            PlotTitle = self.creatPlotName()
+        self.plotter.creat_html_figure(File_name)
+
+    def creatPlotName(self):
+        date_created = f"{datetime.today().strftime('%Y-%m-%d')}"
+        PlotTitle="".join([f"HM{v[1].Appliance_power}kW - {v[1].Test_request}{v[1].Test_Num} - " for v in self.test_param_sets.items()])
+        return PlotTitle + date_created
+
+    def plot_files_eco_design(self):
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
-        for v in test_param_set.collection_file.FileData.items():
-            if 'MICROPLAN' in v[1].name:
-                self.plotter.add_trace_microplan(v[1].data,v[1].header_time)
-            elif 'SEEB' in v[1].name:
-                self.plotter.add_trace_seeb(v[1].data,v[1].header_time)
-            elif 'MICROCOM' in v[1].name:
-                self.plotter.add_trace_microcom(v[1].data,v[1].header_time)
+        for v in self.test_param_sets:
+            for v in self.test_param_sets.items():
+                if 'MICROPLAN' in v[1].name:
+                    self.plotter.add_trace_microplan(v[1].data,v[1].header_time)
+                elif 'SEEB' in v[1].name:
+                    self.plotter.add_trace_seeb(v[1].data,v[1].header_time)
+                elif 'MICROCOM' in v[1].name:
+                    self.plotter.add_trace_microcom(v[1].data,v[1].header_time)
+            self.plotter.add_filtered_trace(self.plotter.fig)
 
-        self.plotter.add_filtered_trace(self.plotter.fig)
 
-    def plot_generate_html(self, File_name:str=''):
-        if File_name=='':
-            File_name = f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html"
-        self.plotter.creat_html_figure(File_name)
-
-# class CompareTests(EcoDesign):
-#     def __init__(self,comparelist:list[dict[str, any]]):
-#         flag=False
-#         self.FullName = f"Compare{[ f"_{x['Test_request']}{x['Test_Num']}" for x in comparelist]}"
-#         self.plot_initiate_figure(self.FullName)
-#         collection={}
-#         for t in comparelist:
-#             if 'Test_Num' in t and 'Test_request' in t and 'Appliance_power' in t:
-#                 EcoTest = EcoDesign(
-#                                 FileType=t['FileType'],
-#                                 #Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\70kW\\25066L',
-#                                 Test_Num=t['Test_Num'],
-#                                 Test_request=t['Test_request'],
-#                                 Appliance_power=t['Appliance_power'])
-#                 EcoTest.normalizing_datetime()
-#                 EcoTest.adding_parameters()
-#                 if not flag:
-#                     flag=True
-#                     self.timeSync, self.indexSync, self.listRisingEdge = EcoTest.collection_file.Files['reference'].list_of_rising_edge('FLDHW [kg/min]',1,[2.5,3.5])
-#                 else:
-#                     self.sync_time_between_test(EcoTest)
-#                 collection[[f"{t['Test_request']}{t['Test_Num']}"]] = EcoTest
-                
-#     def plot_files_eco_design(self):
-#         '''
-#         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
-#         '''
-#         if 'reference' in self.collection_file.Files.keys():
-#             if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-#                 self.plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-#             if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-#                 self.plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-#         if 'MICROCOM' in self.collection_file.Files.keys():
-#             self.plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
-
-#         self.plotter.add_filtered_trace(self.plotter.fig)
-
-#     def sync_time_between_test(self, EcoTest:EcoDesign):
-#         for f in EcoTest.collection_file.Files:
-#             followingSync, i, listRisingEdge = EcoTest.collection_file.Files['reference'].small_water_flow_rising_edge('FLDHW [kg/min]')
-#             EcoTest.collection_file.Files[f].normalize_date_time(self.timeSync-followingSync)
 
             
 # %% run main function 
 if __name__ == "__main__":
-
     single_config = ConfigTest(
         Test_request ='25066',
         Test_Num ='M',
         Appliance_power ='70',
     )
-
 
     test={f"{single_config.Test_request}{single_config.Test_Num}": single_config}
 #defining test to process :
