@@ -122,7 +122,7 @@ class InputFile():
     This class allow us to open a file and import all the data in a dataframe
     Later the user can post process the dataframe with basic function
     '''
-    def __init__(self, FileData:Union[dict[str,ConfigFile],list[dict[str,ConfigFile]]], initialDir:str=''):
+    def __init__(self, FileData:dict[str,ConfigFile], initialDir:str=''):
         '''
         Initialise the class
 
@@ -190,11 +190,10 @@ class InputFile():
             liste_file : 
                 list of all the file selected'''
             i=0
-            file=[]
+            file={}
             for l in list_file:
                 i+=1
-                file.append({basename(l.split('.')[0]) 
-                        : ConfigFile(
+                file[basename(l.split('.')[0])]=ConfigFile(
                             name=basename(l.split('.')[0]),
                             path=l,
                             header_time='',
@@ -204,7 +203,7 @@ class InputFile():
                             FileType=check_file_type(l),
                             value_to_filter=0,
                             sheet_name=0
-                            )})
+                            )
             return file
                 
         def check_file_type(path):
@@ -330,8 +329,8 @@ class InputFile():
             return df
         
         file:ConfigFile
-        for file in self.FileData:
-            self.FileData[file].data = import_data_by_type(self.FileData[file].path, self.FileData[file].delimiter,self.FileData[file].row_to_ignore, self.FileData[file].sheet_name)
+        for k,file in self.FileData.items():
+            file.data = import_data_by_type(file.path, file.delimiter,file.row_to_ignore, file.sheet_name)
     
     def transfrom_data(self):
         '''
@@ -375,9 +374,9 @@ class InputFile():
                     logging.error("Parsing date failed : no column found")
         
         file:ConfigFile
-        for file in self.FileData:
-            down_sample_dataframe(self.FileData[file])
-            parse_column_date(self.FileData[file])
+        for k,file in self.FileData.items():
+            down_sample_dataframe(file)
+            parse_column_date(file)
 
     def sync_file_togheter(self,criteria=None, header='',rising_edge_num=1):
         '''
@@ -399,18 +398,18 @@ class InputFile():
         if criteria==None:
             # if no criteria a mention, we set the synchronisation to 21h30m00s as this would be for the ecodisign mode and we estimate that the time frame a sync allready
             self.ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
-            for k in self.FileData:
-                diff_with_ref_time = self.ref_time - self.FileData[k].data[self.FileData[k].header_time][0]
-                self.FileData[k].data[self.FileData[k].header_time] = self.FileData[k].data[self.FileData[k].header_time] + diff_with_ref_time
+            for k, file in self.FileData.items():
+                diff_with_ref_time = self.ref_time - file.data[file.header_time][0]
+                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
         else:
             # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
-            for k in self.FileData:
+            for k, file in self.FileData.items():
                 # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
                 first_tapping = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
-                file_rising_time, target_index,l=self.list_of_rising_edge(self.FileData[k].data,header,rising_edge_num,criteria)
+                file_rising_time, target_index,l=self.list_of_rising_edge(file.data,header,rising_edge_num,criteria)
 
                 diff_with_ref_time = first_tapping-file_rising_time
-                self.FileData[k].data[self.FileData[k].header_time] = self.FileData[k].data[self.FileData[k].header_time] + diff_with_ref_time
+                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
 
 
         print(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")

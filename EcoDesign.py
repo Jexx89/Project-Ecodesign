@@ -71,7 +71,7 @@ class EcoDesign():
     Class specific for ecodesign ploting, incorporating up to 5 differents kind of file to plot in one .html file.
     This class enherit from the class: FilterFileFromFolder -> InputFolder because we a selecting the files first by selecting a folder. 
     '''
-    def __init__(self, test_parameters:Union[dict[str,ConfigTest],list[dict[str,ConfigTest]]]=None,initialDir:str=''):
+    def __init__(self, test_parameters:dict[str,ConfigTest]=None,initialDir:str=''):
         '''
         Initialize whent he class is called
 
@@ -89,10 +89,10 @@ class EcoDesign():
         if not self.initialDir:
             self.initialDir= getcwd()
         self.test_param_sets  =test_parameters
-        self.verifying_input_user()
+        test_param_set:ConfigTest
         try:
-            test_param_set:ConfigTest
             for k,test_param_set in self.test_param_sets.items():
+                self.verifying_input_user(test_param_set)
                 if test_param_set.Path =='':
                     test_param_set.Path = f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
                 test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
@@ -111,7 +111,7 @@ class EcoDesign():
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
 
-    def verifying_input_user(self):
+    def verifying_input_user(self, test_param_set:ConfigTest):
         '''
         Getting input from the user :
         - the test request number
@@ -144,22 +144,13 @@ class EcoDesign():
                 x = spacementForAnswer - len(s)
             return s + (" " * x)
         
-        if len(self.test_param_sets)>0:
-            for t in self.test_param_sets:
-                #Check if we have all the infos
-                if not self.test_param_sets[t].Test_request: 
-                    self.test_param_sets[t].Test_request = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-                if not self.test_param_sets[t].Test_Num: 
-                    self.test_param_sets[t].Test_Num = input(align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
-                if not self.test_param_sets[t].Appliance_power: 
-                    self.test_param_sets[t].Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-        else:
-            newTest:ConfigTest=None
-             #Check if we have all the infos
-            newTest.Test_request = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-            newTest.Test_Num = input(align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
-            newTest.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-            self.test_param_sets = [{f"{newTest.Test_request}{newTest.Test_Num}": newTest}] #creating ONE test configuration 
+        #Check if we have all the infos
+        if not test_param_set.Test_request: 
+            test_param_set.Test_request = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+        if not test_param_set.Test_Num: 
+            test_param_set.Test_Num = input(align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
+        if not test_param_set.Appliance_power: 
+            test_param_set.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
 
     def get_file_to_plot(self,Files_path:InputFolder)->InputFile:
         '''
@@ -262,8 +253,8 @@ class EcoDesign():
         self.plotter.creat_figure()
 
     def plot_generate_html(self, File_name:str=''):
-        if PlotTitle=='':
-            PlotTitle = self.creatPlotName()
+        if File_name=='':
+            File_name = f"{self.creatPlotName()}.html"
         self.plotter.creat_html_figure(File_name)
 
     def creatPlotName(self):
@@ -275,14 +266,14 @@ class EcoDesign():
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
-        for v in self.test_param_sets:
-            for v in self.test_param_sets.items():
-                if 'MICROPLAN' in v[1].name:
-                    self.plotter.add_trace_microplan(v[1].data,v[1].header_time)
-                elif 'SEEB' in v[1].name:
-                    self.plotter.add_trace_seeb(v[1].data,v[1].header_time)
-                elif 'MICROCOM' in v[1].name:
-                    self.plotter.add_trace_microcom(v[1].data,v[1].header_time)
+        for k, v in self.test_param_sets.items():
+            for kx,vx in v.collection_file.FileData.items():
+                if 'MICROPLAN' in vx.name:
+                    self.plotter.add_trace_microplan(vx.data,vx.header_time,k)
+                elif 'SEEB' in vx.name:
+                    self.plotter.add_trace_seeb(vx.data,vx.header_time,k)
+                elif 'MICROCOM' in vx.name:
+                    self.plotter.add_trace_microcom(vx.data,vx.header_time,k)
             self.plotter.add_filtered_trace(self.plotter.fig)
 
 
