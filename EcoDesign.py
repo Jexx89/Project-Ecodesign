@@ -90,6 +90,7 @@ class EcoDesign():
             self.initialDir= getcwd()
         self.test_param_sets  =test_parameters
         test_param_set:ConfigTest
+        self.test_count = len(self.test_param_sets)
         try:
             for k,test_param_set in self.test_param_sets.items():
                 self.verifying_input_user(test_param_set)
@@ -98,9 +99,9 @@ class EcoDesign():
                 test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
                 test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path)
-                if len(self.test_param_sets)>1:
+                if self.test_count>1:
                     test_param_set.collection_file.sync_file_togheter([2.5,3.5],'FLDHW [kg/min]',1)
-                elif len(self.test_param_sets)==1:
+                elif self.test_count==1:
                     test_param_set.collection_file.sync_file_togheter()
 
                     self.adding_parameters(test_param_set)
@@ -255,25 +256,33 @@ class EcoDesign():
     def plot_generate_html(self, File_name:str=''):
         if File_name=='':
             File_name = f"{self.creatPlotName()}.html"
-        self.plotter.creat_html_figure(File_name)
+            if self.test_count==1:
+                for k, v in self.test_param_sets.items():
+                    p = v.Path + '\\' + File_name
+            else:
+                p='\\Comparaison\\' + File_name
+        self.plotter.creat_html_figure(p)
 
     def creatPlotName(self):
         date_created = f"{datetime.today().strftime('%Y-%m-%d')}"
-        PlotTitle="".join([f"HM{v[1].Appliance_power}kW - {v[1].Test_request}{v[1].Test_Num} - " for v in self.test_param_sets.items()])
+        PlotTitle="".join([f"{v[1].Test_request}{v[1].Test_Num}_HM{v[1].Appliance_power}kW_" for v in self.test_param_sets.items()])
         return PlotTitle + date_created
 
     def plot_files_eco_design(self):
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
+        grouping_text=''
         for k, v in self.test_param_sets.items():
+            grouping_text = k
             for kx,vx in v.collection_file.FileData.items():
+                if self.test_count==1:grouping_text=''
                 if 'MICROPLAN' in vx.name:
-                    self.plotter.add_trace_microplan(vx.data,vx.header_time,k)
+                    self.plotter.add_trace_microplan(vx.data,vx.header_time,grouping_text)
                 elif 'SEEB' in vx.name:
-                    self.plotter.add_trace_seeb(vx.data,vx.header_time,k)
+                    self.plotter.add_trace_seeb(vx.data,vx.header_time,grouping_text)
                 elif 'MICROCOM' in vx.name:
-                    self.plotter.add_trace_microcom(vx.data,vx.header_time,k)
+                    self.plotter.add_trace_microcom(vx.data,vx.header_time,grouping_text)
             self.plotter.add_filtered_trace(self.plotter.fig)
 
 

@@ -127,9 +127,31 @@ class GeneratePlot():
             xaxis=dict(title=self.lab_x_axe,title_font={"size": self.txt_siz_lbl_xy},spikesnap="hovered data",spikemode="toaxis+across", domain=[0.0, 0.95]),
             yaxis=dict(title=self.lab_prim_y_axe, title_font={"size": self.txt_siz_lbl_xy}),
             yaxis2=dict(title=self.lab_sec_y_axe, overlaying="y", side="right", title_font={"size": self.txt_siz_lbl_xy},anchor="y"),
-            hovermode="x unified",  # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
-            margin=dict(l=60, r=120, t=50, b=50)
-        )
+            hovermode="x",  # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
+            margin=dict(l=60, r=120, t=50, b=50), 
+            updatemenus=[dict(
+                                type="buttons",
+                                direction="right",
+                                buttons=list([
+                                    dict(label="Hover: x",
+                                        method="relayout",
+                                        args=[{"hovermode": "x"}]),
+                                    dict(label="Hover: x unified",
+                                        method="relayout",
+                                        args=[{"hovermode": "x unified"}]),
+                                    dict(label="Hover: Closest",
+                                        method="relayout",
+                                        args=[{"hovermode": "closest"}]),
+                                    # dict(label="Hover: y unified",
+                                    #     method="relayout",
+                                    #     args=[{"hovermode": "y unified"}]),
+                                ]),
+                                x=1,
+                                y=1.1,
+                            )
+                        ],
+
+            )
         print(f"PLOT - Creating figure and initialisasing layout : {time() - self.stime:.2f} sec")
         logging.info(f"PLOT - Creating figure and initialising layout : {time() - self.stime:.2f} sec")
 
@@ -214,7 +236,7 @@ class GeneratePlot():
             ]
             # Microplan parameter serie 
         if microplan_name == 'MicroPlan' :
-            trace_param.append([
+            trace_param.extend([
                 dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = microplan_name,legendgrouptitle_text = microplan_name ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
                 dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = microplan_name,legendgrouptitle_text = microplan_name ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
                 dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = microplan_name,legendgrouptitle_text = microplan_name ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
@@ -251,7 +273,7 @@ class GeneratePlot():
             ]
             # Microplan parameter serie 
         if SEEB_name == 'SEEB' :
-            trace_param.append([
+            trace_param.extend([
                 dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
                 dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
                 dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
@@ -286,7 +308,7 @@ class GeneratePlot():
             ]
             # microcom serie for parameter line
         if Microcom_name == 'Microcom' :
-            trace_param.append([
+            trace_param.extend([
             dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
             dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
             dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
