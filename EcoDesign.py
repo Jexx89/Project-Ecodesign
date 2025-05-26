@@ -33,76 +33,100 @@ from datetime import datetime
 
 class errorEcodesign(Exception):
     pass
+
+@dataclass
+class ConfigTest:
+    '''
+    Class to store the configuration of the test
+    
+    Parameters
+    ----------
+    
+    path: str default value = ''
+        Absolute path of the file
+    FileType : list[tuple[str,str]], default val = [[FILES_LIST.fCSV]]
+        Type of file we need to find
+    Test_request : str, default val = ''
+        the test request number 
+    Test_Num : str, default val = ''
+        the test index, here a letter
+    Appliance_power : str, default val = ''
+        the power of the appliance (boiler)
+    ParamSet: EcoDesign_Parameter
+        class with all the parameter from the test found in the database file
+    '''
+    Test_request:str=''
+    Test_Num:str=''
+    Appliance_power:str=''
+    Path: str='' #where to search the data
+    ParamSet: EcoDesign_Parameter = None
+    Files_path:list = None #list[dict['FileName':'','path':'','FileType':'']] = None #{'FileName':'','path':'','FileType':''}
+    collection_file:InputFile=None
+
+
+
 # %% Ecodesign classes
-class EcoDesign(FilterFileFromFolder):
+class EcoDesign():
     '''
     Class specific for ecodesign ploting, incorporating up to 5 differents kind of file to plot in one .html file.
     This class enherit from the class: FilterFileFromFolder -> InputFolder because we a selecting the files first by selecting a folder. 
     '''
-    def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value],Test_request:str='',Test_Num:str='',Appliance_power:str=''):
+    def __init__(self, test_parameters:dict[str,ConfigTest]=None,initialDir:str=''):
         '''
         Initialize whent he class is called
 
         Parameter
         -----------------
 
-        currDir : str, default val = ''
+        initialDir : str, default val = ''
             Set the first path to look into when the file dialogue is called
-        Path_Folder : str, default val = ''
-            set the path of the folder
-        FileType : list[tuple[str,str]], default val = [[FILES_LIST.fCSV]]
-            Type of file we need to find
-        Test_request : str, default val = ''
-            the test request number 
-        Test_Num : str, default val = ''
-            the test index, here a letter
-        Appliance_power : str, default val = ''
-            the power of the appliance (boiler)
-        
+
         Returns
         -----------------
         return in output a HTML file that help us to analyse the data from all the ecodesign tests
-
         '''
-        negativeAnswer = ("NO", "NON", "N", "", "0")
-        self.getting_input_user(Test_request,Test_Num,Appliance_power)
-        if Path_Folder =='':
-            Path_Folder = f"HM\\{self.pow_appl}kW\\{self.test_req_num}{self.test_letter}\\"
-        super().__init__(currDir, Path_Folder, FileType)
-
-        if self.test_req_num not in self.Path_Folder : 
-            answer = input("Test request num isn't in the file name are you sure you want to continue? [y/n]")
-            if answer.upper() in negativeAnswer:
-                exit("The folder is different from test request num")
-            
+        self.initialDir = initialDir
+        if not self.initialDir:
+            self.initialDir= getcwd()
+        self.test_param_sets  =test_parameters
+        test_param_set:ConfigTest
+        self.test_count = len(self.test_param_sets)
+        now = datetime.now()
+        value_to_filter = self.test_count*2
         try:
-            self.paramSet = EcoDesign_Parameter(int( self.test_req_num), self.test_letter)
-            self.collection_file = self.get_file_to_plot(self.CompletePath)
-            self.normalizing_datetime()
-            self.adding_parameters()
-            self.ploting_files_eco_design()
+            
+            for k,test_param_set in self.test_param_sets.items():
+                self.verifying_input_user(test_param_set)
+                if test_param_set.Path =='':
+                    test_param_set.Path = f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
+                test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
+                test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
+                test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path,value_to_filter)
+                if self.test_count>1:
+                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
+                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time,from_file=['SEEB','MICROPLAN'],criteria=[2.5,3.5],header='FLDHW [kg/min]',rising_edge_num=1)
+                    self.adding_parameters(test_param_set)
+                elif self.test_count==1:
+                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
+                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time)
+                    self.adding_parameters(test_param_set)
+                else:
+                    exit("-_-_-_-_-_-_-_-\n\nBye bye")
+                
+
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
 
-    def getting_input_user(self,Test_request:str='',Test_Num:str='',Appliance_power:str=''):
+    def verifying_input_user(self, test_param_set:ConfigTest):
         '''
         Getting input from the user :
         - the test request number
         - the test index ( letter here )
         - the power of the appliance in kw
 
-        Parameters
-        -----------------
-        Test_request : str, default val = ''
-            the test request number 
-        Test_Num : str, default val = ''
-            the test index, here a letter
-        Appliance_power : str, default val = ''
-            the power of the appliance (boiler)
-        
         Returns
         -----------------
-            void
+            update self.test_param_sets
 
         '''
         def align_input_user(s: str) -> str:
@@ -126,20 +150,15 @@ class EcoDesign(FilterFileFromFolder):
                 x = spacementForAnswer - len(s)
             return s + (" " * x)
         
-        if not Test_request: 
-            self.test_req_num = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
-        else:
-            self.test_req_num = Test_request
-        if not Test_Num:
-            self.test_letter = input(align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
-        else:
-            self.test_letter = Test_Num
-        if not Appliance_power:
-            self.pow_appl = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-        else:
-            self.pow_appl = Appliance_power
+        #Check if we have all the infos
+        if not test_param_set.Test_request: 
+            test_param_set.Test_request = input(align_input_user("Enter the test request number(yyxxx): "))  # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
+        if not test_param_set.Test_Num: 
+            test_param_set.Test_Num = input(align_input_user("Enter the test letter: ")).upper()  # The test number. It can be A, B, C, D, etc.
+        if not test_param_set.Appliance_power: 
+            test_param_set.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
 
-    def get_file_to_plot(self,listFiles=[str]):
+    def get_file_to_plot(self,Files_path:InputFolder,value_to_filter=0)->InputFile:
         '''
         Function to filter all the file that we need to plot for ecodesign ploting
         this dictionary is build base on the condition of the naming of the file
@@ -156,17 +175,17 @@ class EcoDesign(FilterFileFromFolder):
             a dictionary with the name as a key and the full path as a value of all the files we found to plot
 
         '''
-        def file_database():
+        def file_database(value_to_filter=0):
             '''
             This function return a complete set of configfile that we can found in the folder
             We initialize all the file with there parameters
             '''
-            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
-            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
-            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
-            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
-            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
-            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
+            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
+            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
+            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
             hl = dict(
                     MICROPLAN = MIP,
                     SEEB = SEB,
@@ -178,15 +197,12 @@ class EcoDesign(FilterFileFromFolder):
             return hl
 
         files_to_plot={}
-        header_list = file_database()
-        for f in listFiles:
-            for xf in header_list:
-                if header_list[xf].name in f['name'].upper():
-                    header_list[xf].path = f['full_path']
-                    if header_list[xf].name == 'MICROPLAN' or header_list[xf].name == 'SEEB':
-                        files_to_plot['reference']= header_list[xf]
-                    else:
-                        files_to_plot[header_list[xf].name]= header_list[xf]
+        header_list = file_database(value_to_filter)
+        for file in Files_path.files_in_folder:
+            for xfile in header_list:
+                if header_list[xfile].name in file['FileName'].upper() and file['FileType'] in header_list[xfile].FileType.value:
+                    header_list[xfile].path = file['Path']
+                    files_to_plot[file['FileName']]= header_list[xfile]
                     break
         if len(files_to_plot) == 0:
             print("Probleme detecting the files in the list")
@@ -195,80 +211,105 @@ class EcoDesign(FilterFileFromFolder):
 
         print(f"ECO_DESIGN - {len(files_to_plot)} file(s) found")
         logging.info(f"ECO_DESIGN - {len(files_to_plot)} file(s) found")
-        return Collection_inputFile(files_config=files_to_plot)
+        return InputFile(files_to_plot)
 
-    def normalizing_datetime(self):
-        '''
-        This function help us to normalize the date and time for each files an start all the file at 21h30m00s as defined in standard 
-        '''
-        diff_time_to_normalise = self.collection_file.Files['reference'].diff_standard_time_normalize()
-        if diff_time_to_normalise is None :
-            print("No reference file for normalizing date time found")
-            logging.error("No reference file for normalizing date time found")
-        else:
-            for f in self.collection_file.Files:
-                self.collection_file.Files[f].normalize_date_time(diff_time_to_normalise)
-
-    def adding_parameters(self):
+    def adding_parameters(self, test_param_set:ConfigTest):
         '''
         This function is there to creat new trace from the parameter section taht help the used for analysing the data
         '''
-        t_DHW_setPoint = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'SetpointDHW']
-        t_adder = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'ParamADDER']
-        t_adder_coef = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'ParamAdderCoef']
-        t_hysteresys = self.paramSet.test_parameters.at[self.paramSet.test_parameters.index[0],'ParamHysteresis']
+        if test_param_set.ParamSet.status_param()['test']:
+            t_DHW_setPoint = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'SetpointDHW']
+            t_adder = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamADDER']
+            t_adder_coef = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamAdderCoef']
+            t_hysteresys = test_param_set.ParamSet.test_parameters.at[test_param_set.ParamSet.test_parameters.index[0],'ParamHysteresis']
 
-        BurnerON = t_DHW_setPoint - t_hysteresys
-        BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
-        t_ch_setPoint = t_DHW_setPoint + t_adder
-        
-        if 'reference' in self.collection_file.Files.keys():
-            self.collection_file.Files['reference'].FileData.data['T = 30 [°C]'] = 30 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
-            self.collection_file.Files['reference'].FileData.data['T = 45 [°C]'] = 45 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
-            self.collection_file.Files['reference'].FileData.data['T = 55 [°C]'] = 55 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
-            self.collection_file.Files['reference'].FileData.data['T = 30 [°C]'] = 30 * ones(len(self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]'])) 
-            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-                t_out_name = 'T°out AV.  [°C]'
-            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-                t_out_name = 'T°out TC  [°C]'
-            self.collection_file.Files['reference'].FileData.data['Delta T NORM [°C]'] = self.collection_file.Files['reference'].FileData.data[t_out_name] - self.collection_file.Files['reference'].FileData.data['T°in DHW [°C]']
-        if 'MICROCOM' in self.collection_file.Files.keys():
-            self.collection_file.Files['MICROCOM'].FileData.data['Delta T boiler [°C]'] = self.collection_file.Files['MICROCOM'].FileData.data['Supply [°C]'] - self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]']
-            self.collection_file.Files['MICROCOM'].FileData.data['T BURN ON [°C]'] =  BurnerON * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
-            self.collection_file.Files['MICROCOM'].FileData.data['T BURN OFF [°C]'] = BurnerOFF * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
-            self.collection_file.Files['MICROCOM'].FileData.data['T CH STP [°C]'] = t_ch_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]'])) 
-            self.collection_file.Files['MICROCOM'].FileData.data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(self.collection_file.Files['MICROCOM'].FileData.data['Return [°C]']))
+            BurnerON = t_DHW_setPoint - t_hysteresys
+            BurnerOFF = t_DHW_setPoint - (t_adder * t_adder_coef)
+            t_ch_setPoint = t_DHW_setPoint + t_adder
+            v:ConfigFile=None
 
-    # this function allow us to import the data from the csv files put then in dataframe
-    def ploting_files_eco_design(self):
+            for v in test_param_set.collection_file.FileData.items():
+
+                if 'MICROPLAN' in v[1].name or 'SEEB' in v[1].name:
+                    v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 45 [°C]'] = 45 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 55 [°C]'] = 55 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
+                    if 'MICROPLAN' == v[1].name:
+                        t_out_name = 'T°out AV.  [°C]'
+                    if 'SEEB' == v[1].name:
+                        t_out_name = 'T°out TC  [°C]'
+                    v[1].data['Delta T NORM [°C]'] = v[1].data[t_out_name] - v[1].data['T°in DHW [°C]']
+
+                if 'MICROCOM' in v[1].name:
+                    v[1].data['Delta T boiler [°C]'] = v[1].data['Supply [°C]'] - v[1].data['Return [°C]']
+                    v[1].data['T BURN ON [°C]'] =  BurnerON * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T BURN OFF [°C]'] = BurnerOFF * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T CH STP [°C]'] = t_ch_setPoint * ones(len(v[1].data['Return [°C]'])) 
+                    v[1].data['T DHW Setpoint [°C]'] = t_DHW_setPoint * ones(len(v[1].data['Return [°C]']))
+
+    def plot_initiate_figure(self, PlotTitle:str=''):
         '''
         This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
         '''
-        plotter = GeneratePlot(plot_name=f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}")
-        plotter.creat_figure()
-        if 'reference' in self.collection_file.Files.keys():
-            if 'MICROPLAN' == self.collection_file.Files['reference'].FileData.name:
-                plotter.add_trace_microplan(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-            if 'SEEB' == self.collection_file.Files['reference'].FileData.name:
-                plotter.add_trace_seeb(self.collection_file.Files['reference'].FileData.data,self.collection_file.Files['reference'].FileData.header_time)
-        if 'MICROCOM' in self.collection_file.Files.keys():
-            plotter.add_trace_microcom(self.collection_file.Files['MICROCOM'].FileData.data,self.collection_file.Files['MICROCOM'].FileData.header_time)
+        # PlotTitle = f"HM{self.pow_appl}kW - {self.test_req_num}{self.test_letter} - {datetime.today().strftime('%Y-%m-%d')}"
+        if PlotTitle=='':
+            PlotTitle = self.creatPlotName()
+        self.plotter = GeneratePlot(plot_name=PlotTitle)
+        self.plotter.creat_figure()
 
-        plotter.add_filtered_trace()
-        # plotter.show_html_figure()
-        plotter.creat_html_figure(f"{self.Path_Folder}\\{self.test_req_num}{self.test_letter}_XXL_HM{self.pow_appl}TC_PLOT.html")
+    def plot_generate_html(self, File_name:str=''):
+        if File_name=='':
+            File_name = f"{self.creatPlotName()}.html"
+            if self.test_count==1:
+                for k, v in self.test_param_sets.items():
+                    p = v.Path + '\\' + File_name
+            else:
+                p=f"{getcwd()}\\Comparaison\\{File_name}"
+                print(p)
+        self.plotter.creat_html_figure(p)
 
+    def creatPlotName(self):
+        date_created = f"{datetime.today().strftime('%Y-%m-%d')}"
+        PlotTitle="".join([f"{v[1].Test_request}{v[1].Test_Num}_HM{v[1].Appliance_power}kW_" for v in self.test_param_sets.items()])
+        return PlotTitle + date_created
+
+    def plot_files_eco_design(self):
+        '''
+        This function calls the GeneratePlot class to creat and configure a plot ECO-DESIGN
+        '''
+        grouping_text=''
+        for k, v in self.test_param_sets.items():
+            grouping_text = k
+            for kx,vx in v.collection_file.FileData.items():
+                if self.test_count==1:grouping_text=''
+                if 'MICROPLAN' in vx.name:
+                    self.plotter.add_trace_microplan(vx.data,vx.header_time,grouping_text)
+                elif 'SEEB' in vx.name:
+                    self.plotter.add_trace_seeb(vx.data,vx.header_time,grouping_text)
+                elif 'MICROCOM' in vx.name:
+                    self.plotter.add_trace_microcom(vx.data,vx.header_time,grouping_text)
+            self.plotter.darken_named_color(0.8)
+        self.plotter.add_filtered_trace(self.plotter.fig)
+
+
+
+            
 # %% run main function 
 if __name__ == "__main__":
-    
-    Traitement = EcoDesign(
-        FileType=[FILES_LIST.fEXCELX.value],
-        Test_Num='M',
-        Test_request='25066',
-        Appliance_power='70')
-    # Traitement = EcoDesign(
-    #     FileType=[FILES_LIST.fEXCELX.value],
-    #     Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\HM\\35kW\\25063L',
-    #     Test_Num='L',
-    #     Test_request='25063',
-    #     Appliance_power='35')
+    single_config = ConfigTest(
+        Test_request ='25066',
+        Test_Num ='M',
+        Appliance_power ='70',
+    )
+
+    test={f"{single_config.Test_request}{single_config.Test_Num}": single_config}
+#defining test to process :
+
+
+#sequence :: 
+    Traitement = EcoDesign(test)
+
+    Traitement.plot_initiate_figure()
+    Traitement.plot_files_eco_design()
+    Traitement.plot_generate_html()

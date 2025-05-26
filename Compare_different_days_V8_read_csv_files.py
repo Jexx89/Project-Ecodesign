@@ -129,9 +129,8 @@ from plotly.subplots import make_subplots # importing subplots to plot several c
 #              ["HM", "70kW", "HM70TC", "25066", "K", 1, "SEEB", 416]]
 # test_num = [["HM", "35kW", "HM35TC", "24123", "C", 3, "microPLAN", 0],
 #              ["HM", "35kW", "HM35TC", "25063", "k", 1, "microPLAN", 101]]
-test_num = [["HM", "70kW", "HM70TC", "25027", "A", 7, "SEEB", 0],
-             ["HM", "70kW", "HM70TC", "25066", "K", 1, "SEEB", 415],
-             ["HM", "70kW", "HM70TC", "25066", "F", 1, "SEEB", 431]]
+test_num = [["HM", "70kW", "HM70TC", "25027", "Q", 1, "SEEB", 0],
+             ["HM", "70kW", "HM70TC", "25066", "H", 1, "SEEB", 0]]
 
              
 # test_num = [["HM", "70kW", "HM70TC", "25027", "A", 3, "SEEB", 0], # si le test 1 est devant alors on avance l'autre
