@@ -91,19 +91,24 @@ class EcoDesign():
         self.test_param_sets  =test_parameters
         test_param_set:ConfigTest
         self.test_count = len(self.test_param_sets)
+        now = datetime.now()
+        value_to_filter = self.test_count*2
         try:
+            
             for k,test_param_set in self.test_param_sets.items():
                 self.verifying_input_user(test_param_set)
                 if test_param_set.Path =='':
                     test_param_set.Path = f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
                 test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
-                test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path)
+                test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path,value_to_filter)
                 if self.test_count>1:
-                    test_param_set.collection_file.sync_file_togheter([2.5,3.5],'FLDHW [kg/min]',1)
+                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
+                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time,from_file=['SEEB','MICROPLAN'],criteria=[2.5,3.5],header='FLDHW [kg/min]',rising_edge_num=1)
+                    self.adding_parameters(test_param_set)
                 elif self.test_count==1:
-                    test_param_set.collection_file.sync_file_togheter()
-
+                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
+                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time)
                     self.adding_parameters(test_param_set)
                 else:
                     exit("-_-_-_-_-_-_-_-\n\nBye bye")
@@ -153,7 +158,7 @@ class EcoDesign():
         if not test_param_set.Appliance_power: 
             test_param_set.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
 
-    def get_file_to_plot(self,Files_path:InputFolder)->InputFile:
+    def get_file_to_plot(self,Files_path:InputFolder,value_to_filter=0)->InputFile:
         '''
         Function to filter all the file that we need to plot for ecodesign ploting
         this dictionary is build base on the condition of the naming of the file
@@ -170,17 +175,17 @@ class EcoDesign():
             a dictionary with the name as a key and the full path as a value of all the files we found to plot
 
         '''
-        def file_database():
+        def file_database(value_to_filter=0):
             '''
             This function return a complete set of configfile that we can found in the folder
             We initialize all the file with there parameters
             '''
-            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
-            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
-            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
-            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
-            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
-            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=0,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
+            MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
+            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
+            DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
+            PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
             hl = dict(
                     MICROPLAN = MIP,
                     SEEB = SEB,
@@ -192,7 +197,7 @@ class EcoDesign():
             return hl
 
         files_to_plot={}
-        header_list = file_database()
+        header_list = file_database(value_to_filter)
         for file in Files_path.files_in_folder:
             for xfile in header_list:
                 if header_list[xfile].name in file['FileName'].upper() and file['FileType'] in header_list[xfile].FileType.value:
@@ -260,7 +265,8 @@ class EcoDesign():
                 for k, v in self.test_param_sets.items():
                     p = v.Path + '\\' + File_name
             else:
-                p='\\Comparaison\\' + File_name
+                p=f"{getcwd()}\\Comparaison\\{File_name}"
+                print(p)
         self.plotter.creat_html_figure(p)
 
     def creatPlotName(self):
@@ -283,7 +289,8 @@ class EcoDesign():
                     self.plotter.add_trace_seeb(vx.data,vx.header_time,grouping_text)
                 elif 'MICROCOM' in vx.name:
                     self.plotter.add_trace_microcom(vx.data,vx.header_time,grouping_text)
-            self.plotter.add_filtered_trace(self.plotter.fig)
+            self.plotter.darken_named_color(0.8)
+        self.plotter.add_filtered_trace(self.plotter.fig)
 
 
 

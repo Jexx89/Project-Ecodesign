@@ -143,7 +143,7 @@ class InputFile():
         self.get_df_from_file()
         self.transfrom_data()
 
-    def get_File_path(self,FileType:list[tuple[str,str]]):
+    def get_File_path(self,FileType:list[tuple[str,str]],value_to_filter=0):
         '''
         This function will open a file dialogue window to get the path of one file
 
@@ -181,7 +181,7 @@ class InputFile():
                 logging.info("No file selected!")
                 exit("-_-_-_-_-_-_-_-\n\nBye bye")
 
-        def init_config_file(list_file):
+        def init_config_file(list_file,value_to_filter=0):
             '''
             Initiate the config file list with all the files selected
 
@@ -201,7 +201,7 @@ class InputFile():
                             # delimiter=, (default val = ',')
                             row_to_ignore= 0,
                             FileType=check_file_type(l),
-                            value_to_filter=0,
+                            value_to_filter=value_to_filter,
                             sheet_name=0
                             )
             return file
@@ -220,7 +220,7 @@ class InputFile():
                 if c.value[1] in path:
                     return c.value
 
-        return init_config_file(open_file_dialogue())
+        return init_config_file(open_file_dialogue(),value_to_filter)
 
     def get_df_from_file(self):
         '''
@@ -378,7 +378,7 @@ class InputFile():
             down_sample_dataframe(file)
             parse_column_date(file)
 
-    def sync_file_togheter(self,criteria=None, header='',rising_edge_num=1):
+    def sync_file_togheter(self, ref_time:datetime, from_file='',criteria=None, header='',rising_edge_num=1):
         '''
         Function to sync ann the data from a criteria defined by the user
 
@@ -393,48 +393,49 @@ class InputFile():
         Return the dataframe updated with a new date time frame
         '''
         self.stime = time()
-        now = datetime.now()
             
         if criteria==None:
-            # if no criteria a mention, we set the synchronisation to 21h30m00s as this would be for the ecodisign mode and we estimate that the time frame a sync allready
-            self.ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
+            # if no criteria a mention, we set the synchronisation to ref_time as this would be for the ecodisign mode and we estimate that the time frame a sync allready
+            self.ref_time = ref_time
             for k, file in self.FileData.items():
-                diff_with_ref_time = self.ref_time - file.data[file.header_time][0]
+                diff_with_ref_time = ref_time - file.data[file.header_time][0]
                 file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
         else:
             # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
-            for k, file in self.FileData.items():
                 # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
-                first_tapping = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
-                file_rising_time, target_index,l=self.list_of_rising_edge(file.data,header,rising_edge_num,criteria)
-
-                diff_with_ref_time = first_tapping-file_rising_time
+            self.ref_time = ref_time
+            for k, file in self.FileData.items():
+                if file.name in from_file:
+                    file_rising_time, target_index,l=self.finding_rising_edge(file,header,rising_edge_num,criteria)
+                    break
+            diff_with_ref_time = ref_time-file_rising_time
+            for k, file in self.FileData.items():
                 file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
 
 
         print(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
         logging.info(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
 
-    def list_of_rising_edge(self,df,header_sync_name, n:int=1, criteria=None):
+    def finding_rising_edge(self,file:ConfigFile,header_sync_name, n:int=1, criteria=None):
         if type(criteria)==list:
-            conditional :DataFrame = df[header_sync_name].between(min(criteria), max(criteria), inclusive='both')
+            conditional :DataFrame = file.data[header_sync_name].between(min(criteria), max(criteria), inclusive='both')
         elif type(criteria)==int:
-            conditional :DataFrame = df[header_sync_name].between(2.5, 3.5, inclusive='both')
+            conditional :DataFrame = file.data[header_sync_name].ge(fill_value=criteria)
         else:
             return 0
 
-        conditional :DataFrame = df[header_sync_name].between(2.5, 3.5, inclusive='both')
+        # conditional :DataFrame = df[header_sync_name].between(2.5, 3.5, inclusive='both')
         rising_edge:DataFrame = conditional & (~conditional.shift(fill_value=False))
-        rising_edge_indices = df.index[rising_edge]
+        rising_edge_indices = file.data.index[rising_edge]
 
         # Sélectionner le nième front montant (attention : n commence à 1 ici)
         if len(rising_edge_indices) >= n:
             target_index = rising_edge_indices[n - 1]  # n-1 car indexation Python
-            rising_time = df.loc[target_index, self.FileData.header_time]
+            rising_time = file.data.loc[target_index, file.header_time]
             print(f"{n}ᵉ front montant détecté à : {rising_time} sur {len(rising_edge_indices)}")
         else:
             print(f"Moins de {n} fronts montants trouvés.")
-        return rising_time, target_index, [{'index':x,'time':df.loc[x, self.FileData.header_time]} for x in rising_edge_indices]
+        return rising_time, target_index, [{'index':x,'time':file.data.loc[x, file.header_time]} for x in rising_edge_indices]
 
 
 # %% folder class
@@ -520,53 +521,6 @@ class InputFolder():
                     self.files_in_folder.append({"FileName":item,
                                                 "Path":f"{self.Path_Folder}\\{item}",
                                                 "FileType":path.splitext(item)[-1]})
-
-# class FilterFileFromFolder(InputFolder):
-#     '''
-#     class calling InputFolder and from the folder gather all the file in it and return a collection of file that is filtered by a critéria of type
-#     '''
-#     def __init__(self, currDir:str='', Path_Folder:str='', FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]):
-#         '''
-#         Initialize the class
-
-#         Parameter
-#         ---------
-#         currDir : str - default value = ''
-#             set the initial directory, if none set, it will automatically select the dir from the script
-#         Path_Folder:str=''
-#             if path '' then a windows appeard 
-#             if all ready initialize, keep the value in class
-#         FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value]
-#             the criteria based on the file type 
-#         '''
-#         super().__init__(currDir,Path_Folder)
-#         self.FilterdFile = self.dict_file_type_in_folder(self.Path_Folder,FileType)
-#         self.CompletePath = [dict(full_path=f"{self.Path_Folder}\\{item}",name=item) for item in self.FilterdFile]
-
-#     def dict_file_type_in_folder(self,folder:str,FileType:list[tuple[str,str]]=[FILES_LIST.fCSV.value])->list[str]:
-#         ''' 
-#         Check if files type in a folder exist and return the list of them
-
-#         Parameter
-#         -----------------
-
-#         folder : str, default val = ''
-#             set the path of the folder
-#         FileType : list[tuple[str,str]], default val = [[FILES_LIST.fCSV]]
-#             Type of file we need to find
-        
-#         Returns
-#         -----------------
-#             filtered : list[str]
-#                 the list of all the files from a certain type
-
-#         '''
-#         b = FileType[0]
-#         filtered=[f for f in listdir(folder) if isfile(join(folder,f)) and f.lower().endswith(b)]
-#         if len(filtered) == 0:
-#             print(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
-#             logging.info(f"INPUT_FOLDER - No file ({b}) files found in {folder}")
-#         return filtered
 
  
  # %% main function on how to use it
