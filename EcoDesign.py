@@ -62,6 +62,7 @@ class ConfigTest:
     ParamSet: EcoDesign_Parameter = None
     Files_path:list = None #list[dict['FileName':'','path':'','FileType':'']] = None #{'FileName':'','path':'','FileType':''}
     collection_file:InputFile=None
+    Time_correction:int=0
 
 
 
@@ -88,11 +89,14 @@ class EcoDesign():
         self.initialDir = initialDir
         if not self.initialDir:
             self.initialDir= getcwd()
-        self.test_param_sets  =test_parameters
-        test_param_set:ConfigTest
+        self.test_param_sets = test_parameters
+        test_param_set : ConfigTest
+        if self.test_param_sets == None:
+            self.test_param_sets = {'newTest':ConfigTest()}
+
         self.test_count = len(self.test_param_sets)
         now = datetime.now()
-        value_to_filter = self.test_count*2
+        value_to_filter = self.test_count*1
         try:
             
             for k,test_param_set in self.test_param_sets.items():
@@ -104,7 +108,11 @@ class EcoDesign():
                 test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path,value_to_filter)
                 if self.test_count>1:
                     ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
-                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time,from_file=['SEEB','MICROPLAN'],criteria=[2.5,3.5],header='FLDHW [kg/min]',rising_edge_num=1)
+                    test_param_set.collection_file.sync_file_togheter(
+                        ref_time=ref_time,from_file=['SEEB','MICROPLAN'],
+                        criteria=[2.5,3.5],header='FLDHW [kg/min]',
+                        rising_edge_num=1,
+                        diff_in_second=test_param_set.Time_correction)
                     self.adding_parameters(test_param_set)
                 elif self.test_count==1:
                     ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
@@ -112,10 +120,11 @@ class EcoDesign():
                     self.adding_parameters(test_param_set)
                 else:
                     exit("-_-_-_-_-_-_-_-\n\nBye bye")
-                
+            
 
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
+
 
     def verifying_input_user(self, test_param_set:ConfigTest):
         '''

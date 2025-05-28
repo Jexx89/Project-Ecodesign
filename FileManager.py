@@ -48,7 +48,7 @@ from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd, path
 from os.path import basename, normpath, isdir
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timedelta
 from sys import exit
 from typing import Union
 import logging
@@ -378,7 +378,7 @@ class InputFile():
             down_sample_dataframe(file)
             parse_column_date(file)
 
-    def sync_file_togheter(self, ref_time:datetime, from_file='',criteria=None, header='',rising_edge_num=1):
+    def sync_file_togheter(self, ref_time:datetime, from_file='',criteria=None, header='',rising_edge_num=1, diff_in_second=0):
         '''
         Function to sync ann the data from a criteria defined by the user
 
@@ -393,13 +393,14 @@ class InputFile():
         Return the dataframe updated with a new date time frame
         '''
         self.stime = time()
+        manual_diff_timing = timedelta(seconds = diff_in_second)
             
         if criteria==None:
             # if no criteria a mention, we set the synchronisation to ref_time as this would be for the ecodisign mode and we estimate that the time frame a sync allready
             self.ref_time = ref_time
             for k, file in self.FileData.items():
                 diff_with_ref_time = ref_time - file.data[file.header_time][0]
-                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
+                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time + manual_diff_timing
         else:
             # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
                 # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
@@ -410,7 +411,7 @@ class InputFile():
                     break
             diff_with_ref_time = ref_time-file_rising_time
             for k, file in self.FileData.items():
-                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time
+                file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time + manual_diff_timing
 
 
         print(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
