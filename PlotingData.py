@@ -56,7 +56,7 @@ class GeneratePlot():
         The ouput is a plot as a form of .html file.
         '''
         logging.basicConfig(filename='log\\trace.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-        self.colorDatabase()# allow us to initialize de db color, so if we compare file we can update de basic colors to darker rev
+        self.color_Database()# allow us to initialize de db color, so if we compare file we can update de basic colors to darker rev
         self.header_time = header_time
         self.plot_name = plot_name
         self.trace_param = []
@@ -131,8 +131,8 @@ class GeneratePlot():
             hovermode="x",  # "x" lables appear with each colour. "x unified" one unique box that groups all the lable
             margin=dict(l=60, r=120, t=50, b=50), 
             updatemenus=[dict(
-                                type="buttons",
-                                direction="right",
+                                type="dropdown",
+                                direction="down",
                                 buttons=list([
                                     dict(label="Hover: x",
                                         method="relayout",
@@ -143,12 +143,29 @@ class GeneratePlot():
                                     dict(label="Hover: Closest",
                                         method="relayout",
                                         args=[{"hovermode": "closest"}]),
-                                    # dict(label="Hover: y unified",
-                                    #     method="relayout",
-                                    #     args=[{"hovermode": "y unified"}]),
+                                    dict(label="Hover: y unified",
+                                        method="relayout",
+                                        args=[{"hovermode": "y unified"}]),
                                 ]),
-                                x=1,
+                                x=1.0,
+                                xanchor="right",
                                 y=1.1,
+                                yanchor="top",
+                            ),
+                        dict(
+                                type="buttons",
+                                direction="down",
+                                buttons=[
+                                    dict(label = "Legend : Show",
+                                        args = [{"showlegend": True}],
+                                        method = "relayout"),
+                                    dict(label = "Legend : Hide",
+                                        args = [{"showlegend": False}],
+                                        method = "relayout")],
+                                x=1.0,
+                                xanchor="left",
+                                y=1.1,
+                                yanchor="top",
                             )
                         ],
 
@@ -392,7 +409,7 @@ class GeneratePlot():
 
         return rd.choice(colorCollection)
 
-    def colorDatabase(self):
+    def color_Database(self):
         self.colorDB={
             "T in DHW [°C]":"cyan",
             "T out avg [°C]":"red",
