@@ -298,7 +298,7 @@ class EcoDesign():
                     v[1].data['T = 55 [°C]'] = 55 * ones(len(v[1].data['T°in DHW [°C]'])) 
                     v[1].data['T = 30 [°C]'] = 30 * ones(len(v[1].data['T°in DHW [°C]'])) 
 
-                    t_out_name = 'T°out AV.  [°C]' if 'MICROPLAN' == v[1].name else t_out_name = 'T°out TC  [°C]' #specific name for Tout
+                    t_out_name = 'T°out AV.  [°C]' if 'MICROPLAN' == v[1].name else 'T°out TC  [°C]' #specific name for Tout
                     v[1].data['Delta T NORM [°C]'] = v[1].data[t_out_name] - v[1].data['T°in DHW [°C]']
 
                 if 'MICROCOM' in v[1].name:
@@ -363,7 +363,7 @@ class EcoDesign():
         '''
         grouping_text=''
         for k, v in self.test_param_sets.items(): # each test 
-            grouping_text='' if self.test_count==1 else grouping_text = k # to seperate the trace in group of test
+            grouping_text ='' if self.test_count==1 else  k # to seperate the trace in group of test
             for kx,vx in v.collection_file.FileData.items(): # each file in test (SEEB, microplan, microcom, ...)
                 if 'MICROPLAN' in vx.name:
                     self.plotter.add_trace_microplan(vx.data,vx.header_time,grouping_text)
