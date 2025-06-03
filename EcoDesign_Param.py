@@ -49,7 +49,21 @@ class EcoDesign_Parameter():
         logging.basicConfig(filename='log\\trace.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
         self.ALL_DF:DataFrame = []
         self.stime = time()
-        self.test_parameters = self.import_test_param(Test_request,Test_Num)
+        self.Test_request = Test_request
+        self.Test_Num=Test_Num
+        self.test_parameters = self.import_test_param(self.Test_request,self.Test_Num)
+
+
+        self.BoilerPower = self.test_parameters.at[self.test_parameters.index[0],'BoilerPower']
+        self.BoilerStructure = self.test_parameters.at[self.test_parameters.index[0],'BoilerStructure']
+        self.SetpointDHW = self.test_parameters.at[self.test_parameters.index[0],'SetpointDHW']
+        self.ParamADDER = self.test_parameters.at[self.test_parameters.index[0],'ParamADDER']
+        self.ParamHysteresis = self.test_parameters.at[self.test_parameters.index[0],'ParamHysteresis']
+        self.ParamAdderCoef = self.test_parameters.at[self.test_parameters.index[0],'ParamAdderCoef']
+        self.RangeModulation  = self.test_parameters.at[self.test_parameters.index[0],'RangeModulation ']
+        self.SetPointDeltaPump = self.test_parameters.at[self.test_parameters.index[0],'SetPointDeltaPump']
+
+
 
     def status_param(self):
         '''Function to return the stat of the parameter

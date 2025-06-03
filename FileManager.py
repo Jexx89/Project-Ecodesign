@@ -140,6 +140,7 @@ class InputFile():
             self.FileData = self.get_File_path([]) # accept anyfiletype
         else:
             self.FileData = FileData
+
         self.get_df_from_file()
         self.transfrom_data()
 
@@ -393,7 +394,7 @@ class InputFile():
         Return the dataframe updated with a new date time frame
         '''
         self.stime = time()
-        manual_diff_timing = timedelta(seconds = diff_in_second)
+        manual_diff_timing = timedelta(seconds = diff_in_second) # in some case the file 
             
         if criteria==None:
             # if no criteria a mention, we set the synchronisation to ref_time as this would be for the ecodisign mode and we estimate that the time frame a sync allready
@@ -403,7 +404,6 @@ class InputFile():
                 file.data[file.header_time] = file.data[file.header_time] + diff_with_ref_time + manual_diff_timing
         else:
             # in this case we considere all the files from different timing/day/test, so we try to find a specific value on with to start the sync
-                # for the moment I sync to the first tapping of the day for eco design (7h00m tapping 3l)
             self.ref_time = ref_time
             for k, file in self.FileData.items():
                 if file.name in from_file:
@@ -417,10 +417,28 @@ class InputFile():
         print(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
         logging.info(f"INPUT_FILE - Synchronze data : {time()-self.stime:.2f}")
 
-    def finding_rising_edge(self,file:ConfigFile,header_sync_name, n:int=1, criteria=None):
-        if type(criteria)==list:
+    def finding_rising_edge(self,file:ConfigFile,header_sync_name:str, n:int=1, criteria=None):
+        '''
+        This specific function allow us to find the rising edge based on a selective criteria
+
+        Parameters
+        -----------
+        file:ConfigFile
+            the configuration file on which apply the criteria
+        header_sync_name:str
+            the serie on which apply the criteria
+        n:int=1
+            Since we can have more than one result, by default we select the first one
+        criteria=None
+            depending on the input type we apply different criteria
+            * -list- : of 2 elements will search the rising edge of a value between the 2 elements
+            * -int- : will search the rising edge of a value above or equal the parameter
+
+        '''
+        #depending on the input type we apply different criteria
+        if type(criteria)==list: #find value between
             conditional :DataFrame = file.data[header_sync_name].between(min(criteria), max(criteria), inclusive='both')
-        elif type(criteria)==int:
+        elif type(criteria)==int: #find value greater or equal
             conditional :DataFrame = file.data[header_sync_name].ge(fill_value=criteria)
         else:
             return 0
