@@ -41,7 +41,7 @@ V1.0 : initial rev
     * open folder and gather all the file in it
 '''
 # %% import lib
-from pandas import read_csv, to_datetime, DataFrame ,read_excel
+from pandas import read_csv, to_datetime, DataFrame ,read_excel, concat
 from dataclasses import dataclass
 from time import time
 from tkinter import Tk, filedialog

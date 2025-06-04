@@ -1,6 +1,7 @@
 HM/
 __pycache__/
 Comparaison/
+Schneider/
 *.html
 *.xlsx
 *.log

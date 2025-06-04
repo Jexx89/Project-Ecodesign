@@ -375,7 +375,20 @@ class EcoDesign():
         self.plotter.add_filtered_trace(self.plotter.fig)
 
     def separating_days(self):
-        # to do, add a function to split the DF per day ( use 'TT_sec' for microplan and 'Cumul Time(ms)' for SEEB)
+        # to do, add a function to split the DF per day ( use 'TT_sec' for microplan and  for SEEB)
+        if self.test_count == 1 :
+            all_test : ConfigTest
+            all_test = self.test_param_sets.values[0]
+            for k, file in all_test.collection_file.FileData.items():
+                if 'SEEB' in file.name:
+                    col='Cumul Time(ms)' 
+                    break
+                if 'MICROPLAN' in file.name:
+                    col='TT_sec'
+                    break
+            
+            all_test.collection_file.finding_rising_edge(all_test.collection_file.FileData,col,1,'tbd')
+
         pass
 
 
