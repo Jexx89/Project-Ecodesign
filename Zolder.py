@@ -15,7 +15,7 @@ for x in folder:
                                         )
 files = InputFile(files_to_plot)
 plt = GeneratePlot('DATE-TIME','Test Client Zolder')
-plt.creat_figure()
+plt.creat_figure('Values [°C][%][µA]','Values [bar][volt]')
 
 list_of_df = [file.data for k, file in files.FileData.items()]
 combined_df = concat(list_of_df, ignore_index=True)

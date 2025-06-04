@@ -103,14 +103,14 @@ class GeneratePlot():
         print(f"PLOT - Adding trace for each columns : {time() - self.stime:.2f} sec")
         logging.info(f"PLOT - Adding trace for each columns : {time() - self.stime:.2f} sec")
 
-    def creat_figure(self):
+    def creat_figure(self, label_y1:str = "Values [°C][bar][l/m][kg/m][%][µA]", label_y2:str ="Values [l][Watt][mbar]"):
         """
         Function to creat and edit the layout of the figure
         """
         self.stime = time()
         self.lab_x_axe = "Time"
-        self.lab_prim_y_axe = "Values [°C][bar][l/m][kg/m][%][µA]"
-        self.lab_sec_y_axe = "Values [l][Watt][mbar]"
+        self.lab_prim_y_axe = label_y1
+        self.lab_sec_y_axe = label_y2
         self.txt_size_num_ax = 20
         self.txt_siz_lbl_xy = 20
         self.txt_siz_leg = 14
@@ -354,13 +354,13 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["DHW_input DEG"]      ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "DHW_input [°C]"       , visible=True ,opacity = 1,line=dict(color='aqua'                          , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["DHW_middle DEG"]     ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "DHW_middle [°C]"      , visible=True ,opacity = 1,line=dict(color=self.colorDB["T DHW [°C]"]      , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["DHW_output DEG"]     ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "DHW_output [°C]"      , visible=True ,opacity = 1,line=dict(color='darkblue'                      , width=1.5, dash="solid"),secondary_y = False),
+            dict(x=df[header_time],y=df["FLUE DEG"]           ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "FLUE [°C]"            , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["T fume MC[°C]"], width=1.5, dash="solid"),secondary_y = False),
             #boilers
             dict(x=df[header_time],y=df["MODULATION"]         ,legendgroup = boiler_name,legendgrouptitle_text = boiler_name ,name = "MODULATION [%]"   , visible=True ,opacity = 1,line=dict(color=self.colorDB["Burner mod[%]"]   , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["FLAME microA"]       ,legendgroup = boiler_name,legendgrouptitle_text = boiler_name ,name = "FLAME [µA]"       , visible=True ,opacity = 1,line=dict(color=self.colorDB["Flame curr [µA]"]     , width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["FLUE DEG"]           ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "FLUE [°C]"            , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["T fume MC[°C]"], width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["BURNER STATUS"]      ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "BurnerStatus"         , visible='legendonly' ,opacity = 1,line=dict(color='black'              , width=1, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["VOLTAGE"]            ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "VOLTAGE"               , visible='legendonly' ,opacity = 1,line=dict(color='yellow'              , width=1, dash="dash"),secondary_y = True),
-            dict(x=df[header_time],y=df["ERROR NUM"]          ,legendgroup = temp_name,legendgrouptitle_text = temp_name ,name = "Error"                   , visible='legendonly' ,opacity = 1,line=dict(color='red'              , width=1, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["BURNER STATUS"]      ,legendgroup = boiler_name,legendgrouptitle_text = boiler_name ,name = "BurnerStatus"         , visible='legendonly' ,opacity = 1,line=dict(color='black'              , width=1, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["VOLTAGE"]            ,legendgroup = boiler_name,legendgrouptitle_text = boiler_name ,name = "Voltage [volt]"               , visible='legendonly' ,opacity = 1,line=dict(color='yellow'              , width=1, dash="dash"),secondary_y = True),
+            dict(x=df[header_time],y=df["ERROR NUM"]          ,legendgroup = boiler_name,legendgrouptitle_text = boiler_name ,name = "Error"                   , visible='legendonly' ,opacity = 1,line=dict(color='red'              , width=1, dash="dash"),secondary_y = False),
             #pressures
             dict(x=df[header_time],y=df["PRESS. CH B"]        ,legendgroup = pressure_name,legendgrouptitle_text = pressure_name ,name = "Primary [bar]"            , visible='legendonly' ,opacity = 1,line=dict(color='chartreuse', width=1.5, dash="solid"),secondary_y = True),
             dict(x=df[header_time],y=df["PRESS. DHW_i B"]        ,legendgroup = pressure_name,legendgrouptitle_text = pressure_name ,name = "DHW_input [bar]"            , visible='legendonly' ,opacity = 1,line=dict(color='lime', width=1.5, dash="solid"),secondary_y = True),
