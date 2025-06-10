@@ -26,7 +26,7 @@ from EcoDesign_Param import *
 
 from numpy import ones # to creat single vector
 from sys import exit
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class errorEcodesign(Exception):
@@ -96,7 +96,7 @@ class EcoDesign():
         self.initialDir = initialDir
         self.test_param_sets = test_parameters
         test_param_set : ConfigTest
-        now = datetime.now() # this to help us to synchronize the date
+        self.now = datetime.now() # this to help us to synchronize the date
         # check variable if none, initialise them
         if not self.initialDir:
             self.initialDir= getcwd()# simply get the actual folder of the script
@@ -119,8 +119,10 @@ class EcoDesign():
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
                 # import the data from all the files found in folder and keep them in dataframe
                 test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path,value_to_filter)
+                test_param_set.collection_file.get_df_from_file()
+                test_param_set.collection_file.transfrom_data()
                 #defining our reference time (here actual date at 7h00m00s, ==> first tapping at 3l/min (see profile XXL Ecodesign))
-                ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
+                ref_time = datetime(year=self.now.year,month=self.now.month,day=self.now.day,hour=7,minute=0, second=0)
                 #synchronise test and files togheter
                 test_param_set.collection_file.sync_file_togheter(
                     ref_time=ref_time, # our reference time to synchronize
@@ -216,9 +218,9 @@ class EcoDesign():
             -----------------
                 returns a dictionary with all the known file used for the project Ecodesign
             '''
-            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data')
+            MIP = ConfigFile(header_time='Timestamp',name='MICROPLAN',        delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrLine Data',header_cumul_time='TT-sec')
             MIC = ConfigFile(header_time='Time DMY' ,name='MICROCOM',         delimiter=',',row_to_ignore=2, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'McrCom Data')
-            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data')
+            SEB = ConfigFile(header_time='Timestamp',name='SEEB',             delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fEXCELX, sheet_name = 'Seeb Data',header_cumul_time='Cumul Time(ms)')
             DHW = ConfigFile(header_time='Date-Time',name='DHW_TEMPERATURE',  delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
             SID = ConfigFile(header_time='Date&Time',name='SIDE_TEMPERATURE', delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
             PLC = ConfigFile(header_time='DATE-TIME',name='PLC',              delimiter=',',row_to_ignore=0, value_to_filter=value_to_filter,FileType=FILES_LIST.fCSV, sheet_name = 0)
@@ -343,20 +345,21 @@ class EcoDesign():
         # example : 25066H_HM70kW_25066M_HM70kW_25066Q_HM70kW_2025-05-26 ; 25071D_HM45kW_24086D_HM45kW_2025-05-28; 25071E_HM45kW_2025-06-02
         return PlotTitle + date_created
 
-    def plot_files_eco_design(self):
+    def plot_files_eco_design(self, per_day=False):
         '''
         This function calls all the trtace creator for each indivual files and add them to the figure
         '''
         grouping_text=''
         for k, v in self.test_param_sets.items(): # each test 
-            grouping_text ='' if self.test_count==1 else  k # to seperate the trace in group of test
+            grouping_text ='' if self.test_count==1 else k # to seperate the trace in group of test
             for kx,vx in v.collection_file.FileData.items(): # each file in test (SEEB, microplan, microcom, ...)
-                if 'MICROPLAN' in vx.name:
-                    self.plotter.add_trace_microplan(vx.data,vx.header_time,grouping_text)
-                elif 'SEEB' in vx.name:
-                    self.plotter.add_trace_seeb(vx.data,vx.header_time,grouping_text)
-                elif 'MICROCOM' in vx.name:
-                    self.plotter.add_trace_microcom(vx.data,vx.header_time,grouping_text)
+                if not ('Day_' not in kx and per_day) :
+                    if 'MICROPLAN' in vx.name:
+                        self.plotter.add_trace_microplan(vx.data,vx.header_time,grouping_text)
+                    elif 'SEEB' in vx.name:
+                        self.plotter.add_trace_seeb(vx.data,vx.header_time,grouping_text)
+                    elif 'MICROCOM' in vx.name:
+                        self.plotter.add_trace_microcom(vx.data,vx.header_time,grouping_text)
             self.plotter.darken_named_color(0.8) #darken the colors for each new test added to the figure
         self.plotter.add_filtered_trace(self.plotter.fig)
 
@@ -366,29 +369,69 @@ class EcoDesign():
         '''
         for k,test_param_set in self.test_param_sets.items():
             for k, file in test_param_set.collection_file.FileData.items():
-                if 'Cumul Time(ms)' in file.data :
-                    col='Cumul Time(ms)'
+                if file.name in ['SEEB','MICROPLAN'] :
+                    first_time = file.data[file.header_time].min()
+                    file.data['time_test_diff'] = file.data[file.header_cumul_time].diff()
+                    file.data['cycle'] = (file.data['time_test_diff'] < 0).cumsum()
+                    grouped = file.data.groupby('cycle')
+                    dataframes = [group for _, group in grouped]
+                    grouped = file.data.groupby('cycle')
+                    min_max = [[dt[file.header_time].min(),dt[file.header_time].max(),dt[file.header_time].min()-first_time,dt[file.header_time].max()-dt[file.header_time].min()] for dt in dataframes]
                     break
-                elif 'TT-sec' in file.data :
-                    col='TT-sec'
-                    break
-                else:
-                    continue
 
+        print(*min_max,sep='\n')
+        delta_time = timedelta(hours=20,minutes=0, seconds=0)
+        temp_param_sets={}
+        # update test parameters
+        i=1
+        for k,test_param_set in self.test_param_sets.items():
+            for limits in min_max:
+                if delta_time < limits[3]:
+                    temporary_dict={}
+                    for k, f in test_param_set.collection_file.FileData.items():
+                        template_df = f.data[f.data[f.header_time].between(limits[0],limits[1])]
+                        template_df[f.header_time] = template_df[f.header_time]-limits[2]
+                        temporary_dict[f"Day_{i}_{f.name}"] = ConfigFile(
+                                                name  = f.name,
+                                                path = f.path,
+                                                header_time = f.header_time,
+                                                header_cumul_time = f.header_cumul_time,
+                                                data = template_df,
+                                                delimiter = f.delimiter,
+                                                row_to_ignore = f.row_to_ignore,
+                                                FileType = f.FileType,
+                                                value_to_filter = f.value_to_filter,
+                                                sheet_name = f.sheet_name
+                                                )
+                    temp_param_sets[f"{test_param_set.Test_request}{test_param_set.Test_Num}_day_{i}"] = ConfigTest(
+                        Test_request=test_param_set.Test_request,
+                        Test_Num=f"{test_param_set.Test_Num}_day_{i}",
+                        Appliance_power=test_param_set.Appliance_power,
+                        Path=test_param_set.Path,
+                        ParamSet=test_param_set.ParamSet,
+                        Files_path=test_param_set.Files_path,
+                        collection_file=InputFile(temporary_dict),
+                        Time_correction=test_param_set.Time_correction
+                        )
+                    i+=1
+            print(*test_param_set.collection_file.FileData.keys(),sep='\n')
 
-            file.data['time_test_diff'] = file.data[col].diff()
-            file.data['cycle'] = (file.data['time_test_diff'] < 0).cumsum()
-            grouped = file.data.groupby('cycle')
-            dataframes = [group for _, group in grouped]
-            grouped = file.data.groupby('cycle')
-            min_max = [[dt['Time (h)'].min(),dt['Time (h)'].max()] for dt in dataframes]
+        self.test_param_sets.clear()
+        self.test_param_sets = temp_param_sets.copy()
+        self.test_count = len(self.test_param_sets)
 
+        ref_time = datetime(year=self.now.year,month=self.now.month,day=self.now.day,hour=7,minute=0, second=0)
+        for k,test_param_set in self.test_param_sets.items():
+                #synchronise test and files togheter
+                test_param_set.collection_file.sync_file_togheter(
+                    ref_time=ref_time, # our reference time to synchronize
+                    from_file=['SEEB','MICROPLAN'], # select what file to used as a reference 
+                    criteria=[2.5,3.5], #what is the criteria, here the first edge between 2.5 and 3.5
+                    header='FLDHW [kg/min]', # the serie on which apply the filter : 'FLDHW [kg/min]'
+                    rising_edge_num=1, # we can find multiple rising edge, so we will use the first one
+                    diff_in_second=test_param_set.Time_correction) # this is to add a delay if the rising edge isn't sync well
 
-            #dataframe[dataframe[timestamp_col].between(middle_start, middle_end)] for limits in min_max:
-
-            print (min_max)
-            #finding the negative time step
-#
+        print(f'Number of days : {i}')
 
 
 

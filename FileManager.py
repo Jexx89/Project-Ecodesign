@@ -132,12 +132,14 @@ class ConfigFile:
     name: str=''
     path: str=''
     header_time: str =''
+    header_cumul_time:str=''
     data: DataFrame=None
     delimiter:str=','
     row_to_ignore:int = 0
     FileType:tuple[str,str]=FILES_LIST.fCSV.value
     value_to_filter:int=0
     sheet_name : object = 0
+
 
 # %% READ files and store in Dataframe
 class InputFile():
@@ -170,9 +172,6 @@ class InputFile():
             self.FileData = self.get_File_path([]) # accept anyfiletype
         else:
             self.FileData = FileData
-
-        self.get_df_from_file()
-        self.transfrom_data()
 
     def get_File_path(self,FileType:list[tuple[str,str]],value_to_filter=0):
         '''
@@ -559,12 +558,10 @@ class InputFolder():
         for file in listdir(self.Path_Folder):
             if bad_chars.isdisjoint(file) and isfile(join(self.Path_Folder, file)):
                     self.all_path_only.append(file)
-
         if len(self.all_path_only) == 0:
             print(f"INPUT_FOLDER - No file files found in {self.Path_Folder}")
             logging.info(f"INPUT_FOLDER - No file files found in {self.Path_Folder}")
         else:
-
             self.files_in_folder=[]
             for item in self.all_path_only:
                     self.files_in_folder.append({"FileName":item,

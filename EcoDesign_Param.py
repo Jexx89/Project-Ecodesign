@@ -63,8 +63,6 @@ class EcoDesign_Parameter():
         self.RangeModulation  = self.test_parameters.at[self.test_parameters.index[0],'RangeModulation ']
         self.SetPointDeltaPump = self.test_parameters.at[self.test_parameters.index[0],'SetPointDeltaPump']
 
-
-
     def status_param(self):
         '''Function to return the stat of the parameter
         
