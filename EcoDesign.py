@@ -7,9 +7,7 @@ Class:
 
 TODO:
 --------------
-* add a comparaison file 
 * add a comparaison of each day
-* generate file into HTML offline
 
 Created by JSB(based on Marcello😍🍕 script)
 --------------
@@ -121,28 +119,16 @@ class EcoDesign():
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
                 # import the data from all the files found in folder and keep them in dataframe
                 test_param_set.collection_file = self.get_file_to_plot(test_param_set.Files_path,value_to_filter)
-
-                if self.test_count>1:
-                #compare mode ::
-                    #defining our reference time (here actual date at 7h00m00s, ==> first tapping at 3l/min (see profile XXL Ecodesign))
-                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
-                    #synchronise test and files togheter
-                    test_param_set.collection_file.sync_file_togheter(
-                        ref_time=ref_time, # our reference time to synchronize
-                        rom_file=['SEEB','MICROPLAN'], # select what file to used as a reference 
-                        criteria=[2.5,3.5], #what is the criteria, here the first edge between 2.5 and 3.5
-                        header='FLDHW [kg/min]', # the serie on which apply the filter : 'FLDHW [kg/min]'
-                        rising_edge_num=1, # we can find multiple rising edge, so we will use the first one
-                        diff_in_second=test_param_set.Time_correction) # this is to add a delay if the rising edge isn't sync well
-                    # adding parameter to the file if needed
-                    self.adding_parameters(test_param_set)
-                
-                elif self.test_count==1:
-                #solo mode ::
-                    #defining our reference time (here actual date at 21h30m00s (see profile XXL Ecodesign))
-                    ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=21,minute=30, second=0)
-                    #synchronise only files togheter
-                    test_param_set.collection_file.sync_file_togheter(ref_time=ref_time)
+                #defining our reference time (here actual date at 7h00m00s, ==> first tapping at 3l/min (see profile XXL Ecodesign))
+                ref_time = datetime(year=now.year,month=now.month,day=now.day,hour=7,minute=0, second=0)
+                #synchronise test and files togheter
+                test_param_set.collection_file.sync_file_togheter(
+                    ref_time=ref_time, # our reference time to synchronize
+                    from_file=['SEEB','MICROPLAN'], # select what file to used as a reference 
+                    criteria=[2.5,3.5], #what is the criteria, here the first edge between 2.5 and 3.5
+                    header='FLDHW [kg/min]', # the serie on which apply the filter : 'FLDHW [kg/min]'
+                    rising_edge_num=1, # we can find multiple rising edge, so we will use the first one
+                    diff_in_second=test_param_set.Time_correction) # this is to add a delay if the rising edge isn't sync well
                 # adding parameter to the file if needed
                 self.adding_parameters(test_param_set)
         except errorEcodesign as error :
@@ -375,21 +361,34 @@ class EcoDesign():
         self.plotter.add_filtered_trace(self.plotter.fig)
 
     def separating_days(self):
-        # to do, add a function to split the DF per day ( use 'TT_sec' for microplan and  for SEEB)
-        if self.test_count == 1 :
-            all_test : ConfigTest
-            all_test = self.test_param_sets.values[0]
-            for k, file in all_test.collection_file.FileData.items():
-                if 'SEEB' in file.name:
-                    col='Cumul Time(ms)' 
+        '''
+        in preparation 
+        '''
+        for k,test_param_set in self.test_param_sets.items():
+            for k, file in test_param_set.collection_file.FileData.items():
+                if 'Cumul Time(ms)' in file.data :
+                    col='Cumul Time(ms)'
                     break
-                if 'MICROPLAN' in file.name:
-                    col='TT_sec'
+                elif 'TT-sec' in file.data :
+                    col='TT-sec'
                     break
-            
-            all_test.collection_file.finding_rising_edge(all_test.collection_file.FileData,col,1,'tbd')
+                else:
+                    continue
 
-        pass
+
+            file.data['time_test_diff'] = file.data[col].diff()
+            file.data['cycle'] = (file.data['time_test_diff'] < 0).cumsum()
+            grouped = file.data.groupby('cycle')
+            dataframes = [group for _, group in grouped]
+            grouped = file.data.groupby('cycle')
+            min_max = [[dt['Time (h)'].min(),dt['Time (h)'].max()] for dt in dataframes]
+
+
+            #dataframe[dataframe[timestamp_col].between(middle_start, middle_end)] for limits in min_max:
+
+            print (min_max)
+            #finding the negative time step
+#
 
 
 

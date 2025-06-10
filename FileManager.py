@@ -20,6 +20,29 @@ Class:
 * FilterFileFromFolder :
     class calling InputFolder and from the folder gather all the file in it and return a collection of file that is filtered by a critéria of type
     
+Example
+-------------
+
+In this example, we use InputFolder() to gather all the files in a specific folder, and use this list of files to post process de data
+
+>>> from PlotingData import *
+>>> from FileManager import *
+>>> #listing all the files in the folder
+>>> folder = InputFolder(Path_Folder='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Schneider\\client zolder').files_in_folder
+>>> files_to_plot={}
+>>> #creating the ConfigFile dictionary
+>>> for x in folder:
+    >>> files_to_plot[x['FileName']] = ConfigFile(
+                                        name=x['FileName'], 
+                                        path=x['Path'],
+                                        header_time='DATE-TIME',
+                                        delimiter=';',
+                                        row_to_ignore=3,
+                                        FileType=x['FileType'],
+                                        )
+>>> #import the data from all the files
+>>> files = InputFile(files_to_plot)
+
 
 TODO:
 --------------
@@ -46,7 +69,7 @@ from dataclasses import dataclass
 from time import time
 from tkinter import Tk, filedialog
 from os import listdir, sep, getcwd, path
-from os.path import basename, normpath, isdir
+from os.path import basename, normpath, isdir, isfile, join
 from enum import Enum
 from datetime import datetime, timedelta
 from sys import exit
@@ -121,6 +144,10 @@ class InputFile():
     '''
     This class allow us to open a file and import all the data in a dataframe
     Later the user can post process the dataframe with basic function
+
+    Example :
+    --------
+
     '''
     def __init__(self, FileData:dict[str,ConfigFile], initialDir:str=''):
         '''
@@ -129,8 +156,11 @@ class InputFile():
         Parameter
         ---------
 
-        FileData : ConfigFile
-            set of parameter used to open a new file
+        FileData : dict[str,ConfigFile]
+            set of parameter used to open a new file, this is a dictionary of all the files and configuration
+            >>> {Name,ConfigFile()}
+        initialDir : str = ''
+            the initial directory to go, if we don't have any it will take the initial directory of the script
         '''
         logging.basicConfig(filename='log\\trace.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
         self.initialDir = initialDir
@@ -231,19 +261,19 @@ class InputFile():
             '''
             to update ,Function to select the correct method to get the data from file into a dataframe
             '''
-            if FILES_LIST.fCSV.value[1] in p:
+            if FILES_LIST.fCSV.value[1].upper() in p.upper() :
                 df = read_csv_to_df(p,delimiter,row_to_ignore)
                 print(f"INPUT_FILE - CSV importation")
                 logging.info(f"INPUT_FILE - CSV importation")
-            elif FILES_LIST.fEXCELX.value[1] in p:
+            elif FILES_LIST.fEXCELX.value[1].upper() in p.upper() :
                 df = read_xlsx_to_df(p,sheet_name,row_to_ignore)
                 print(f"INPUT_FILE - Excel importation")
                 logging.info(f"INPUT_FILE - Excel importation")
-            elif FILES_LIST.fENR.value[1] in p:
+            elif FILES_LIST.fENR.value[1].upper() in p.upper() :
                 # do stuff
                 i=3
                 df= None
-            elif FILES_LIST.fLOG.value[1] in p:
+            elif FILES_LIST.fLOG.value[1].upper() in p.upper() :
                 # do stuff
                 i=4
                 df= None
@@ -527,7 +557,7 @@ class InputFolder():
         bad_chars = set("%$^¨µ£~§!&")
         self.all_path_only=[]
         for file in listdir(self.Path_Folder):
-            if bad_chars.isdisjoint(file):
+            if bad_chars.isdisjoint(file) and isfile(join(self.Path_Folder, file)):
                     self.all_path_only.append(file)
 
         if len(self.all_path_only) == 0:
@@ -538,7 +568,7 @@ class InputFolder():
             self.files_in_folder=[]
             for item in self.all_path_only:
                     self.files_in_folder.append({"FileName":item,
-                                                "Path":f"{self.Path_Folder}\\{item}",
+                                                "Path":join(self.Path_Folder, item),
                                                 "FileType":path.splitext(item)[-1]})
 
  
