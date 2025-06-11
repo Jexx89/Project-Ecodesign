@@ -292,9 +292,9 @@ class GeneratePlot():
             # Microplan parameter serie 
         if SEEB_name == 'SEEB' :
             trace_param.extend([
-                dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
-                dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
-                dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark'), width=0.25, dash="dash"),secondary_y = False),
+                dict(x=df[header_time],y=df["T = 30 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 30 [°C]"              , visible=True ,opacity = 1,line=dict(color='slategray', width=0.25, dash="dash"),secondary_y = False),
+                dict(x=df[header_time],y=df["T = 45 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 45 [°C]"              , visible=True ,opacity = 1,line=dict(color='slategray', width=0.25, dash="dash"),secondary_y = False),
+                dict(x=df[header_time],y=df["T = 55 [°C]"]               ,legendgroup = SEEB_name,legendgrouptitle_text = SEEB_name ,name = "T = 55 [°C]"              , visible=True ,opacity = 1,line=dict(color='slategray', width=0.25, dash="dash"),secondary_y = False),
             ])
         
         self.trace_param.extend(trace_param)
@@ -328,10 +328,10 @@ class GeneratePlot():
             # microcom serie for parameter line
         if Microcom_name == 'Microcom' :
             trace_param.extend([
-            dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T DHW Setpoint [°C]", visible=True ,opacity = 1,line=dict(color=self.color_randomized('dark')       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color='lightgrey'       , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color='darkgrey'                          , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color='dark'                              , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T DHW Setpoint [°C]", visible=True ,opacity = 1,line=dict(color='midnightblue'       , width=0.25, dash="dash"),secondary_y = False),
            ])
 
         self.trace_param.extend(trace_param)
@@ -375,7 +375,7 @@ class GeneratePlot():
     def color_randomized(self, collection:str='all')->str:
         '''
         This function allow to randomly select a color
-
+        https://i.sstatic.net/lFZum.png
         Parameter
         ---------
         collection : str defautl value = 'all' 
@@ -448,7 +448,7 @@ class GeneratePlot():
             "T in DHW [°C]":"cyan",
             "T out avg [°C]":"red",
             "Delta T NORM [°C]":"purple",
-            "FLDHW [kg/min]":"seagreen",
+            "FLDHW [kg/min]":"aquamarin",
             "T fume MP[°C]":"gray",
             "T Amb [°C]":"magenta",
             "Cum ener [kWh]":"yellow",
@@ -457,7 +457,7 @@ class GeneratePlot():
             "Pow consumption [W]":"tomato",
             "T sup [°C]":"salmon",
             "T DHW [°C]":"powderblue",
-            "Flame curr [µA]":"limegreen",
+            "Flame curr [µA]":"coral",
             "Burner mod[%]":"violet",
             "T ret [°C]":"deeppink",
             "T fume MC[°C]":"moccasin",
