@@ -17,7 +17,7 @@ print("\t2. Need to compare 2 or more files")
 print("\t3. Need to check and compare all the days from one test")
 print("\tQ : Run for your lives (⊙_⊙;)!!! and quit the application !")
 result = input("Your choice is : ").upper()
-print(type(result),result)
+
 if result=='1':
     Traitement = EcoDesign()
     Traitement.plot_initiate_figure()
@@ -38,6 +38,8 @@ elif result=='2':
         Traitement.plot_initiate_figure()
         Traitement.plot_files_eco_design()
         Traitement.plot_generate_html()
+
+        
     except Exception as e:
         print(f"Ouuuuups, I had an error describe as bellow : \n {e}")  
 elif result=='3':
@@ -50,4 +52,3 @@ elif result=='Q':
     print(" I will miss you .... bye bye 🤙🖐")
     print("-"*50)
     print("-"*50)
-

@@ -169,7 +169,7 @@ class EcoDesign():
             if len(s) < spacementForAnswer:
                 x = spacementForAnswer - len(s)
             return s + (" " * x)
-        
+        print("-"*60)
         #Check if we have all the infos
         if not test_param_set.Test_request: 
             # Test number according to test request. 23146: HM BO 70kW XXL / 24013: MONOTANK BO 70kW XXL / 24022: HM SO 45kW XXL /
