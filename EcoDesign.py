@@ -62,9 +62,8 @@ class ConfigTest:
     Test_request:str=''
     Test_Num:str=''
     Appliance_power:str=''
-    Path: str='' #where to search the data
     ParamSet: EcoDesign_Parameter = None
-    Files_path:list = None #list[dict['FileName':'','path':'','FileType':'']] = None #{'FileName':'','path':'','FileType':''}
+    Files_path:InputFolder = None #list[dict['FileName':'','path':'','FileType':'']] = None #{'FileName':'','path':'','FileType':''}
     collection_file:InputFile=None
     Time_correction:int=0
 
@@ -108,13 +107,10 @@ class EcoDesign():
         try:
             for k,test_param_set in self.test_param_sets.items():
                 self.verifying_input_user(test_param_set) # check and ask the user input on the test (for plot and title name)
-                if test_param_set.Path =='':
-                    # this condition to make the code easier but the folder need to exist
-                    # if not, the user will be asked to select a folder in InputFolder class
-                    test_param_set.Path = f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
+                tempory_path =f"HM\\{test_param_set.Appliance_power}kW\\{test_param_set.Test_request}{test_param_set.Test_Num}"
 
                 # get all the files in the folder selected(will search for 'SEEB''MICROPLAN''MICROCOM' in the file name)
-                test_param_set.Files_path = InputFolder(self.initialDir,test_param_set.Path)
+                test_param_set.Files_path = InputFolder(self.initialDir,tempory_path)
                 #check if the test parameters are present in the database
                 test_param_set.ParamSet = EcoDesign_Parameter(int(test_param_set.Test_request), test_param_set.Test_Num)
                 # import the data from all the files found in folder and keep them in dataframe
@@ -324,7 +320,7 @@ class EcoDesign():
             File_name = f"{self.creatPlotName()}.html"
             if self.test_count==1:
                 for k, v in self.test_param_sets.items():
-                    p = v.Path + '\\' + File_name
+                    p = v.Files_path.Path_Folder + '\\' + File_name
             else:
                 p=f"{getcwd()}\\Comparaison\\{File_name}"
                 print(p)
@@ -351,7 +347,7 @@ class EcoDesign():
         '''
         grouping_text=''
         for k, v in self.test_param_sets.items(): # each test 
-            grouping_text ='' if self.test_count==1 else k # to seperate the trace in group of test
+            grouping_text ='' if self.test_count==1 else f"{v.Test_request}{v.Test_Num}" # to seperate the trace in group of test
             for kx,vx in v.collection_file.FileData.items(): # each file in test (SEEB, microplan, microcom, ...)
                 if not ('Day_' not in kx and per_day) :
                     if 'MICROPLAN' in vx.name:
@@ -393,7 +389,6 @@ class EcoDesign():
                         template_df[f.header_time] = template_df[f.header_time]-limits[2]
                         temporary_dict[f"Day_{i}_{f.name}"] = ConfigFile(
                                                 name  = f.name,
-                                                path = f.path,
                                                 header_time = f.header_time,
                                                 header_cumul_time = f.header_cumul_time,
                                                 data = template_df,
@@ -407,7 +402,6 @@ class EcoDesign():
                         Test_request=test_param_set.Test_request,
                         Test_Num=f"{test_param_set.Test_Num}_day_{i}",
                         Appliance_power=test_param_set.Appliance_power,
-                        Path=test_param_set.Path,
                         ParamSet=test_param_set.ParamSet,
                         Files_path=test_param_set.Files_path,
                         collection_file=InputFile(temporary_dict),

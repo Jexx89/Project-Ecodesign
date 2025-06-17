@@ -4,6 +4,7 @@ Comparaison/
 Schneider/
 log/
 test&examples/
+.venv/
 
 *.html
 *.xlsx

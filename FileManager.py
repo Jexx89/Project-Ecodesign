@@ -535,8 +535,8 @@ class InputFolder():
             parent=root, initialdir=currdir, 
             title='Please select a folder'))
         if len(folderz) > 0:
-            print("INPUT_FOLDER - You chose : %s",folderz)
-            logging.info("INPUT_FOLDER - You chose : %s",folderz)
+            print(f"INPUT_FOLDER - You chose : {folderz}")
+            logging.info(f"INPUT_FOLDER - You chose : {folderz}")
             return folderz
         else:
             print("INPUT_FOLDER - No folder selected!!")

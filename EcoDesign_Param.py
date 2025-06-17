@@ -93,7 +93,7 @@ class EcoDesign_Parameter():
         --------
         return a dataframe with all the parameters of the test
         '''
-        def read_xlsx_to_dict(file_path:str, sheet_name:0):
+        def read_xlsx_to_dict(file_path:str, sheet_name=0):
             '''
             This function read an excel file and convert the data correctly to use it later. 
         
