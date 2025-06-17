@@ -1,7 +1,7 @@
 from EcoDesign import *
 print("-"*50)
 print("-"*50)
-print("\nWelcome to the 🔥🔥 post-processing device 🔥🔥\n")
+print("\nWelcome to the *** post-processing device ***\n")
 print("-"*50)
 print("-"*50)
 print("\nHello my beautifull people This tools is to post process the files that comes with the EcoDesign project.")
@@ -15,7 +15,7 @@ print("First choice is the kind of file you need ?")
 print("\t1. Single file to post process ")
 print("\t2. Need to compare 2 or more files")
 print("\t3. Need to check and compare all the days from one test")
-print("\tQ : Run for your lives (⊙_⊙;)!!! and quit the application !")
+print("\tQ : Run for your lives (O_O;)!!! and quit the application !")
 result = input("Your choice is : ").upper()
 
 if result=='1':
@@ -42,6 +42,7 @@ elif result=='2':
         
     except Exception as e:
         print(f"Ouuuuups, I had an error describe as bellow : \n {e}")  
+        input("Press Enter to exit...")
 elif result=='3':
     Traitement = EcoDesign()
     Traitement.separating_days()
@@ -52,3 +53,5 @@ elif result=='Q':
     print(" I will miss you .... bye bye 🤙🖐")
     print("-"*50)
     print("-"*50)
+
+    input("Press Enter to exit...")

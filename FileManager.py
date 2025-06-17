@@ -312,8 +312,10 @@ class InputFile():
                         )
                 except FileNotFoundError:
                     print(f"Le fichier {path_File} n'a pas été trouvé.")
+                    input("Press Enter to exit...")
                 except Exception as e:
                     print(f"Une erreur s'est produite : {e}")
+                    input("Press Enter to exit...")
                 print(f"INPUT_FILE - Opening file : {path_File}")
                 logging.info(f"INPUT_FILE - Opening file : {path_File}")
             else:
@@ -348,8 +350,10 @@ class InputFile():
                         )
                 except FileNotFoundError:
                     print(f"Le fichier {path_File} n'a pas été trouvé.")
+                    input("Press Enter to exit...")
                 except Exception as e:
                     print(f"Une erreur s'est produite : {e}")
+                    input("Press Enter to exit...")
                 print(f"INPUT_FILE - Opening file : {path_File}")
                 logging.info(f"INPUT_FILE - Opening file : {path_File}")
             else:

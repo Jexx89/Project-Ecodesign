@@ -24,10 +24,12 @@ V1.0 : initial rev
 
 # %% import lib
 import logging
+import json
 from pandas import read_excel, DataFrame
-from os import getcwd, sep
-from time import time
+import os
 
+from time import time
+from tkinter import Tk, filedialog
 
 # %% class EcoDesign_Parameter
 class EcoDesign_Parameter():
@@ -47,6 +49,8 @@ class EcoDesign_Parameter():
         Get one line of dataframe with all the parameter
         '''
         logging.basicConfig(filename='log\\trace.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        self.CONFIG_FILE = 'config.json'
+        self.excel_file = self.get_excel_path()
         self.ALL_DF:DataFrame = []
         self.stime = time()
         self.Test_request = Test_request
@@ -62,6 +66,40 @@ class EcoDesign_Parameter():
         self.ParamAdderCoef = self.test_parameters.at[self.test_parameters.index[0],'ParamAdderCoef']
         self.RangeModulation  = self.test_parameters.at[self.test_parameters.index[0],'RangeModulation ']
         self.SetPointDeltaPump = self.test_parameters.at[self.test_parameters.index[0],'SetPointDeltaPump']
+
+    def load_config(self):
+        if os.path.exists(self.CONFIG_FILE):
+            with open(self.CONFIG_FILE, 'r') as f:
+                try:
+                    return json.load(f)
+                except json.JSONDecodeError:
+                    return {}
+        return {}
+
+    def save_config(self,config):
+        with open(self.CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=4)
+
+    def get_excel_path(self):
+        config = self.load_config()
+        path = config.get("excel_path")
+
+        if path and os.path.exists(path):
+            return path
+
+        # Ask the user to select a file if path not set or doesn't exist
+        Tk().withdraw()  # Hide the root window
+        path = filedialog.askopenfilename(
+            title="Select Excel file",
+            filetypes=[("Excel files", "*.xlsx *.xls")]
+        )
+
+        if path:
+            config["excel_path"] = path
+            self.save_config(config)
+            return path
+        else:
+            raise FileNotFoundError("No Excel file selected.")
 
     def status_param(self):
         '''Function to return the stat of the parameter
@@ -129,15 +167,15 @@ class EcoDesign_Parameter():
                 data = df
             except FileNotFoundError:
                 print(f"Le fichier {file_path} n'a pas été trouvé.")
+                input("Press Enter to exit...")
             except Exception as e:
                 print(f"Une erreur s'est produite : {e}")
+                input("Press Enter to exit...")
             return data
 
-        #file path of our parameter table  
-        file_path_xlsx = f"{getcwd()}{sep}DataTable_TestParam.xlsx"
         #filtering to get only the good test parameter
         sheet_name = 0
-        self.ALL_DF = read_xlsx_to_dict(file_path_xlsx, sheet_name)
+        self.ALL_DF = read_xlsx_to_dict(self.excel_file, sheet_name)
         print(f"ECO_PARAM - Reading data from DB : {time() - self.stime:.2f} sec")
         logging.info(f"ECO_PARAM - Reading data from DB : {time() - self.stime:.2f} sec")
 

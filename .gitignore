@@ -5,10 +5,14 @@ Schneider/
 log/
 test&examples/
 .venv/
+build/
+dist/
 
 *.html
 *.xlsx
 *.log
+*.spec
+*.json
 
 pst_comparing_days.py
 pst_comparing_test.py

@@ -131,6 +131,7 @@ class EcoDesign():
                 self.adding_parameters(test_param_set)
         except errorEcodesign as error :
             print(f"\nError will post processing the file : \n\n{error}")
+            input("Press Enter to exit...")
 
     def verifying_input_user(self, test_param_set:ConfigTest):
         '''
