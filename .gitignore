@@ -2,8 +2,14 @@ HM/
 __pycache__/
 Comparaison/
 Schneider/
+log/
+test&examples/
+
 *.html
 *.xlsx
 *.log
-log/
-test&examples/
+
+pst_comparing_days.py
+pst_comparing_test.py
+pst_test.py
+pst_Zolder.py

@@ -330,7 +330,7 @@ class GeneratePlot():
             trace_param.extend([
             dict(x=df[header_time],y=df["T BURN ON [°C]"]            ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN ON [°C]"     , visible=True ,opacity = 1,line=dict(color='lightgrey'       , width=0.25, dash="dash"),secondary_y = False),
             dict(x=df[header_time],y=df["T BURN OFF [°C]"]           ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T BURN OFF [°C]"    , visible=True ,opacity = 1,line=dict(color='darkgrey'                          , width=0.25, dash="dash"),secondary_y = False),
-            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color='dark'                              , width=0.25, dash="dash"),secondary_y = False),
+            dict(x=df[header_time],y=df["T CH STP [°C]"]             ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T CH STP [°C]"      , visible=True ,opacity = 1,line=dict(color='black'                              , width=0.25, dash="dash"),secondary_y = False),
             dict(x=df[header_time],y=df["T DHW Setpoint [°C]"]       ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T DHW Setpoint [°C]", visible=True ,opacity = 1,line=dict(color='midnightblue'       , width=0.25, dash="dash"),secondary_y = False),
            ])
 
@@ -448,7 +448,7 @@ class GeneratePlot():
             "T in DHW [°C]":"cyan",
             "T out avg [°C]":"red",
             "Delta T NORM [°C]":"purple",
-            "FLDHW [kg/min]":"aquamarin",
+            "FLDHW [kg/min]":"aquamarine",
             "T fume MP[°C]":"gray",
             "T Amb [°C]":"magenta",
             "Cum ener [kWh]":"yellow",
