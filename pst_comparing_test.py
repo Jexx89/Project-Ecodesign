@@ -25,13 +25,28 @@ if __name__ == "__main__":
         Appliance_power ='120',
         Time_correction = 0
     )
-    multitest=  {   f"{first_config.Test_request}{first_config.Test_Num}": first_config,
-                    f"{second_config.Test_request}{second_config.Test_Num}": second_config,
-                    #f"{third_config.Test_request}{third_config.Test_Num}": third_config
-                    }
+    fith_config = ConfigTest(
+        Test_request ='24082',
+        Test_Num ='D',
+        Appliance_power ='45',
+        Time_correction = 0
+    )
+    sixth_config = ConfigTest(
+        Test_request ='25074',
+        Test_Num ='A',
+        Appliance_power ='45',
+        Time_correction = 0
+    )
+    # multitest=  {   f"{first_config.Test_request}{first_config.Test_Num}": first_config,
+    #                 f"{second_config.Test_request}{second_config.Test_Num}": second_config,
+    #                 #f"{third_config.Test_request}{third_config.Test_Num}": third_config
+    #                 }
     # multitest=  {   f"{third_config.Test_request}{third_config.Test_Num}": third_config,
     #                 f"{fourth_config.Test_request}{fourth_config.Test_Num}": fourth_config,
     #                 }
+    multitest=  {   f"{fith_config.Test_request}{fith_config.Test_Num}": fith_config,
+                    f"{sixth_config.Test_request}{sixth_config.Test_Num}": sixth_config,
+                    }
 
 
     Traitement = EcoDesign(multitest)

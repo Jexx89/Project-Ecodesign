@@ -180,7 +180,7 @@ class EcoDesign():
             test_param_set.Test_Num = input(align_input_user("Enter the test letter: ")).upper()  
         if not test_param_set.Appliance_power: 
             # The power of the appliance in kW: 25, 35, 45, 60, 70, 85, 120, 45X, 25X
-            test_param_set.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120, 45X, 25X): "))  
+            test_param_set.Appliance_power = input(align_input_user("Enter the power type (25, 35, 45, 60, 70, 85, 120): "))  
 
     def get_file_to_plot(self,Files_path:InputFolder,value_to_filter=0)->InputFile:
         '''

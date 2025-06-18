@@ -13,6 +13,7 @@ dist/
 *.log
 *.spec
 *.json
+*.ico
 
 pst_comparing_days.py
 pst_comparing_test.py

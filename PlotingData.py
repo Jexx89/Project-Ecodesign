@@ -309,6 +309,14 @@ class GeneratePlot():
         report_name = f"{groupName}Report"
         Microcom_name = f"{groupName}Microcom"
 
+        pumpheader = "Pump PWM %(111F)"
+        if pumpheader not in df:
+            pumpheader = "Pump PWM"
+
+        pumppowerheader = "Pump Power W(65F2)"
+        if pumppowerheader not in df:
+            pumppowerheader = ""
+
 
         self.stime = time()
         trace_param = [
@@ -321,10 +329,12 @@ class GeneratePlot():
             dict(x=df[header_time],y=df["Return [°C]"]               ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T ret [°C]"         , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["T ret [°C]"]         , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["Flue temp [0,01°C]"]        ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "T fume MC[°C]"      , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["T fume MC[°C]"]          , width=1.5, dash="solid"),secondary_y = False),
             dict(x=df[header_time],y=df["Delta T boiler [°C]"]       ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Delta T boiler [°C]", visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["Delta T boiler [°C]"]         , width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["Pump PWM %(111F)"]          ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Pump mod. [%]"      , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["Pump mod. [%]"]         , width=1.5, dash="solid"),secondary_y = False),
-            dict(x=df[header_time],y=df["Pump Power W(65F2)"]        ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Pump power [Watt]"  , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["Pump power [Watt]"]       , width=1.5, dash="solid"),secondary_y = False),
+            dict(x=df[header_time],y=df[pumpheader]                  ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Pump mod. [%]"      , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["Pump mod. [%]"]         , width=1.5, dash="solid"),secondary_y = False),
             #dict(x=df[header_time],y=df["Burner State"]              ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Burner status"      , visible=False ,opacity = 1,line=dict(color="tomato"       , width=1.5, dash="solid"),secondary_y = False),
             ]
+        if pumppowerheader:   
+            trace_param.extend([dict(x=df[header_time],y=df["Pump Power W(65F2)"]        ,legendgroup = Microcom_name,legendgrouptitle_text = Microcom_name ,name = "Pump power [Watt]"  , visible='legendonly' ,opacity = 1,line=dict(color=self.colorDB["Pump power [Watt]"]       , width=1.5, dash="solid"),secondary_y = False)])
+            
             # microcom serie for parameter line
         if Microcom_name == 'Microcom' :
             trace_param.extend([

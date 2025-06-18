@@ -1,4 +1,14 @@
+'''
+---command to activate the virtual environement---
+source .venv/Scripts/activate
+
+---command to generate a .exe file---
+pyinstaller --onefile main.py --name EcoDesign_processing -i "C:/ACV/Coding Library/Python/Project-Ecodesign/Media/plot.ico"
+
+'''
 from EcoDesign import *
+
+
 print("-"*50)
 print("-"*50)
 print("\nWelcome to the *** post-processing device ***\n")
@@ -38,8 +48,6 @@ elif result=='2':
         Traitement.plot_initiate_figure()
         Traitement.plot_files_eco_design()
         Traitement.plot_generate_html()
-
-        
     except Exception as e:
         print(f"Ouuuuups, I had an error describe as bellow : \n {e}")  
         input("Press Enter to exit...")
@@ -55,3 +63,5 @@ elif result=='Q':
     print("-"*50)
 
     input("Press Enter to exit...")
+
+
