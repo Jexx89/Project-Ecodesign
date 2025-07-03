@@ -2,9 +2,9 @@ from EcoDesign import *
 
 if __name__ == "__main__":
     Solo_config = ConfigTest(
-        Test_request ='25069',
-        Test_Num ='B',
-        Appliance_power ='35',
+        Test_request ='25071',
+        Test_Num ='F',
+        Appliance_power ='45',
     )
     test={f"{Solo_config.Test_request}{Solo_config.Test_Num}": Solo_config}
 

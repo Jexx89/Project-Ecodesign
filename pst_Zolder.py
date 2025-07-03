@@ -6,8 +6,9 @@ This script is used to post processing the data from a PLC scnheider, concatenin
 '''
 from PlotingData import *
 from FileManager import *
+from pandas import concat
 #listing all the files in the folder
-Path='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Schneider\\20250610_rapid test'
+Path='C:\\ACV\\Coding Library\\Python\\Project-Ecodesign\\Schneider\\20250702'
 folder = InputFolder(Path_Folder=Path).files_in_folder
 files_to_plot={}
 #creating the ConfigFile dictionary
@@ -37,4 +38,4 @@ plt.creat_figure('Values [°C][%][µA]','Values [bar][volt]')
 plt.add_trace_schneider_plc_zolder(combined_df,'DATE-TIME')
 plt.add_filtered_trace(plt.fig)
 
-plt.creat_html_figure(Path+'\\2025-06-12_Zoler acquisition.html')
+plt.creat_html_figure(Path+'\\2025-07-02_Zoler acquisition.html')

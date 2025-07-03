@@ -2,8 +2,8 @@ from EcoDesign import *
 
 if __name__ == "__main__":
     Solo_config = ConfigTest(
-        Test_request ='24082',
-        Test_Num ='D',
+        Test_request ='25074',
+        Test_Num ='I',
         Appliance_power ='45',
     )
     # Solo_config = ConfigTest(
